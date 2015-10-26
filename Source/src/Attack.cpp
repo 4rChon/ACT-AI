@@ -5,7 +5,7 @@
 
 Attack::Attack(Zone* target)
 {	
-	this->taskType = TaskType::ATT;
+	this->taskType = ATT;
 	this->taskName = "Attack(Zone*)";
 	this->target = target;
 	std::cout << "Attack(" << this->target->getRegion()->getID() << ")\n";
@@ -46,9 +46,12 @@ void Attack::act()
 void Attack::update()
 {
 	if (coalition->isActive())
-	{
+	{		
+		act();
+
 		cleanSubTasks(subTasks);
 		this->complete = true;
+
 		g_Tasks.remove(this);
 	}
 }

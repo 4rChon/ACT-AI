@@ -3,13 +3,14 @@
 
 #include <BWAPI.h>
 
+#include "Agent.h"
+#include "Attack.h"
 #include "Composition.h"
+#include "CreateUnit.h"
 #include "Globals.h"
 #include "Task.h"
 #include "Threatfield.h"
 #include "Zone.h"
-#include "Attack.h"
-
 
 namespace std 
 {
@@ -36,10 +37,11 @@ class Core : public BWAPI::AIModule
 {
 private:
 	//Agentset agents;
-	int tempBool = 0;
+	int tempCounter = 0;
 	bool drawGui;
 	ThreatField* threatField;
 	Attack* attack;
+	//CreateUnit* createUnit;
 
 	//Composition attackComp;
 

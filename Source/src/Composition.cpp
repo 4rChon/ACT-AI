@@ -19,17 +19,15 @@ Composition::Composition(std::unordered_map<BWAPI::UnitType, int> unitMap)
 
 bool Composition::operator==(const Composition& rhs) const
 {
-	std::cout << "Composition: Equating\n";
+	//std::cout << "Composition: Equating\n";
 	//return unitMap == rhs.getUnitMap();
 	if (unitMap.size() != rhs.getUnitMap().size())
 		return false;
 
 	for each(auto unitType in unitMap)
-	{
-		std::cout << "UnitType: " << unitType.second << " == " << rhs.getUnitMap()[unitType.first] << "\n";
+		//std::cout << "UnitType: " << unitType.second << " == " << rhs.getUnitMap()[unitType.first] << "\n";
 		if (unitType.second != rhs.getUnitMap()[unitType.first])
 			return false;
-	}
 	return true;
 }
 

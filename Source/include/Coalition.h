@@ -4,10 +4,12 @@
 
 #include "Composition.h"
 #include "TaskType.h"
+#include "Agent.h"
 
 class Coalition
 {
-private:
+private:	
+	std::unordered_set<Agent*> agentSet;
 	BWAPI::Unitset unitSet;
 	Composition currentComp;
 	Composition targetComp;
@@ -27,10 +29,14 @@ public:
 	std::string getCurrentTaskString() const;
 	TaskType getCurrentTaskType() const;
 	BWAPI::Unitset getUnitSet() const;
+	std::unordered_set<Agent*> getAgentSet() const;
 	Composition getCurrentComp() const;
 	Composition getTargetComp() const;
 
 	//-
 	void addUnit(BWAPI::Unit unit);
+	void addAgent(Agent* agent);	
 	void removeUnit(BWAPI::Unit unit);
+	void removeAgent(Agent* agent);
+	void updateFreeAgents();
 };

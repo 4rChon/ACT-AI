@@ -4,7 +4,7 @@
 
 CreateCoalition::CreateCoalition(Composition composition, Task* task)
 {	
-	this->taskType = TaskType::CRC;
+	this->taskType = CRC;
 	this->taskName = "CreateCoalition(Composition, Task*)";
 	this->taskCoalition = new Coalition(composition, task->getType());
 	task->setCoalition(this->taskCoalition);
@@ -45,14 +45,13 @@ void CreateCoalition::act()
 
 void CreateCoalition::update()
 {
-	if (taskCoalition->isActive())
+	if (this->taskCoalition->isActive())
 	{
-		std::cout << "CreateCoalition Complete\n";
 		this->complete = true;
-		for (auto task : subTasks)
-			g_Tasks.remove(task);
-		this->subTasks.clear();
+
+		cleanSubTasks(this->subTasks);
 		g_Tasks.remove(this);
+
 		return;
 	}
 

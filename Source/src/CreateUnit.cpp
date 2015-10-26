@@ -4,7 +4,7 @@
 
 CreateUnit::CreateUnit(BWAPI::UnitType unitType)
 {
-	this->taskType = TaskType::CRU;
+	this->taskType = CRU;
 	this->taskName = "CreateUnit(unitType)";
 	this->unitType = unitType;
 }
@@ -43,8 +43,9 @@ void CreateUnit::act()
 	if (this->coalition->isActive())
 		if (!this->acting && this->assigned)
 		{
+			std::cout << "Creating Unit\n";
 			if (unitType.isBuilding())
-				this->coalition->getUnitSet().build(unitType);
+				this->coalition->getUnitSet().train(unitType);
 			if (!unitType.isBuilding())
 				this->coalition->getUnitSet().build(unitType);
 			acting = true;
@@ -55,12 +56,12 @@ void CreateUnit::update()
 {
 	if (coalition->isActive())
 	{
-		std::cout << "CreateUnit complete\n";
+		act();
+
 		cleanSubTasks(subTasks);
-		this->complete = true;
-		g_Tasks.remove(this);	
-		return;
+		g_Tasks.remove(this);
+
+		this->complete = true;		
 	}
-	act();
 	
 }

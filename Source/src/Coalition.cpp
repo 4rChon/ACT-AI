@@ -15,7 +15,7 @@ Coalition::Coalition(Composition targetComp, TaskType taskType)
 
 void Coalition::setUnitSet(BWAPI::Unitset unitSet)
 {
-	this->unitSet = unitSet;
+	this->unitSet = unitSet;	
 	currentComp = Composition(unitSet);
 }
 
@@ -55,6 +55,11 @@ BWAPI::Unitset Coalition::getUnitSet() const
 	return this->unitSet;
 }
 
+//std::unordered_set<Agent*> Coalition::getAgentSet() const
+//{
+//	return this->agentSet;
+//}
+
 Composition Coalition::getCurrentComp() const
 {
 	return this->currentComp;
@@ -69,16 +74,31 @@ void Coalition::addUnit(BWAPI::Unit unit)
 {
 	this->unitSet.insert(unitSet.begin(), unit);
 	this->currentComp += unit;
-	std::cout << "A " << unit->getType() << " has joined a coalition\n";
+	//std::cout << "A " << unit->getType() << " has joined a coalition\n";
 	if (!active)
 	{
 		if (currentComp == targetComp)
 		{
-			std::cout << "A coalition has been activated!\n";
-			g_OpenCoalitions.erase(this);
+			//std::cout << "A coalition has been activated!\n";
+			/*for (auto agent : agentSet)
+				g_FreeAgents.erase(agent);*/
+			
+			//g_OpenCoalitions.erase(this);
 			active = true;
 		}
 	}
+}
+
+void Coalition::addAgent(Agent* agent)
+{
+	for (auto type : targetComp.getTypes())
+		if (agent->getUnit()->getType() == type)
+		{
+			std::cout << agent->getUnit()->getType().c_str() << " is joining a coalition\n";
+			agentSet.insert(agentSet.begin(), agent);
+			addUnit(agent->getUnit());
+			return;
+		}
 }
 
 void Coalition::removeUnit(BWAPI::Unit unit)
@@ -86,4 +106,17 @@ void Coalition::removeUnit(BWAPI::Unit unit)
 	this->unitSet.erase(unit);
 	this->currentComp -= unit;
 	std::cout << "A " << unit->getType() << " has left a coalition\n";
+}
+
+void Coalition::removeAgent(Agent* agent)
+{
+	this->agentSet.erase(agent);
+	removeUnit(agent->getUnit());
+}
+
+void Coalition::updateFreeAgents()
+{
+	if (active)
+		for (auto agent : agentSet)
+			g_FreeAgents.erase(agent);
 }
