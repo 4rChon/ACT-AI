@@ -22,7 +22,7 @@ void Attack::assign()
 		//g_OpenCoalitions.insert(coalition);
 
 		Composition composition;
-		composition.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 5);
+		composition.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 9);
 		
 		CreateCoalition* createCoalition = new CreateCoalition(composition, this);
 		g_Tasks.push_back(createCoalition);

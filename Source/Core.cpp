@@ -114,13 +114,7 @@ void Core::onFrame()
 
 	std::unordered_set<Agent*>::iterator agent = g_FreeAgents.begin();
 	while (agent != g_FreeAgents.end())
-	{		
-	/*	if (g_OpenCoalitions.find((*agent)->getCoalition()) != g_OpenCoalitions.end())
-		{
-			g_FreeAgents.insert(*agent);
-			(*agent)->leaveCoalition();
-		}*/
-			
+	{
 		if (!(*agent)->getUnit()->exists())
 		{
 			agent = g_Agents.erase(agent);
@@ -167,9 +161,8 @@ void Core::onFrame()
 	//{
 		//tempCounter++;
 	for (auto coalition : g_Coalitions)
-	{
 		coalition->updateFreeAgents();
-	}
+
 	updateTaskTree(attack);
 	//}
 }

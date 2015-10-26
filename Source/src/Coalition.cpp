@@ -91,14 +91,17 @@ void Coalition::addUnit(BWAPI::Unit unit)
 
 void Coalition::addAgent(Agent* agent)
 {
-	for (auto type : targetComp.getTypes())
-		if (agent->getUnit()->getType() == type)
-		{
-			std::cout << agent->getUnit()->getType().c_str() << " is joining a coalition\n";
-			agentSet.insert(agentSet.begin(), agent);
-			addUnit(agent->getUnit());
-			return;
-		}
+	if (agentSet.find(agent) == agentSet.end())
+	{
+		for (auto type : targetComp.getTypes())
+			if (agent->getUnit()->getType() == type)
+			{
+				std::cout << agent->getUnit()->getType().c_str() << " is joining a coalition\n";
+				agentSet.insert(agentSet.begin(), agent);
+				addUnit(agent->getUnit());
+				return;
+			}
+	}
 }
 
 void Coalition::removeUnit(BWAPI::Unit unit)
