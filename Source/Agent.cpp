@@ -17,6 +17,7 @@ void Agent::setCoalition(Coalition* coalition)
 		for (auto type : coalition->getTargetComp().getTypes())
 			if (this->unit->getType() == type)
 			{
+				std::
 				this->coalition = coalition;
 				this->coalition->addUnit(this->unit);
 				g_FreeAgents.erase(this);
