@@ -1,0 +1,439 @@
+	//std::ifstream readFile("UnitThreat.txt");
+	//std::string line;
+	
+	/*Json::Reader reader;
+	if (readFile.is_open())
+	{
+		while (std::getline(readFile, line))
+		{
+			unitPowerString << line << "\n";
+		}
+		reader.parse(unitPowerString.str(), unitPowerJson);
+		readFile.close();
+	}
+	else
+		std::cout << "unable to open file\n";
+		*/
+
+	/*std::ostringstream unitPowerString;
+
+	//Json::Value unitPowerJson;
+	//Json::StyledWriter styledWriter;
+
+	std::ofstream writeFile("UnitThreat.txt");
+	
+	if (writeFile.is_open())
+	{
+		for (int i = BWAPI::UnitTypes::Enum::Enum::Terran_Marine; i < BWAPI::UnitTypes::Enum::Enum::MAX; i++)
+		{
+			unitTypeThreat.push_back(1);
+			writeFile << unitTypeThreat[i] << "\n";			
+		}
+		writeFile.close();
+	}
+	else
+		std::cout << "unable to open file\n";*/
+
+-------------------------
+
+#include "Zone.h"
+
+Zone::Zone(int x, int y, int width, int height)
+{
+	this->x = x;
+	this->y = y;
+	this->width = width;
+	this->height = height;
+	this->enemyScore = 0;
+	this->friendScore = 0;
+	this->resourceScore = 0;
+	this->confidence = 0;
+	this->unitSet = BWAPI::Unitset::none;
+}
+
+int Zone::getX()
+{
+	return this->x;
+}
+
+int Zone::getY()
+{
+	return this->y;
+}
+
+int Zone::getWidth()
+{
+	return this->width;
+}
+
+int Zone::getHeight()
+{
+	return this->height;
+}
+float Zone::getEnemyScore()
+{
+	return this->enemyScore;
+}
+float Zone::getFriendScore()
+{
+	return this->friendScore;
+}
+float Zone::getResourceScore()
+{
+	return this->resourceScore;
+}
+float Zone::getConfidence()
+{
+	return this->confidence;
+}
+
+BWAPI::Unitset Zone::getUnitSet()
+{
+	return this->unitSet;
+}
+
+BWAPI::Position Zone::getTopLeftPos()
+{
+	return BWAPI::Position(this->x * 32, this->y * 32);
+}
+BWAPI::Position Zone::getBotRightPos()
+{
+	return BWAPI::Position((this->x + this->width) * 32, (this->y + this->height) * 32);
+}
+BWAPI::Position Zone::getCenterPos()
+{
+	return BWAPI::Position((this->x + (this->width / 2)) * 32, (this->y + (this->height / 2)) * 32);
+}
+
+void Zone::setX(int x)
+{
+	this->x = x;
+}
+void Zone::setY(int y)
+{
+	this->y = y;
+}
+void Zone::setWidth(int width)
+{
+	this->width = width;
+}
+void Zone::setHeight(int height)
+{
+	this->height = height;
+}
+void Zone::setEnemyScore(float enemyScore)
+{
+	this->enemyScore = enemyScore;
+}
+void Zone::setFriendScore(float friendScore)
+{
+	this->friendScore = friendScore;
+}
+void Zone::setResourceScore(float resourceScore)
+{
+	this->resourceScore = resourceScore;
+}
+void Zone::setConfidence(float confidence)
+{
+	this->confidence = confidence;
+}
+void Zone::setUnitSet(BWAPI::Unitset unitSet)
+{
+	this->unitSet = unitSet;
+}
+
+--------------------
+
+#pragma once
+#include <BWAPI.h>
+
+class Zone: public BWAPI::AIModule
+{
+private:
+	int x, y, width, height;
+	float enemyScore, friendScore, resourceScore, confidence;
+	BWAPI::Unitset unitSet;
+public:
+	Zone(int x, int y, int width, int height);
+	int getX();
+	int getY();
+	int getWidth();
+	int getHeight();
+	float getEnemyScore();
+	float getFriendScore();
+	float getResourceScore();
+	float getConfidence();
+	BWAPI::Unitset getUnitSet(); //unused
+	BWAPI::Position getTopLeftPos();
+	BWAPI::Position getBotRightPos();
+	BWAPI::Position getCenterPos();
+
+	void setX(int x);
+	void setY(int y);
+	void setWidth(int width);
+	void setHeight(int height);
+	void setEnemyScore(float enemyScore);
+	void setFriendScore(float friendScore);
+	void setResourceScore(float resourceScore);
+	void setConfidence(float confidence);
+	void setUnitSet(BWAPI::Unitset unitSet); //unused
+
+	void incrementThreat(float threat); //unused
+};
+
+-------------------------
+
+#include "ThreatField.h"
+#include "Zone.h"
+#include <BWAPI.h>
+#include <vector>
+#include <cmath>
+#include <iostream>
+
+#include <string>
+#include <fstream>
+#include <sstream>
+
+using namespace BWAPI;
+
+ThreatField::ThreatField(int xCount, int yCount, int width, int height)
+{	
+	this->width = width;
+	this->height = height;
+	
+	float zoneWidth = (float)this->width / (float)xCount;	
+	float zoneHeight = (float)this->height / (float)yCount;	
+	Broodwar << "Map Size is " << this->width << " x " << this->height << std::endl;
+
+	for (int i = 0; i < xCount; i++)
+		for (int j = 0; j < yCount; j++)
+			this->field.push_back(Zone(int(i * zoneWidth), int(j * zoneHeight), (int)zoneWidth, (int)zoneHeight));
+
+	this->size = field.size();
+	
+	std::ifstream readFile("UnitThreat.txt");
+	std::istringstream unitPowerString;
+	
+	if (readFile.is_open())
+	{
+		for (std::string line; std::getline(readFile, line); )	
+		{
+			std::istringstream in(line);
+
+			float val;
+			in >> val;
+			unitTypeThreat.push_back(val);
+		}
+		readFile.close();
+	}
+	else
+		std::cout << "unable to open file\n";	
+}
+
+ThreatField::~ThreatField()
+{
+	std::ofstream writeFile("UnitThreat.txt");
+	if (writeFile.is_open())
+	{
+		for (size_t i = 0; i < unitTypeThreat.size(); i++)
+			writeFile << unitTypeThreat[i] << "\n";
+		writeFile.close();
+	}
+	else
+		std::cout << "unable to open file\n";
+}
+
+int ThreatField::getSize()
+{
+	return this->size;
+}
+
+int ThreatField::getWidth()
+{
+	return this->width;
+}
+
+int ThreatField::getHeight()
+{
+	return this->height;
+}
+
+Zone ThreatField::getZone(int index)
+{
+	return this->field[index];
+}
+
+float ThreatField::getUnitTypeThreat(int unitType)
+{
+	return this->unitTypeThreat[unitType];
+}
+
+std::vector<Zone> ThreatField::getField()
+{
+	return this->field;
+}
+
+void ThreatField::setSize(int size)
+{
+	this->size = size;
+}
+
+void ThreatField::setWidth(int width)
+{
+	this->width = width;
+}
+
+void ThreatField::setHeight(int height)
+{
+	this->height = height;
+}
+
+void ThreatField::setZone(Zone zone, int index)
+{
+	this->field[index] = zone;
+}
+
+void ThreatField::setField(std::vector<Zone> field)
+{
+	this->field = field;
+}
+
+void ThreatField::updateField()
+{
+	int friendCount = 0;	
+	for (int i = 0; i < this->size; i++)
+	{		
+		/* get all friendly units in zone*/
+		auto unitSet = Broodwar->getUnitsInRectangle(
+			Position(
+			this->field[i].getX() * 32,
+			this->field[i].getY() * 32
+			),
+			Position(
+			(this->field[i].getX() + this->field[i].getWidth()) * 32,
+			(this->field[i].getY() + this->field[i].getHeight()) * 32
+			),
+			BWAPI::Filter::IsOwned
+		);
+
+		//this->field[i].setUnitSet(unitSet);
+		friendCount += unitSet.size();
+
+		/* get all opposing units in zone and adjust threat*/
+		if (unitSet.size() > 0)
+		{
+			float enemyScore = 0, friendScore = 0, resourceScore = 0;
+
+			for each (auto unit in Broodwar->getUnitsInRectangle(this->field[i].getTopLeftPos(), this->field[i].getBotRightPos()))
+			{
+				if (unit->getPlayer() == Broodwar->enemy())
+					enemyScore += unit->getType().buildScore() + unit->getType().destroyScore();
+				if (unit->getPlayer() == Broodwar->self())
+					friendScore += unit->getType().buildScore() + unit->getType().destroyScore();
+				if (unit->getType().isResourceContainer())
+					resourceScore += unit->getResources();
+			}
+			this->field[i].setEnemyScore(enemyScore);
+			this->field[i].setFriendScore(friendScore);
+			this->field[i].setResourceScore(resourceScore);
+			
+		}
+					
+
+		int zoneSize = this->field[i].getWidth() * this->field[i].getHeight();
+
+		/* adjust confidence*/
+		for each (auto unit in unitSet)
+		{
+			int sightRange = unit->getType().sightRange();			
+
+			if (this->field[i].getConfidence() < 1.0f)
+				this->field[i].setConfidence(float(this->field[i].getConfidence() + (sightRange * sightRange * (atan(1) * 4)) / (32 * 32 * zoneSize)));			
+		}
+		
+		if (this->field[i].getConfidence() < 0.0005f)
+			this->field[i].setConfidence(0.0f);
+		else if (this->field[i].getConfidence() > 1.0f)
+			this->field[i].setConfidence(1.0f);
+		else
+			this->field[i].setConfidence(this->field[i].getConfidence() * 0.999f);		
+	}	
+}
+
+void ThreatField::setUnitTypeThreat(int unitType, float threatValue)
+{
+	this->unitTypeThreat[unitType] = threatValue;
+}
+
+----------------------------
+
+#pragma once
+#include "Zone.h"
+#include <BWAPI.h>
+#include <vector>
+
+class ThreatField : public BWAPI::AIModule
+{
+private:
+	int size;
+	int width;
+	int height;
+	std::vector<Zone> field;
+	std::vector<float> unitTypeThreat;
+public:
+	//ThreatField(int size, int width, int height);
+	ThreatField(int xCount, int yCount, int width, int height);
+	~ThreatField();
+	int getSize();
+	int getWidth();
+	int getHeight();	
+	Zone getZone(int index);
+	std::vector<Zone> getField();
+	float getUnitTypeThreat(int unitType);
+	
+	void setSize(int size);
+	void setWidth(int width);
+	void setHeight(int height);
+	void setZone(Zone zone, int index);
+	void setField(std::vector<Zone> field);
+	void setUnitTypeThreat(int unitType, float threatValue); //unused
+
+	void updateField();
+	void updateThreat(float threatValue, int index); //unused
+	void updateConfidence();
+};
+
+-----------------
+
+	
+	/*std::ifstream readFile("UnitThreat.txt");
+	std::istringstream unitPowerString;
+	
+	if (readFile.is_open())
+	{
+		for (std::string line; std::getline(readFile, line); )	
+		{
+			std::istringstream in(line);
+
+			float val;
+			in >> val;
+			unitTypeThreat.push_back(val);
+		}
+		readFile.close();
+	}
+	else
+		std::cout << "unable to open file\n";*/
+}
+
+ThreatField::~ThreatField()
+{
+	/*std::ofstream writeFile("UnitThreat.txt");
+	if (writeFile.is_open())
+	{
+		for (size_t i = 0; i < unitTypeThreat.size(); i++)
+			writeFile << unitTypeThreat[i] << "\n";
+		writeFile.close();
+	}
+	else
+		std::cout << "unable to open file\n";*/
+}
