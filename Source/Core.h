@@ -36,7 +36,6 @@ namespace std
 class Core : public BWAPI::AIModule
 {
 private:
-	//Agentset agents;
 	int tempCounter = 0;
 	bool drawGui;
 	ThreatField* threatField;

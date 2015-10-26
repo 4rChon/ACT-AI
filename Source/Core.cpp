@@ -46,7 +46,7 @@ void Core::onStart()
 	attack = new Attack(threatField->getZone(10));
 	//createUnit = new CreateUnit(Broodwar->self()->getRace().getWorker());
 
-	g_Tasks.push_back(attack);
+	//g_Tasks.push_back(attack);
 	//attackComp.addType(Broodwar->self()->getRace().getWorker(), 1);	
 
 	Broodwar->sendText("gl hf");
@@ -143,7 +143,7 @@ void Core::onFrame()
 		std::unordered_set<Coalition*>::iterator coalition = g_OpenCoalitions.begin();
 		while (coalition != g_OpenCoalitions.end())
 		{			
-			(*coalition)->addAgent((*agent));
+			(*coalition)->addAgent((*agent)); //probability parameter
 			if ((*coalition)->isActive())
 			{
 				g_OpenCoalitions.erase(coalition);
@@ -157,14 +157,10 @@ void Core::onFrame()
 	}
 
 
-	//if (tempCounter < 1)
-	//{
-		//tempCounter++;
 	for (auto coalition : g_Coalitions)
-		coalition->updateFreeAgents();
+		coalition->updateFreeAgents();		
 
 	updateTaskTree(attack);
-	//}
 }
 
 void Core::onSendText(std::string text)

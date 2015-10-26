@@ -114,12 +114,21 @@ void Coalition::removeUnit(BWAPI::Unit unit)
 void Coalition::removeAgent(Agent* agent)
 {
 	this->agentSet.erase(agent);
+	g_FreeAgents.insert(agent);
 	removeUnit(agent->getUnit());
 }
 
 void Coalition::updateFreeAgents()
 {
 	if (active)
-		for (auto agent : agentSet)
+		for (auto agent : this->agentSet)
 			g_FreeAgents.erase(agent);
+}
+
+void Coalition::disband()
+{
+	g_FreeAgents.insert(this->agentSet.begin(), this->agentSet.end());
+	this->agentSet.clear();
+	this->unitSet.clear();
+	g_Coalitions.erase(this);
 }

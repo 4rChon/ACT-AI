@@ -39,4 +39,5 @@ public:
 	void removeUnit(BWAPI::Unit unit);
 	void removeAgent(Agent* agent);
 	void updateFreeAgents();
+	void Coalition::disband();
 };

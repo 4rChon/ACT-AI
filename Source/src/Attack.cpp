@@ -22,10 +22,9 @@ void Attack::assign()
 		//g_OpenCoalitions.insert(coalition);
 
 		Composition composition;
-		composition.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 9);
+		composition.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 5);
 		
-		CreateCoalition* createCoalition = new CreateCoalition(composition, this);
-		g_Tasks.push_back(createCoalition);
+		CreateCoalition* createCoalition = new CreateCoalition(composition, this);		
 		subTasks.push_back(createCoalition);
 		this->assigned = true;
 	}
@@ -50,7 +49,9 @@ void Attack::update()
 		act();
 
 		cleanSubTasks(subTasks);
+
 		this->complete = true;
+		coalition->disband();
 
 		g_Tasks.remove(this);
 	}

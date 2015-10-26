@@ -22,7 +22,8 @@ void CreateUnit::assign()
 		if (unitType.supplyRequired() > BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed())
 		{
 			std::cout << "You must construct additional pylons\n";
-			//subTasks.push_back(CreateUnit(supplyProvider));
+			CreateUnit* createUnit = new CreateUnit(BWAPI::Broodwar->self()->getRace().getSupplyProvider());
+			subTasks.push_back(createUnit);
 		}
 
 		Composition producer;
@@ -33,7 +34,6 @@ void CreateUnit::assign()
 		
 		CreateCoalition* createCoalition = new CreateCoalition(producer, this);
 		subTasks.push_back(createCoalition);
-		g_Tasks.push_back(createCoalition);
 		assigned = true;
 	}
 }
@@ -54,14 +54,16 @@ void CreateUnit::act()
 
 void CreateUnit::update()
 {
-	if (coalition->isActive())
+	if (!coalition->isActive() && !this->complete)
 	{
 		act();
 
-		cleanSubTasks(subTasks);
-		g_Tasks.remove(this);
+		cleanSubTasks(subTasks);		
 
-		this->complete = true;		
+		this->complete = true;
+
+		g_Tasks.remove(this);
+		//coalition->disband();
 	}
 	
 }

@@ -8,6 +8,7 @@ Task::Task()
 	complete = false;
 	assigned = false;
 	acting = false;
+	g_Tasks.push_back(this);
 }
 
 void Task::update()

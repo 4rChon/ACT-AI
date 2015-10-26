@@ -22,7 +22,6 @@ void CreateCoalition::assign()
 				{
 					std::cout << "Coalition Requires more " << unitType.c_str() << "\n";
 					CreateUnit* createUnit = new CreateUnit(unitType);
-					g_Tasks.push_back(createUnit);
 					this->subTasks.push_back(createUnit);
 				}
 		this->assigned = true;
@@ -37,7 +36,6 @@ void CreateCoalition::act()
 		{
 			//std::cout << "Coalition Requires more " << unitType.c_str() << "\n";			
 			//CreateUnit* createUnit = new CreateUnit(unitType);
-			//g_Tasks.push_back(createUnit);
 			//this->subTasks.push_back(createUnit);
 		}
 	}
@@ -45,12 +43,14 @@ void CreateCoalition::act()
 
 void CreateCoalition::update()
 {
-	if (this->taskCoalition->isActive())
-	{
-		this->complete = true;
+	if (this->assigned && this->taskCoalition->isActive())
+	{		
+		cleanSubTasks(this->subTasks);		
 
-		cleanSubTasks(this->subTasks);
-		g_Tasks.remove(this);
+		this->complete = true;
+		coalition->disband();
+
+		g_Tasks.remove(this);		
 
 		return;
 	}
