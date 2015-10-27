@@ -11,6 +11,11 @@ Task::Task()
 	g_Tasks.push_back(this);
 }
 
+void Task::act()
+{
+	acting = true;
+}
+
 void Task::update()
 {
 	int completeCount = 0;
@@ -23,7 +28,7 @@ void Task::update()
 	{
 		//std::cout << "Task Complete\n";
 		complete = true;
-		subTasks.clear();
+		cleanSubTasks();
 	}
 }
 
@@ -58,11 +63,11 @@ Coalition* Task::getCoalition() const
 	return coalition;
 }
 
-void Task::cleanSubTasks(std::list<Task*> subTasks)
+void Task::cleanSubTasks()
 {
-	for (auto task : subTasks)
+	for (auto task : this->subTasks)
 	{
-		cleanSubTasks(task->getSubTasks());
+		task->cleanSubTasks();
 		g_Tasks.remove(task);
 	}
 }

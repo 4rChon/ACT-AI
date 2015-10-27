@@ -26,6 +26,7 @@ class Composition
 {
 private:
 	std::unordered_map<BWAPI::UnitType, int> unitMap;
+	double cost = 0;
 public:
 	//setters
 	Composition();

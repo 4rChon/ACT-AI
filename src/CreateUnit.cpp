@@ -1,6 +1,7 @@
 #include "CreateUnit.h"
 #include "CreateCoalition.h"
 #include "Globals.h"
+#include "SatisfyRequirement.h"
 
 CreateUnit::CreateUnit(BWAPI::UnitType unitType)
 {
@@ -13,10 +14,12 @@ void CreateUnit::assign()
 {
 	if (!assigned)
 	{
+		std::cout << "Assigning Create " << unitType.c_str() << "\n";
 		if (!g_isUnlocked[unitType])
 		{
 			std::cout << unitType.c_str() << " unavailable\n";
-			//	subTasks.push_back(SatisfyRequirement(unitType));
+			SatisfyRequirement* satisfyRequirement = new SatisfyRequirement(unitType);
+			subTasks.push_back(satisfyRequirement);
 		}
 
 		if (unitType.supplyRequired() > BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed())
@@ -40,30 +43,61 @@ void CreateUnit::assign()
 
 void CreateUnit::act()
 {
-	if (this->coalition->isActive())
-		if (!this->acting && this->assigned)
+	if (!this->acting && this->assigned)
+	{
+
+		if (unitType.mineralPrice() > BWAPI::Broodwar->self()->minerals())
 		{
-			std::cout << "Creating Unit\n";
-			if (unitType.isBuilding())
-				this->coalition->getUnitSet().train(unitType);
-			if (!unitType.isBuilding())
-				this->coalition->getUnitSet().build(unitType);
-			acting = true;
+			//CreateUnit* createUnit = new CreateUnit(BWAPI::Broodwar->self()->getRace().getWorker());
+			//subTasks.push_back(createUnit);
+			return;
 		}
+		std::cout << "Creating Unit\n";
+		if (unitType.whatBuilds().first.isBuilding())
+		{
+			this->coalition->getUnitSet().train(unitType);
+			this->acting = true;
+			this->complete = true;
+		}
+		else if (unitType.isBuilding())
+		{
+			for (auto builder : this->coalition->getUnitSet())
+			{
+				BWAPI::TilePosition targetBuildLocation = BWAPI::Broodwar->getBuildLocation(unitType, builder->getTilePosition());
+				if (targetBuildLocation)
+				{
+					if (builder->build(unitType, targetBuildLocation))
+					{
+						this->acting = true;
+						this->complete = true;
+					}
+					// Register an event that draws the target build location
+					auto ut = unitType;
+					BWAPI::Broodwar->registerEvent([targetBuildLocation, ut](BWAPI::Game*)
+					{
+						BWAPI::Broodwar->drawBoxMap(BWAPI::Position(targetBuildLocation),
+							BWAPI::Position(targetBuildLocation + ut.tileSize()),
+							BWAPI::Colors::Blue);
+					},
+						nullptr,  // condition
+						ut.buildTime() + 100);  // frames to run
+				}
+			}
+		}
+	}		
 }
 
 void CreateUnit::update()
 {
-	if (!coalition->isActive() && !this->complete)
+	if (this->coalition->isActive() && !this->complete)
 	{
 		act();
 
-		cleanSubTasks(subTasks);		
-
-		this->complete = true;
+		cleanSubTasks();		
 
 		g_Tasks.remove(this);
-		//coalition->disband();
 	}
-	
+
+	if (this->complete)
+		coalition->disband();
 }

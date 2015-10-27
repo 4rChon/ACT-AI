@@ -8,7 +8,7 @@ Composition::Composition(BWAPI::Unitset unitSet)
 {
 	for (auto unit : unitSet)
 	{
-		this->addUnit(unit);
+		this->addUnit(unit);		
 	}
 }
 
@@ -34,12 +34,14 @@ bool Composition::operator==(const Composition& rhs) const
 Composition Composition::operator+=(const BWAPI::Unit& rhs)
 {
 	this->unitMap[rhs->getType()]++;
+	cost += (rhs->getType().gasPrice() * 1.5) + (rhs->getType().mineralPrice());
 	return *this;
 }
 
 Composition Composition::operator-=(const BWAPI::Unit& rhs)
 {
 	this->unitMap[rhs->getType()]--;
+	cost -= (rhs->getType().gasPrice() * 1.5) + (rhs->getType().mineralPrice());
 	return *this;
 }
 
@@ -65,9 +67,11 @@ std::unordered_map<BWAPI::UnitType, int> Composition::getUnitMap() const
 void Composition::addType(BWAPI::UnitType unitType, int count)
 {
 	unitMap.insert(std::pair<BWAPI::UnitType, int>(unitType, count));
+	cost += (unitType.gasPrice() * 1.5) + (unitType.mineralPrice()) * count;
 }
 
 void Composition::addUnit(BWAPI::Unit unit)
 {
 	addType(unit->getType(), 1);
+	cost += (unit->getType().gasPrice() * 1.5) + (unit->getType().mineralPrice());
 }

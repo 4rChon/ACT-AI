@@ -32,9 +32,9 @@ public:
 
 	//-
 	virtual void assign() = 0;
-	virtual void act() = 0;
+	virtual void act();
 	virtual void update();
-	virtual void cleanSubTasks(std::list<Task*> subTasks);
+	virtual void cleanSubTasks();
 	virtual std::string toString() const;
 
 };

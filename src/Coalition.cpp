@@ -79,7 +79,7 @@ void Coalition::addUnit(BWAPI::Unit unit)
 	{
 		if (currentComp == targetComp)
 		{
-			//std::cout << "A coalition has been activated!\n";
+			std::cout << "A coalition has been activated!\n";
 			/*for (auto agent : agentSet)
 				g_FreeAgents.erase(agent);*/
 			

@@ -17,13 +17,9 @@ void Attack::assign()
 	{
 		//Scout* scout = new Scout(target);
 		//subTasks.push_back(scout);
-		//this->coalition = new Coalition(composition, this->taskType);
-		//g_Coalitions.insert(coalition);
-		//g_OpenCoalitions.insert(coalition);
 
 		Composition composition;
-		composition.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 5);
-		
+		composition.addType(BWAPI::UnitTypes::Terran_Marine, 5);		
 		CreateCoalition* createCoalition = new CreateCoalition(composition, this);		
 		subTasks.push_back(createCoalition);
 		this->assigned = true;
@@ -32,12 +28,15 @@ void Attack::assign()
 
 void Attack::act()
 {
-	if (this->coalition->isActive())
+	if (!acting)
 	{
-		if (!this->acting && this->assigned)
+		if (this->coalition->isActive())
 		{
-			this->coalition->getUnitSet().attack(this->target->getRegion()->getCenter());
-			acting = true;
+			if (!this->acting && this->assigned)
+			{
+				this->coalition->getUnitSet().attack(this->target->getRegion()->getCenter());
+				acting = true;
+			}
 		}
 	}
 }
@@ -45,10 +44,10 @@ void Attack::act()
 void Attack::update()
 {
 	if (coalition->isActive())
-	{		
+	{
 		act();
 
-		cleanSubTasks(subTasks);
+		cleanSubTasks();
 
 		this->complete = true;
 		coalition->disband();

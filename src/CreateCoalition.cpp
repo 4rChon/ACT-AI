@@ -30,25 +30,29 @@ void CreateCoalition::assign()
 
 void CreateCoalition::act()
 {
-	for (auto unitType : taskCoalition->getTargetComp().getTypes())
+	if (!acting)
 	{
-		if (taskCoalition->getCurrentComp()[unitType] < taskCoalition->getTargetComp()[unitType])
+		for (auto unitType : taskCoalition->getTargetComp().getTypes())
 		{
-			//std::cout << "Coalition Requires more " << unitType.c_str() << "\n";			
-			//CreateUnit* createUnit = new CreateUnit(unitType);
-			//this->subTasks.push_back(createUnit);
+			if (taskCoalition->getCurrentComp()[unitType] < taskCoalition->getTargetComp()[unitType])
+			{
+				//std::cout << "Coalition Requires more " << unitType.c_str() << "\n";			
+				//CreateUnit* createUnit = new CreateUnit(unitType);
+				//this->subTasks.push_back(createUnit);
+			}
 		}
 	}
+	acting = true;
 }
 
 void CreateCoalition::update()
 {
-	if (this->assigned && this->taskCoalition->isActive())
+	if (this->taskCoalition->isActive())
 	{		
-		cleanSubTasks(this->subTasks);		
+		cleanSubTasks();
 
 		this->complete = true;
-		coalition->disband();
+		//this->coalition->disband();
 
 		g_Tasks.remove(this);		
 
