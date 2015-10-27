@@ -15,6 +15,7 @@ private:
 	Composition targetComp;
 	TaskType currentTask;
 	bool active;
+	int age;
 public:
 	//constructors
 	Coalition();
@@ -22,7 +23,7 @@ public:
 
 	//setters
 	void setUnitSet(BWAPI::Unitset unitSet);
-	void setActive(bool active);
+	void setActive(bool active);	
 
 	//getters
 	bool isActive() const;
@@ -32,6 +33,7 @@ public:
 	std::unordered_set<Agent*> getAgentSet() const;
 	Composition getCurrentComp() const;
 	Composition getTargetComp() const;
+	int getAge() const;
 
 	//-
 	void addUnit(BWAPI::Unit unit);

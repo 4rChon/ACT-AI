@@ -12,21 +12,21 @@ CreateUnit::CreateUnit(BWAPI::UnitType unitType)
 
 void CreateUnit::assign()
 {
-	if (!assigned)
+	if (!this->assigned)
 	{
 		std::cout << "Assigning Create " << unitType.c_str() << "\n";
 		if (!g_isUnlocked[unitType])
 		{
 			std::cout << unitType.c_str() << " unavailable\n";
 			SatisfyRequirement* satisfyRequirement = new SatisfyRequirement(unitType);
-			subTasks.push_back(satisfyRequirement);
+			this->subTasks.push_back(satisfyRequirement);
 		}
 
 		if (unitType.supplyRequired() > BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed())
 		{
 			std::cout << "You must construct additional pylons\n";
 			CreateUnit* createUnit = new CreateUnit(BWAPI::Broodwar->self()->getRace().getSupplyProvider());
-			subTasks.push_back(createUnit);
+			this->subTasks.push_back(createUnit);
 		}
 
 		Composition producer;
@@ -36,8 +36,8 @@ void CreateUnit::assign()
 			std::cout << "\t" << unit.first.c_str() << " : " << unit.second << "\n";
 		
 		CreateCoalition* createCoalition = new CreateCoalition(producer, this);
-		subTasks.push_back(createCoalition);
-		assigned = true;
+		this->subTasks.push_back(createCoalition);
+		this->assigned = true;
 	}
 }
 
@@ -53,13 +53,13 @@ void CreateUnit::act()
 			return;
 		}
 		std::cout << "Creating Unit\n";
-		if (unitType.whatBuilds().first.isBuilding())
+		if (this->unitType.whatBuilds().first.isBuilding())
 		{
 			this->coalition->getUnitSet().train(unitType);
 			this->acting = true;
 			this->complete = true;
 		}
-		else if (unitType.isBuilding())
+		else if (this->unitType.isBuilding())
 		{
 			for (auto builder : this->coalition->getUnitSet())
 			{
@@ -72,15 +72,14 @@ void CreateUnit::act()
 						this->complete = true;
 					}
 					// Register an event that draws the target build location
-					auto ut = unitType;
-					BWAPI::Broodwar->registerEvent([targetBuildLocation, ut](BWAPI::Game*)
+					BWAPI::Broodwar->registerEvent([this, targetBuildLocation](BWAPI::Game*)
 					{
 						BWAPI::Broodwar->drawBoxMap(BWAPI::Position(targetBuildLocation),
-							BWAPI::Position(targetBuildLocation + ut.tileSize()),
+							BWAPI::Position(targetBuildLocation + this->unitType.tileSize()),
 							BWAPI::Colors::Blue);
 					},
 						nullptr,  // condition
-						ut.buildTime() + 100);  // frames to run
+						this->unitType.buildTime() + 100);  // frames to run
 				}
 			}
 		}

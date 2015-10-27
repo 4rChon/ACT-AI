@@ -142,7 +142,7 @@ void Core::onFrame()
 
 		std::unordered_set<Coalition*>::iterator coalition = g_OpenCoalitions.begin();
 		while (coalition != g_OpenCoalitions.end())
-		{			
+		{
 			(*coalition)->addAgent((*agent)); //probability parameter
 			if ((*coalition)->isActive())
 			{
@@ -155,7 +155,6 @@ void Core::onFrame()
 		threatField->getZone((*agent)->getUnit()->getRegion()->getID())->updateZone();
 		++agent;
 	}
-
 
 	for (auto coalition : g_Coalitions)
 		coalition->updateFreeAgents();		

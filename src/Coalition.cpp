@@ -4,6 +4,7 @@
 Coalition::Coalition()
 { 
 	active = false;
+	age = BWAPI::Broodwar->getFrameCount();
 }
 
 Coalition::Coalition(Composition targetComp, TaskType taskType)
@@ -11,6 +12,7 @@ Coalition::Coalition(Composition targetComp, TaskType taskType)
 	active = false;
 	this->targetComp = targetComp;
 	this->currentTask = taskType;
+	age = BWAPI::Broodwar->getFrameCount();
 }
 
 void Coalition::setUnitSet(BWAPI::Unitset unitSet)
@@ -68,6 +70,11 @@ Composition Coalition::getCurrentComp() const
 Composition Coalition::getTargetComp() const
 {
 	return this->targetComp;
+}
+
+int Coalition::getAge() const
+{
+	return BWAPI::Broodwar->getFrameCount() - age;
 }
 
 void Coalition::addUnit(BWAPI::Unit unit)

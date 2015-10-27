@@ -19,7 +19,7 @@ void Attack::assign()
 		//subTasks.push_back(scout);
 
 		Composition composition;
-		composition.addType(BWAPI::UnitTypes::Terran_Marine, 5);		
+		composition.addType(BWAPI::UnitTypes::Terran_Marine, 10);		
 		CreateCoalition* createCoalition = new CreateCoalition(composition, this);		
 		subTasks.push_back(createCoalition);
 		this->assigned = true;
@@ -50,7 +50,7 @@ void Attack::update()
 		cleanSubTasks();
 
 		this->complete = true;
-		coalition->disband();
+		//coalition->disband();
 
 		g_Tasks.remove(this);
 	}

@@ -15,6 +15,7 @@ protected:
 	bool assigned;
 	bool complete;
 	bool acting;
+	int age;
 	Coalition* coalition;	
 public:
 	//constructors

@@ -9,6 +9,7 @@ Task::Task()
 	assigned = false;
 	acting = false;
 	g_Tasks.push_back(this);
+	age = BWAPI::Broodwar->getFrameCount();
 }
 
 void Task::act()
