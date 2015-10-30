@@ -52,7 +52,6 @@ void CreateUnit::act()
 			//subTasks.push_back(createUnit);
 			return;
 		}
-		std::cout << "Creating Unit\n";
 		if (this->unitType.whatBuilds().first.isBuilding())
 		{
 			this->coalition->getUnitSet().train(unitType);

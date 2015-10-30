@@ -43,7 +43,7 @@ void Core::onStart()
 	drawGui = false;
 
 	threatField = new ThreatField(Broodwar->getAllRegions());
-	attack = new Attack(threatField->getZone(10));
+	attack = new Attack(threatField->getZone(20));
 	//createUnit = new CreateUnit(Broodwar->self()->getRace().getWorker());
 
 	//g_Tasks.push_back(attack);
@@ -152,7 +152,13 @@ void Core::onFrame()
 			++coalition;
 		}
 
+		if ((*agent)->getUnit()->getType().isWorker() && (*agent)->getUnit()->isIdle())
+		{ 
+			(*agent)->getUnit()->gather((*agent)->getUnit()->getClosestUnit(IsMineralField || IsRefinery));
+		}		
+
 		threatField->getZone((*agent)->getUnit()->getRegion()->getID())->updateZone();
+
 		++agent;
 	}
 
