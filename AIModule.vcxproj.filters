@@ -1,0 +1,99 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="TODO">
+      <UniqueIdentifier>{b8b70bdb-bac8-49b5-ab80-f31b4f3eb978}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include">
+      <UniqueIdentifier>{750d0683-e292-4498-91ab-b0bab606e7fc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src">
+      <UniqueIdentifier>{bfc5a929-e2ca-459d-a550-356145b4adc2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="include\Agent.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Attack.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Coalition.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Composition.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Core.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CreateCoalition.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\CreateUnit.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Globals.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Task.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\TaskType.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Threatfield.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\Zone.h">
+      <Filter>include</Filter>
+    </ClInclude>
+    <ClInclude Include="include\SatisfyRequirement.h">
+      <Filter>include</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="src\Agent.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Attack.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Coalition.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Composition.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Core.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CreateCoalition.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\CreateUnit.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Dll.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Globals.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Task.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ThreatField.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Zone.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="src\SatisfyRequirement.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
