@@ -93,6 +93,11 @@ void CreateUnit::act()
 						nullptr,  // condition
 						this->unitType.buildTime() + 100);  // frames to run
 				}
+				else if (this->unitType.requiresPsi())
+				{
+					CreateUnit* createUnit = new CreateUnit(BWAPI::UnitTypes::Protoss_Pylon);
+					this->subTasks.push_back(createUnit);
+				}
 			}
 		}
 		else

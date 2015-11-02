@@ -17,7 +17,7 @@ void SatisfyRequirement::assign()
 		{
 			CreateUnit* createUnit = new CreateUnit(this->unitType.whatBuilds().first);
 			subTasks.push_back(createUnit);
-		}
+		}		
 
 		for each (auto requirement in unitType.requiredUnits())
 		{
