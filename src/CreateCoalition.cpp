@@ -27,10 +27,13 @@ void CreateCoalition::assign()
 			BWAPI::Broodwar->registerEvent([this, unitType](BWAPI::Game*)
 			{
 				if (this->taskCoalition->getCurrentComp()[unitType] < this->taskCoalition->getTargetComp()[unitType])
-				{
-					std::cout << "Coalition Requires more " << unitType.c_str() << "\n";
-					CreateUnit* createUnit = new CreateUnit(unitType);
-					this->subTasks.push_back(createUnit);
+				{					
+					if (unitType != BWAPI::UnitTypes::Zerg_Larva)
+					{
+						std::cout << "Coalition Requires more " << unitType.c_str() << "\n";
+						CreateUnit* createUnit = new CreateUnit(unitType);
+						this->subTasks.push_back(createUnit);
+					}
 				}
 			},
 			[this](BWAPI::Game*){return !this->taskCoalition->isActive(); },
@@ -43,7 +46,7 @@ void CreateCoalition::assign()
 
 void CreateCoalition::act()
 {
-	if (!acting)
+	/*if (!acting)
 	{
 		for (auto unitType : taskCoalition->getTargetComp().getTypes())
 		{
@@ -54,8 +57,8 @@ void CreateCoalition::act()
 				//this->subTasks.push_back(createUnit);
 			}
 		}
-	}
-	acting = true;
+	}*/
+	//acting = true;
 }
 
 void CreateCoalition::update()

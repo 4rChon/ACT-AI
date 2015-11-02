@@ -32,6 +32,8 @@ void updateSatisfied()
 					g_isUnlocked[buildsThis] = true;
 				}
 
+	if (Broodwar->self()->getRace() == Races::Zerg)
+		g_isUnlocked[UnitTypes::Zerg_Larva] = true;
 }
 
 void Core::onStart()
@@ -81,6 +83,7 @@ void Core::onStart()
 void Core::onEnd(bool isWinner)
 {
 	delete threatField;
+	delete attack;
 	if (isWinner)
 	{
 	}
@@ -117,7 +120,7 @@ void Core::onFrame()
 	{
 		if (!(*agent)->getUnit()->exists())
 		{
-			agent = g_Agents.erase(agent);
+			g_Agents.erase(agent);
 			agent = g_FreeAgents.erase(agent);
 			continue;
 		}
@@ -146,7 +149,7 @@ void Core::onFrame()
 			(*coalition)->addAgent((*agent)); //probability parameter
 			if ((*coalition)->isActive())
 			{
-				g_OpenCoalitions.erase(coalition);
+				coalition = g_OpenCoalitions.erase(coalition);
 				break;
 			}
 			++coalition;
@@ -163,7 +166,7 @@ void Core::onFrame()
 	}
 
 	for (auto coalition : g_Coalitions)
-		coalition->updateFreeAgents();		
+		coalition->updateFreeAgents();
 
 	updateTaskTree(attack);
 }

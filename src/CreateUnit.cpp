@@ -45,17 +45,22 @@ void CreateUnit::act()
 {
 	if (!this->acting && this->assigned)
 	{
-
-		if (unitType.mineralPrice() > BWAPI::Broodwar->self()->minerals())
+		this->acting = true;
+		if (unitType.mineralPrice() > BWAPI::Broodwar->self()->minerals() && unitType != BWAPI::Broodwar->self()->getRace().getWorker())
 		{
-			//CreateUnit* createUnit = new CreateUnit(BWAPI::Broodwar->self()->getRace().getWorker());
-			//subTasks.push_back(createUnit);
+			this->complete = true;
+			/*CreateUnit* createUnit = new CreateUnit(BWAPI::Broodwar->self()->getRace().getWorker());
+			subTasks.push_back(createUnit);*/
 			return;
 		}
 		if (this->unitType.whatBuilds().first.isBuilding())
 		{
 			this->coalition->getUnitSet().train(unitType);
-			this->acting = true;
+			this->complete = true;
+		}
+		else if (this->unitType.whatBuilds().first == BWAPI::UnitTypes::Zerg_Larva)
+		{
+			this->coalition->getUnitSet().morph(unitType);
 			this->complete = true;
 		}
 		else if (this->unitType.isBuilding())
@@ -65,9 +70,17 @@ void CreateUnit::act()
 				BWAPI::TilePosition targetBuildLocation = BWAPI::Broodwar->getBuildLocation(unitType, builder->getTilePosition());
 				if (targetBuildLocation)
 				{
+					/*if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
+					{
+						builder->move(BWAPI::Position(targetBuildLocation.x, targetBuildLocation.y));
+						if (builder->morph(true))
+						{
+							this->acting = true;
+							this->complete = true;
+						}
+					}*/
 					if (builder->build(unitType, targetBuildLocation))
 					{
-						this->acting = true;
 						this->complete = true;
 					}
 					// Register an event that draws the target build location
@@ -81,6 +94,12 @@ void CreateUnit::act()
 						this->unitType.buildTime() + 100);  // frames to run
 				}
 			}
+		}
+		else
+		{
+			std::cout << "I don't know what to do\n";
+			std::cout << "\t" << this->unitType.c_str() << "\n";
+			std::cout << "\t" << this->unitType.whatBuilds().first.c_str() << "\n";
 		}
 	}		
 }

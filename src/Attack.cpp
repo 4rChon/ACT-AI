@@ -19,7 +19,7 @@ void Attack::assign()
 		//subTasks.push_back(scout);
 
 		Composition composition;
-		composition.addType(BWAPI::UnitTypes::Terran_Marine, 10);		
+		composition.addType(BWAPI::UnitTypes::Terran_Marine, 20);		
 		CreateCoalition* createCoalition = new CreateCoalition(composition, this);		
 		subTasks.push_back(createCoalition);
 		this->assigned = true;
