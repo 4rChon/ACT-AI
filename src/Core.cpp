@@ -121,7 +121,7 @@ void Core::onFrame()
 	{
 		if (!(*agent)->getUnit()->exists())
 		{
-			g_Agents.erase(*agent);
+			g_Agents.erase(agent);
 			agent = g_FreeAgents.erase(agent);
 			continue;
 		}
@@ -224,6 +224,10 @@ void Core::onUnitCreate(BWAPI::Unit unit)
 void Core::onUnitDestroy(BWAPI::Unit unit)
 {
 	updateSatisfied();
+	if (unit->getPlayer() == Broodwar->self())
+	{
+		g_TotalCount[unit->getType()]--;
+	}
 }
 
 void Core::onUnitMorph(BWAPI::Unit unit)

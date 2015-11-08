@@ -18,7 +18,7 @@ void Attack::assign()
 		std::cout << "Attack: Assign\n";
 		Composition c;
 		//c.addType(BWAPI::UnitTypes::Terran_Marine, 10);
-		c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 20);
+		c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 10);
 		CreateCoalition *createCoalition = new CreateCoalition(c, this);
 		addSubTask(createCoalition);
 		this->assigned = true;
@@ -34,7 +34,6 @@ void Attack::act()
 		this->coalition->getUnitSet().attack(this->target->getRegion()->getCenter());
 		this->acting = true;
 	}
-
 }
 
 void Attack::update()

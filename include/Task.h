@@ -24,9 +24,13 @@ public:
 	
 	//setters
 	virtual void setCoalition(Coalition* coalition);
+	virtual void setAssigned(bool assigned);
+	virtual void setActing(bool acting);
+	virtual void setComplete(bool complete);
 
 	//getters
 	virtual bool isAssigned() const;
+	virtual bool isActing() const;
 	virtual bool isComplete() const;
 	virtual std::list<Task*> getSubTasks() const;
 	virtual TaskType getType() const;

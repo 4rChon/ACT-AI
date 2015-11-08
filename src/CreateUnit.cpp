@@ -30,19 +30,14 @@ void CreateUnit::assign()
 void CreateUnit::act()
 {
 	if (!this->acting)
-	{		
-		BWAPI::Broodwar->registerEvent(
-		[this](BWAPI::Game*)
+	{	
+		std::cout << "I need " << unitCount << " more " << this->unitType.c_str() << "\n";
+		for (int i = 0; i < unitCount; i++)
 		{			
-			std::cout << "CreateUnit: Acting\n";
-			this->coalition->getUnitSet().train(this->unitType);			
-		},
-		[this](BWAPI::Game*)
-		{
-			return !this->coalition->getUnitSet().train(this->unitType);
-		},
-		this->unitCount);		
-		
+			if (!this->coalition->getUnitSet().train(this->unitType))
+				return;
+			else unitCount--;
+		}
 		this->acting = true;
 	}
 }

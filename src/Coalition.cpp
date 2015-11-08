@@ -128,12 +128,19 @@ void Coalition::removeAgent(Agent* agent)
 void Coalition::updateFreeAgents()
 {
 	if (active)
+	{
 		for (auto agent : this->agentSet)
+		{
+			if (!agent->getUnit()->exists())
+				g_Agents.erase(agent);
 			g_FreeAgents.erase(agent);
+		}
+	}
 }
 
 void Coalition::disband()
 {
+	this->active = false;
 	g_FreeAgents.insert(this->agentSet.begin(), this->agentSet.end());
 	this->agentSet.clear();
 	this->unitSet.clear();

@@ -41,6 +41,7 @@ void CreateCoalition::act()
 		Composition differenceComposition = this->taskCoalition->getTargetComp() - this->taskCoalition->getCurrentComp();
 		for (auto unitType : differenceComposition.getTypes())
 		{
+			std::cout << "I need " << differenceComposition[unitType] << " more " << unitType.c_str() << "\n";
 			CreateUnit *createUnit = new CreateUnit(unitType, differenceComposition[unitType]);
 			this->addSubTask(createUnit);
 		}
