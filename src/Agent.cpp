@@ -57,12 +57,14 @@ void Agent::act()
 		{
 			this->commandType = command.first;
 			/*BWAPI::Broodwar->registerEvent([this](BWAPI::Game*)
-			{
-				BWAPI::Broodwar->drawTextMap(this->getUnit()->getPosition(), commandType.c_str());
+			{				
+				std::ostringstream oss;
+				oss << "\n" << commandType.c_str();
+				BWAPI::Broodwar->drawTextMap(this->getUnit()->getPosition(), oss.str().c_str());
 			},
 				[this](BWAPI::Game*)
 			{
-				return !this->getUnit()->getLastCommand().getType() == this->commandType;
+				return this->getUnit()->getLastCommand().getType() == this->commandType;
 			});*/
 			break;
 		}
@@ -80,7 +82,10 @@ void Agent::act()
 	bool hasCommand = false;
 
 	if (this->commandType == BWAPI::UnitCommandTypes::Build)
-	{				
+	{
+		if (produceType == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
+			g_Supply *= 0.5;
+
 		BWAPI::TilePosition targetBuildLocation = BWAPI::Broodwar->getBuildLocation(this->produceType, this->unit->getTilePosition());
 		if (targetBuildLocation)
 		{

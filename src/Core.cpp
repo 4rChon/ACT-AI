@@ -98,12 +98,13 @@ void Core::onFrame()
 		drawRegions();
 	
 	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
-	Broodwar->drawTextScreen(200, 20, "Average FPS: %f", Broodwar->getAverageFPS());
-	Broodwar->drawTextScreen(200, 40, "Active Tasks: %d", g_Tasks.size());
-	Broodwar->drawTextScreen(200, 60, "Coalition Count: %d", g_Coalitions.size());
-	Broodwar->drawTextScreen(200, 80, "Open Coalition Count: %d", g_OpenCoalitions.size());
-	Broodwar->drawTextScreen(200, 100, "Agent Count: %d", g_Agents.size());
-	Broodwar->drawTextScreen(200, 120, "Free Agent Count: %d", g_FreeAgents.size());
+	Broodwar->drawTextScreen(200, 10, "Average FPS: %f", Broodwar->getAverageFPS());
+	Broodwar->drawTextScreen(200, 30, "Active Tasks: %d", g_Tasks.size());
+	Broodwar->drawTextScreen(200, 40, "Coalition Count: %d", g_Coalitions.size());
+	Broodwar->drawTextScreen(200, 50, "Open Coalition Count: %d", g_OpenCoalitions.size());
+	Broodwar->drawTextScreen(200, 60, "Agent Count: %d", g_Agents.size());
+	Broodwar->drawTextScreen(200, 70, "Free Agent Count: %d", g_FreeAgents.size());
+	Broodwar->drawTextScreen(200, 80, "Supply Desire: %.5f", g_Supply);
 
 	for (auto coalition : g_Coalitions)
 		for (auto unit : coalition->getUnitSet())
@@ -250,10 +251,14 @@ void Core::onUnitComplete(BWAPI::Unit unit)
 {	
 	if (unit->getPlayer() == Broodwar->self())
 	{
-		Agent* agent = new Agent(unit);
-		g_Agents.insert(agent);
-		g_FreeAgents.insert(agent);
+		if (!(unit->getType().supplyProvided() == 8))
+		{
+			Agent* agent = new Agent(unit);
+			g_Agents.insert(agent);
+			g_FreeAgents.insert(agent);
+		}
 		g_TotalCount[unit->getType()]++;
+
 	}
 	updateSatisfied();
 	g_Supply = (0.25 / (double)((BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()) + 1)) * (int)(BWAPI::Broodwar->self()->getRace().getSupplyProvider().mineralPrice() < BWAPI::Broodwar->self()->minerals());
