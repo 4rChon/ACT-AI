@@ -10,7 +10,10 @@ private:
 public:
 	//constructors and destructors
 	CreateCoalition(Composition targetComposition, Task* task);
+
+	//getters
 	bool getCoalitionState();
+	double getCost();
 
 	//-
 	void assign();

@@ -9,5 +9,6 @@ enum TaskType
 	CRC,
 	CRU,
 	RES,
-	SAT
+	SAT,
+	INC
 };

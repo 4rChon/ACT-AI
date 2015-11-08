@@ -16,6 +16,7 @@ protected:
 	bool complete;
 	bool acting;
 	int age;
+	double cost;
 	Coalition* coalition;	
 public:
 	//constructors
@@ -30,12 +31,14 @@ public:
 	virtual std::list<Task*> getSubTasks() const;
 	virtual TaskType getType() const;
 	virtual Coalition* getCoalition() const;
+	virtual double getCost();
 
 	//-
 	virtual void assign() = 0;
 	virtual void act();
 	virtual void update();
 	virtual void cleanSubTasks();
+	virtual void addSubTask(Task* task);
 	virtual std::string toString() const;
 
 };

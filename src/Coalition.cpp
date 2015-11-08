@@ -1,5 +1,5 @@
 #include "Coalition.h"
-#include "Globals.h"
+#include "GlobalSets.h"
 
 Coalition::Coalition()
 { 

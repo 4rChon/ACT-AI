@@ -38,16 +38,30 @@ Composition Composition::operator+=(const BWAPI::Unit& rhs)
 	return *this;
 }
 
+Composition Composition::operator-=(const BWAPI::UnitType& rhs)
+{
+	this->unitMap[rhs]--;
+	cost -= (rhs.gasPrice() * 1.5) + (rhs.mineralPrice());
+	return *this;
+}
+
 Composition Composition::operator-=(const BWAPI::Unit& rhs)
 {
-	this->unitMap[rhs->getType()]--;
-	cost -= (rhs->getType().gasPrice() * 1.5) + (rhs->getType().mineralPrice());
-	return *this;
+	return *this -= rhs->getType();	
 }
 
 int Composition::operator[](const BWAPI::UnitType& b)
 {
 	return this->unitMap[b];
+}
+
+Composition Composition::operator-(const Composition& b)
+{
+	Composition composition = Composition(this->unitMap);
+	for (auto unit : b.getUnitMap())
+		composition -= unit.first;
+
+	return composition;
 }
 
 std::vector<BWAPI::UnitType> Composition::getTypes() const
@@ -64,6 +78,11 @@ std::unordered_map<BWAPI::UnitType, int> Composition::getUnitMap() const
 	return this->unitMap;
 }
 
+double Composition::getCost() const
+{
+	return this->cost;
+}
+
 void Composition::addType(BWAPI::UnitType unitType, int count)
 {
 	unitMap.insert(std::pair<BWAPI::UnitType, int>(unitType, count));
@@ -72,6 +91,5 @@ void Composition::addType(BWAPI::UnitType unitType, int count)
 
 void Composition::addUnit(BWAPI::Unit unit)
 {
-	addType(unit->getType(), 1);
-	cost += (unit->getType().gasPrice() * 1.5) + (unit->getType().mineralPrice());
+	addType(unit->getType(), 1);	
 }

@@ -120,7 +120,7 @@ void Core::onFrame()
 	{
 		if (!(*agent)->getUnit()->exists())
 		{
-			g_Agents.erase(agent);
+			g_Agents.erase(*agent);
 			agent = g_FreeAgents.erase(agent);
 			continue;
 		}
@@ -155,10 +155,10 @@ void Core::onFrame()
 			++coalition;
 		}
 
-		if ((*agent)->getUnit()->getType().isWorker() && (*agent)->getUnit()->isIdle())
-		{ 
-			(*agent)->getUnit()->gather((*agent)->getUnit()->getClosestUnit(IsMineralField || IsRefinery));
-		}		
+		//if ((*agent)->getUnit()->getType().isWorker() && (*agent)->getUnit()->isIdle())
+		//{ 
+			(*agent)->act();
+		//}
 
 		threatField->getZone((*agent)->getUnit()->getRegion()->getID())->updateZone();
 
@@ -166,7 +166,7 @@ void Core::onFrame()
 	}
 
 	for (auto coalition : g_Coalitions)
-		coalition->updateFreeAgents();
+		coalition->updateFreeAgents();	
 
 	updateTaskTree(attack);
 }
@@ -218,7 +218,6 @@ void Core::onUnitHide(BWAPI::Unit unit)
 
 void Core::onUnitCreate(BWAPI::Unit unit)
 {
-
 }
 
 void Core::onUnitDestroy(BWAPI::Unit unit)
@@ -257,6 +256,7 @@ void Core::onUnitComplete(BWAPI::Unit unit)
 		g_TotalCount[unit->getType()]++;
 	}
 	updateSatisfied();
+	g_Supply = (0.25 / (double)((BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()) + 1)) * (int)(BWAPI::Broodwar->self()->getRace().getSupplyProvider().mineralPrice() < BWAPI::Broodwar->self()->minerals());
 }
 
 void Core::drawRegions()

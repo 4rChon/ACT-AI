@@ -1,34 +1,34 @@
 #include "Task.h"
-#include "Globals.h"
+#include "GlobalSets.h"
 
 Task::Task()
 {
-	taskType = NON;
-	taskName = "Task";
-	complete = false;
-	assigned = false;
-	acting = false;
+	this->taskType = NON;
+	this->taskName = "Task";
+	this->complete = false;
+	this->assigned = false;
+	this->acting = false;	
+	this->age = BWAPI::Broodwar->getFrameCount();
 	g_Tasks.push_back(this);
-	age = BWAPI::Broodwar->getFrameCount();
 }
 
 void Task::act()
 {
-	acting = true;
+	this->acting = true;
 }
 
 void Task::update()
 {
 	int completeCount = 0;
 	//std::cout << "Task: Updating\n";
-	for (auto task : subTasks)
+	for (auto task : this->subTasks)
 		if (task->isComplete())
 			completeCount++;
 	
-	if (subTasks.size() == completeCount)
+	if (this->subTasks.size() == completeCount)
 	{
 		//std::cout << "Task Complete\n";
-		complete = true;
+		this->complete = true;
 		cleanSubTasks();
 	}
 }
@@ -40,41 +40,59 @@ void Task::setCoalition(Coalition* coalition)
 
 bool Task::isAssigned() const
 {
-	return assigned;
+	return this->assigned;
 }
 
 bool Task::isComplete() const
 {
-	return complete;
+	return this->complete;
 }
 
 std::list<Task*> Task::getSubTasks() const
 {
 	//std::cout << "Task: Getting Subtasks\n";
-	return subTasks;
+	return this->subTasks;
 }
 
 TaskType Task::getType() const
 {
-	return taskType;
+	return this->taskType;
 }
 
 Coalition* Task::getCoalition() const
 {
-	return coalition;
+	return this->coalition;
+}
+
+double Task::getCost()
+{
+	this->cost = 0;
+	
+	for (auto task : this->subTasks)
+		this->cost += task->getCost();
+	
+	return this->cost;
 }
 
 void Task::cleanSubTasks()
 {
-	for (auto task : this->subTasks)
+	std::list<Task*>::iterator it = this->subTasks.begin();
+	while (it != this->subTasks.end())
 	{
-		task->cleanSubTasks();
-		g_Tasks.remove(task);
+		(*it)->cleanSubTasks();				
+		g_Tasks.remove((*it));
+		delete (*it);
+		it = this->subTasks.erase(it);
 	}
+}
+
+void Task::addSubTask(Task* task)
+{
+	this->subTasks.push_back(task);
 }
 
 std::string Task::toString() const
 {
 	std::cout << "Task: Getting Name\n";
-	return taskName;
+	return this->taskName;
 }

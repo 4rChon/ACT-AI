@@ -28,7 +28,7 @@ private:
 	std::unordered_map<BWAPI::UnitType, int> unitMap;
 	double cost = 0;
 public:
-	//setters
+	//constructors
 	Composition();
 	Composition(BWAPI::Unitset unitSet);
 	Composition(std::unordered_map<BWAPI::UnitType, int> unitMap);
@@ -36,12 +36,15 @@ public:
 	//operator overrides
 	bool operator==(const Composition& rhs) const;
 	Composition operator+=(const BWAPI::Unit& rhs);
+	Composition operator-=(const BWAPI::UnitType& rhs);
 	Composition operator-=(const BWAPI::Unit& rhs);
+	Composition operator-(const Composition& b);
 	int operator[](const BWAPI::UnitType& b);	
 
 	//getters
 	std::vector<BWAPI::UnitType> getTypes() const;
 	std::unordered_map<BWAPI::UnitType, int> getUnitMap() const;
+	double getCost() const;
 
 	//-
 	void addType(BWAPI::UnitType unitType, int count);

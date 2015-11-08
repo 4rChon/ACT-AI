@@ -1,15 +1,19 @@
 #include "CreateCoalition.h"
 #include "CreateUnit.h"
-#include "Globals.h"
+#include "GlobalSets.h"
 
 CreateCoalition::CreateCoalition(Composition composition, Task* task)
 {	
 	this->taskType = CRC;
 	this->taskName = "CreateCoalition(Composition, Task*)";
 	this->taskCoalition = new Coalition(composition, task->getType());
+	
 	task->setCoalition(this->taskCoalition);
-	g_Coalitions.insert(taskCoalition);
-	g_OpenCoalitions.insert(taskCoalition);
+
+	g_Coalitions.insert(this->taskCoalition);	
+
+	this->cost = composition.getCost();
+	this->assign();
 }
 
 bool CreateCoalition::getCoalitionState()
@@ -17,58 +21,54 @@ bool CreateCoalition::getCoalitionState()
 	return this->taskCoalition->isActive();
 }
 
+// add coalition to open coalitions
 void CreateCoalition::assign()
 {
 	if (!this->assigned)
-	{
-		for (auto unitType : taskCoalition->getTargetComp().getTypes())
-		{
-			std::cout << unitType.c_str() << "\n";
-			BWAPI::Broodwar->registerEvent([this, unitType](BWAPI::Game*)
-			{
-				if (this->taskCoalition->getCurrentComp()[unitType] < this->taskCoalition->getTargetComp()[unitType])
-				{					
-					if (unitType != BWAPI::UnitTypes::Zerg_Larva)
-					{
-						std::cout << "Coalition Requires more " << unitType.c_str() << "\n";
-						CreateUnit* createUnit = new CreateUnit(unitType);
-						this->subTasks.push_back(createUnit);
-					}
-				}
-			},
-			[this](BWAPI::Game*){return !this->taskCoalition->isActive(); },
-			-1,//parameter
-			unitType.buildTime());
-		}
+	{		
+		std::cout << "CreateCoalition: Assign\n";
+		g_OpenCoalitions.insert(this->taskCoalition);
 		this->assigned = true;
 	}
 }
 
+// attempt to activate coalition
 void CreateCoalition::act()
 {
-	/*if (!acting)
-	{
-		for (auto unitType : taskCoalition->getTargetComp().getTypes())
+	if (!this->acting)
+	{		
+		std::cout << "CreateCoalition: Acting\n";
+		Composition differenceComposition = this->taskCoalition->getTargetComp() - this->taskCoalition->getCurrentComp();
+		for (auto unitType : differenceComposition.getTypes())
 		{
-			if (taskCoalition->getCurrentComp()[unitType] < taskCoalition->getTargetComp()[unitType])
-			{
-				//std::cout << "Coalition Requires more " << unitType.c_str() << "\n";			
-				//CreateUnit* createUnit = new CreateUnit(unitType);
-				//this->subTasks.push_back(createUnit);
-			}
+			CreateUnit *createUnit = new CreateUnit(unitType, differenceComposition[unitType]);
+			this->addSubTask(createUnit);
 		}
-	}*/
-	//acting = true;
+		this->acting = true;
+	}
 }
 
 void CreateCoalition::update()
 {
-	if (this->taskCoalition->isActive() || BWAPI::Broodwar->getFrameCount() - age > 500)
-	{		
-		cleanSubTasks();
+	double abandonChance = (((double)rand() / RAND_MAX) * this->getCost() + ((BWAPI::Broodwar->getFrameCount() - this->age) / this->getCost()));
+	if (abandonChance <= 100000)
+		if (this->assigned)
+			act();
 
+	if (!this->complete && (this->taskCoalition->isActive() || abandonChance > 100000))
+	{
+		std::cout << "CreateCoalition: Complete\n";
 		this->complete = true;
-
-		g_Tasks.remove(this);		
+		this->cleanSubTasks();
+		g_Tasks.remove(this);
 	}
+}
+
+double CreateCoalition::getCost()
+{
+	this->cost = this->taskCoalition->getTargetComp().getCost() - this->taskCoalition->getCurrentComp().getCost();
+	for (auto task : this->subTasks)
+		this->cost += task->getCost();
+
+	return this->cost;
 }
