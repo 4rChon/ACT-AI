@@ -31,12 +31,11 @@ void CreateUnit::act()
 {
 	if (!this->acting)
 	{	
-		std::cout << "I need " << unitCount << " more " << this->unitType.c_str() << "\n";
-		for (int i = 0; i < unitCount; i++)
+		while (this->unitCount > 0)
 		{			
 			if (!this->coalition->getUnitSet().train(this->unitType))
 				return;
-			else unitCount--;
+			else this->unitCount--;
 		}
 		this->acting = true;
 	}

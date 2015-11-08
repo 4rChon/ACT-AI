@@ -7,7 +7,8 @@ Task::Task()
 	this->taskName = "Task";
 	this->complete = false;
 	this->assigned = false;
-	this->acting = false;	
+	this->acting = false;
+	this->coalition = nullptr;
 	this->age = BWAPI::Broodwar->getFrameCount();
 	g_Tasks.push_back(this);
 }
@@ -38,9 +39,29 @@ void Task::setCoalition(Coalition* coalition)
 	this->coalition = coalition;
 }
 
+void Task::setAssigned(bool assigned)
+{
+	this->assigned = assigned;
+}
+
+void Task::setActing(bool acting)
+{
+	this->acting = acting;
+}
+
+void Task::setComplete(bool complete)
+{
+	this->complete = complete;
+}
+
 bool Task::isAssigned() const
 {
 	return this->assigned;
+}
+
+bool Task::isActing() const
+{
+	return this->acting;
 }
 
 bool Task::isComplete() const
@@ -79,9 +100,11 @@ void Task::cleanSubTasks()
 	std::list<Task*>::iterator it = this->subTasks.begin();
 	while (it != this->subTasks.end())
 	{
-		(*it)->cleanSubTasks();				
+		if ((*it)->getCoalition() != nullptr)
+			(*it)->getCoalition()->disband();
+
+		(*it)->cleanSubTasks();
 		g_Tasks.remove((*it));
-		delete (*it);
 		it = this->subTasks.erase(it);
 	}
 }

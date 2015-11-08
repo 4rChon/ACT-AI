@@ -6,7 +6,7 @@ CreateCoalition::CreateCoalition(Composition composition, Task* task)
 {	
 	this->taskType = CRC;
 	this->taskName = "CreateCoalition(Composition, Task*)";
-	this->taskCoalition = new Coalition(composition, task->getType());
+	this->taskCoalition = new Coalition(composition, task->getType());	
 	
 	task->setCoalition(this->taskCoalition);
 
