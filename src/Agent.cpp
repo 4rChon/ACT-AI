@@ -2,28 +2,34 @@
 #include "GlobalVariables.h"
 #include <random>
 #include <iterator>
-
+#include <chrono>
 Agent::Agent(BWAPI::Unit unit, double freewill)
 {
 	this->unit = unit;
 	this->freewill = freewill;
 	if (this->unit->getType().isWorker())
 	{
-		this->commandMap[BWAPI::UnitCommandTypes::Attack_Unit] = 0;
-		this->commandMap[BWAPI::UnitCommandTypes::Repair] = 0;
-		this->commandMap[BWAPI::UnitCommandTypes::Gather] = 1;
-		this->commandMap[BWAPI::UnitCommandTypes::Build] = 0;			
+		this->commandMap[BWAPI::UnitCommandTypes::Attack_Unit] = 0.0;
+		this->commandMap[BWAPI::UnitCommandTypes::Repair] = 0.0;
+		this->commandMap[BWAPI::UnitCommandTypes::Gather] = 0.99;
+		this->commandMap[BWAPI::UnitCommandTypes::Build] = 0.01;
 	}
 
 	if (this->unit->getType().canProduce() && this->unit->getType().isBuilding())
-		commandMap[BWAPI::UnitCommandTypes::Train] = 1;		
+		commandMap[BWAPI::UnitCommandTypes::Train] = 1.0;
 
 
 	for (auto unitType : this->unit->getType().buildsWhat())
-		this->produceMap[unitType] = 1 / this->unit->getType().buildsWhat().size();
+	{
+		if (!g_isUnlocked[unitType])
+			this->produceMap[unitType] = 0.0001;
+		else
+			this->produceMap[unitType] = 1.0 / (double)this->unit->getType().buildsWhat().size();
+		//std::cout << unitType.c_str() << " : " << this->produceMap[unitType] << "\n";
+	}
 
 	if (this->unit->getType().isResourceDepot())
-		this->produceMap[BWAPI::Broodwar->self()->getRace().getWorker()] = 1;
+		this->produceMap[BWAPI::Broodwar->self()->getRace().getWorker()] = 1.0;
 	
 	this->commandType = BWAPI::UnitCommandTypes::None;
 }
@@ -38,64 +44,75 @@ BWAPI::Unit Agent::getUnit() const
 	return this->unit;
 }
 
-int discreteDistribution(std::unordered_map<BWAPI::UnitCommandType, double> map)
-{
-	std::vector<double> weights;
-	weights.reserve(map.size());
-	for (auto element : map)
-	{
-		weights.push_back(element.second);
-	}
-	return 0;
-}
-
 void Agent::act()
 {
 
-	if (this->unit->getType().isWorker())
+	for (auto unitType : this->unit->getType().buildsWhat())
 	{
-		this->commandMap[BWAPI::UnitCommandTypes::Build] = g_Supply * (int)(BWAPI::Broodwar->self()->getRace().getSupplyProvider().mineralPrice() < BWAPI::Broodwar->self()->minerals());
-		this->commandMap[BWAPI::UnitCommandTypes::Gather] = 1 - this->commandMap[BWAPI::UnitCommandTypes::Build];
-		this->produceMap[BWAPI::Broodwar->self()->getRace().getSupplyProvider()] = g_Supply;
-	}	
-
-	for (auto command : commandMap)
-	{
-		if (((double)rand() / RAND_MAX) < command.second)
-		{
-			this->commandType = command.first;
-			/*BWAPI::Broodwar->registerEvent([this](BWAPI::Game*)
-			{
-			std::ostringstream oss;
-			oss << "\n" << commandType.c_str();
-			BWAPI::Broodwar->drawTextMap(this->getUnit()->getPosition(), oss.str().c_str());
-			},
-			[this](BWAPI::Game*)
-			{
-			return this->getUnit()->getLastCommand().getType() == this->commandType;
-			});*/
-			//	break;
-		}
+		if (!g_isUnlocked[unitType])
+			this->produceMap[unitType] = 0.0001;
+		else
+			this->produceMap[unitType] = 1.0 / (double)this->unit->getType().buildsWhat().size();
+		//std::cout << unitType.c_str() << " : " << this->produceMap[unitType] << "\n";
 	}
 
-	produceType = BWAPI::UnitTypes::None;
-	for (auto produce : this->produceMap)
+	if (this->unit->getType().isWorker())
 	{
-		if (((double)rand() / RAND_MAX) < produce.second)
+		this->commandMap[BWAPI::UnitCommandTypes::Build] = g_Supply *(int)(BWAPI::Broodwar->self()->getRace().getSupplyProvider().mineralPrice() < BWAPI::Broodwar->self()->minerals());
+		this->commandMap[BWAPI::UnitCommandTypes::Gather] = 1 - this->commandMap[BWAPI::UnitCommandTypes::Build];
+		this->produceMap[BWAPI::Broodwar->self()->getRace().getSupplyProvider()] = g_Supply *(int)(BWAPI::Broodwar->self()->getRace().getSupplyProvider().mineralPrice() < BWAPI::Broodwar->self()->minerals());
+	}
+
+	std::vector<double> commandWeights;
+	commandWeights.reserve(commandMap.size());
+	for (auto command : commandMap)
+		commandWeights.push_back(command.second);
+	auto seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+	std::default_random_engine generator(seed);
+	if (commandWeights.size() > 0)
+	{		
+		std::size_t i = 0;
+		std::discrete_distribution<> dist(commandWeights.size(), 0.0, 1.0, [&commandWeights, &i](double){return commandWeights[i++]; });
+
+		auto it = commandMap.begin();
+		int number = dist(generator);
+		advance(it, number);
+		//std::cout << (*it).first.c_str() << "\n";
+		this->commandType = (*it).first;
+	}
+	else
+		this->commandType = BWAPI::UnitCommandTypes::None;
+
+	this->produceType = BWAPI::UnitTypes::None;
+	if (this->commandType == BWAPI::UnitCommandTypes::Build || this->commandType == BWAPI::UnitCommandTypes::Train)
+	{
+		std::vector<double> produceWeights;
+		produceWeights.reserve(produceMap.size());
+		for (auto produce : produceMap)
+			produceWeights.push_back(produce.second);
+	
+		if (produceWeights.size() > 0)
 		{
-			this->produceType = produce.first;
-			break;
+			std::size_t i = 0;
+			std::discrete_distribution<> dist(produceWeights.size(), 0.0, 1.0, [&produceWeights, &i](double){return produceWeights[i++]; });
+
+			auto it = produceMap.begin();
+			int number = dist(generator);
+			advance(it, number);
+			//std::cout << "\t" << (*it).first.c_str() << "\n";
+			this->produceType = (*it).first;
 		}
 	}
 
 	bool hasCommand = false;
 
 	if (this->commandType == BWAPI::UnitCommandTypes::Build && produceType != BWAPI::UnitTypes::None)
-	{		
+	{				
 		if (produceType == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
 			g_Supply *= 0.25;
 
 		BWAPI::TilePosition targetBuildLocation = BWAPI::Broodwar->getBuildLocation(this->produceType, this->unit->getTilePosition());
+
 		if (targetBuildLocation)
 		{
 			if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
@@ -108,6 +125,7 @@ void Agent::act()
 			// Register an event that draws the target build location
 			if (hasCommand)
 			{
+				std::cout << "Found a place to build a " << produceType.c_str() << "\n";
 				BWAPI::Broodwar->registerEvent([this, targetBuildLocation](BWAPI::Game*)
 				{
 					BWAPI::Broodwar->drawBoxMap(BWAPI::Position(targetBuildLocation),
@@ -149,4 +167,14 @@ void Agent::act()
 	}
 
 	this->commandType = BWAPI::UnitCommandTypes::None;
+}
+
+bool build()
+{
+	return true;
+}
+
+bool train()
+{
+	return true;
 }

@@ -33,7 +33,7 @@ void CreateUnit::act()
 	{
 		while (this->unitCount > 0)
 		{	
-			if (!(this->unitType.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && this->unitType.gasPrice() <= BWAPI::Broodwar->self()->gas()))
+			if (!(this->unitType.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && this->unitType.gasPrice() <= BWAPI::Broodwar->self()->gas() && this->unitType.supplyRequired() <= BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()))
 				return;
 			if (this->unitType.isBuilding() && this->unitType.whatBuilds().first == BWAPI::Broodwar->self()->getRace().getWorker())
 			{

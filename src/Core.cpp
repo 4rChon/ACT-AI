@@ -258,7 +258,7 @@ void Core::onUnitComplete(BWAPI::Unit unit)
 
 	}
 	updateSatisfied();
-	g_Supply = (0.25 / (double)((BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()) + 1));
+	g_Supply = (1 / (double)((BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()) + 1));
 }
 
 void Core::drawRegions()
