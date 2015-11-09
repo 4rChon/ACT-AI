@@ -30,9 +30,10 @@ private:
 	BWAPI::UnitCommandType commandType;
 	std::unordered_map<BWAPI::UnitType, double> produceMap;
 	BWAPI::UnitType produceType;
+	double freewill;
 public:
 	//constructors
-	Agent(BWAPI::Unit unit);
+	Agent(BWAPI::Unit unit, double freewill);
 
 	//setters
 	void setUnit(BWAPI::Unit unit);

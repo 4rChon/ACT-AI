@@ -1,33 +1,30 @@
 #include "Agent.h"
 #include "GlobalVariables.h"
 #include <random>
+#include <iterator>
 
-Agent::Agent(BWAPI::Unit unit)
+Agent::Agent(BWAPI::Unit unit, double freewill)
 {
 	this->unit = unit;
+	this->freewill = freewill;
 	if (this->unit->getType().isWorker())
 	{
 		this->commandMap[BWAPI::UnitCommandTypes::Attack_Unit] = 0;
 		this->commandMap[BWAPI::UnitCommandTypes::Repair] = 0;
 		this->commandMap[BWAPI::UnitCommandTypes::Gather] = 1;
-		this->commandMap[BWAPI::UnitCommandTypes::Build] = 0;
-	
-		for (auto unitType : this->unit->getType().buildsWhat())
-			this->produceMap[unitType] = 0;
+		this->commandMap[BWAPI::UnitCommandTypes::Build] = 0;			
 	}
 
 	if (this->unit->getType().canProduce() && this->unit->getType().isBuilding())
-	{
-		commandMap[BWAPI::UnitCommandTypes::Train] = 1;
-		for (auto unitType : this->unit->getType().buildsWhat())
-			this->produceMap[unitType] = 0;
+		commandMap[BWAPI::UnitCommandTypes::Train] = 1;		
 
-	}
+
+	for (auto unitType : this->unit->getType().buildsWhat())
+		this->produceMap[unitType] = 1 / this->unit->getType().buildsWhat().size();
 
 	if (this->unit->getType().isResourceDepot())
-	{
 		this->produceMap[BWAPI::Broodwar->self()->getRace().getWorker()] = 1;
-	}
+	
 	this->commandType = BWAPI::UnitCommandTypes::None;
 }
 
@@ -41,6 +38,17 @@ BWAPI::Unit Agent::getUnit() const
 	return this->unit;
 }
 
+int discreteDistribution(std::unordered_map<BWAPI::UnitCommandType, double> map)
+{
+	std::vector<double> weights;
+	weights.reserve(map.size());
+	for (auto element : map)
+	{
+		weights.push_back(element.second);
+	}
+	return 0;
+}
+
 void Agent::act()
 {
 
@@ -51,25 +59,26 @@ void Agent::act()
 		this->produceMap[BWAPI::Broodwar->self()->getRace().getSupplyProvider()] = g_Supply;
 	}	
 
-	for (auto command : this->commandMap)
+	for (auto command : commandMap)
 	{
 		if (((double)rand() / RAND_MAX) < command.second)
 		{
 			this->commandType = command.first;
 			/*BWAPI::Broodwar->registerEvent([this](BWAPI::Game*)
-			{				
-				std::ostringstream oss;
-				oss << "\n" << commandType.c_str();
-				BWAPI::Broodwar->drawTextMap(this->getUnit()->getPosition(), oss.str().c_str());
-			},
-				[this](BWAPI::Game*)
 			{
-				return this->getUnit()->getLastCommand().getType() == this->commandType;
+			std::ostringstream oss;
+			oss << "\n" << commandType.c_str();
+			BWAPI::Broodwar->drawTextMap(this->getUnit()->getPosition(), oss.str().c_str());
+			},
+			[this](BWAPI::Game*)
+			{
+			return this->getUnit()->getLastCommand().getType() == this->commandType;
 			});*/
-			break;
+			//	break;
 		}
 	}
 
+	produceType = BWAPI::UnitTypes::None;
 	for (auto produce : this->produceMap)
 	{
 		if (((double)rand() / RAND_MAX) < produce.second)
@@ -77,14 +86,14 @@ void Agent::act()
 			this->produceType = produce.first;
 			break;
 		}
-	}	
+	}
 
 	bool hasCommand = false;
 
-	if (this->commandType == BWAPI::UnitCommandTypes::Build)
-	{
+	if (this->commandType == BWAPI::UnitCommandTypes::Build && produceType != BWAPI::UnitTypes::None)
+	{		
 		if (produceType == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
-			g_Supply *= 0.5;
+			g_Supply *= 0.25;
 
 		BWAPI::TilePosition targetBuildLocation = BWAPI::Broodwar->getBuildLocation(this->produceType, this->unit->getTilePosition());
 		if (targetBuildLocation)
@@ -113,8 +122,8 @@ void Agent::act()
 			}
 		}
 	}
-	else if (this->commandType == BWAPI::UnitCommandTypes::Train)
-	{
+	else if (this->commandType == BWAPI::UnitCommandTypes::Train && produceType != BWAPI::UnitTypes::None)
+	{		
 		if (this->unit->getTrainingQueue().size() < 1)
 			if(this->unit->train(produceType))
 				return;

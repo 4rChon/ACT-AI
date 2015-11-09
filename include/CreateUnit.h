@@ -9,7 +9,7 @@ private:
 	int unitCount;
 public:
 	//constructors
-	CreateUnit(BWAPI::UnitType unitType, int unitCount);
+	CreateUnit(BWAPI::UnitType unitType, int unitCount = 1);
 
 	//-
 	void assign();

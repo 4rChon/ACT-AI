@@ -57,11 +57,6 @@ BWAPI::Unitset Coalition::getUnitSet() const
 	return this->unitSet;
 }
 
-//std::unordered_set<Agent*> Coalition::getAgentSet() const
-//{
-//	return this->agentSet;
-//}
-
 Composition Coalition::getCurrentComp() const
 {
 	return this->currentComp;
@@ -81,16 +76,11 @@ void Coalition::addUnit(BWAPI::Unit unit)
 {
 	this->unitSet.insert(unitSet.begin(), unit);
 	this->currentComp += unit;
-	//std::cout << "A " << unit->getType() << " has joined a coalition\n";
 	if (!active)
 	{
 		if (currentComp == targetComp)
 		{
 			std::cout << "A coalition has been activated!\n";
-			/*for (auto agent : agentSet)
-				g_FreeAgents.erase(agent);*/
-			
-			//g_OpenCoalitions.erase(this);
 			active = true;
 		}
 	}

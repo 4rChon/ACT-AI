@@ -46,11 +46,7 @@ void Core::onStart()
 
 	threatField = new ThreatField(Broodwar->getAllRegions());
 	attack = new Attack(threatField->getZone(20));
-	//createUnit = new CreateUnit(Broodwar->self()->getRace().getWorker());
-
-	//g_Tasks.push_back(attack);
-	//attackComp.addType(Broodwar->self()->getRace().getWorker(), 1);	
-
+	
 	Broodwar->sendText("gl hf");
 	Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
 
@@ -156,10 +152,7 @@ void Core::onFrame()
 			++coalition;
 		}
 
-		//if ((*agent)->getUnit()->getType().isWorker() && (*agent)->getUnit()->isIdle())
-		//{ 
-			(*agent)->act();
-		//}
+		(*agent)->act();
 
 		threatField->getZone((*agent)->getUnit()->getRegion()->getID())->updateZone();
 
@@ -257,7 +250,7 @@ void Core::onUnitComplete(BWAPI::Unit unit)
 	{
 		if (!(unit->getType().supplyProvided() == 8))
 		{
-			Agent* agent = new Agent(unit);
+			Agent* agent = new Agent(unit, 1);
 			g_Agents.insert(agent);
 			g_FreeAgents.insert(agent);
 		}
@@ -265,7 +258,7 @@ void Core::onUnitComplete(BWAPI::Unit unit)
 
 	}
 	updateSatisfied();
-	g_Supply = (0.25 / (double)((BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()) + 1)) * (int)(BWAPI::Broodwar->self()->getRace().getSupplyProvider().mineralPrice() < BWAPI::Broodwar->self()->minerals());
+	g_Supply = (0.25 / (double)((BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()) + 1));
 }
 
 void Core::drawRegions()
