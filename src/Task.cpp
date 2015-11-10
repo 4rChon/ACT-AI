@@ -13,25 +13,14 @@ Task::Task()
 	g_Tasks.push_back(this);
 }
 
-void Task::act()
+Task::~Task()
 {
-	this->acting = true;
-}
-
-void Task::update()
-{
-	int completeCount = 0;
-	//std::cout << "Task: Updating\n";
-	for (auto task : this->subTasks)
-		if (task->isComplete())
-			completeCount++;
-	
-	if (this->subTasks.size() == completeCount)
-	{
-		//std::cout << "Task Complete\n";
-		this->complete = true;
-		cleanSubTasks();
-	}
+	std::cout << "Task Destructor\n";
+	std::cout << taskName << "\n";	
+	this->cleanSubTasks();
+	g_Coalitions.erase(this->coalition);
+	this->coalition = nullptr;
+	g_Tasks.remove(this);
 }
 
 void Task::setCoalition(Coalition* coalition)
@@ -99,12 +88,8 @@ void Task::cleanSubTasks()
 {
 	std::list<Task*>::iterator it = this->subTasks.begin();
 	while (it != this->subTasks.end())
-	{
-		if ((*it)->getCoalition() != nullptr)
-			(*it)->getCoalition()->disband();
-
-		(*it)->cleanSubTasks();
-		g_Tasks.remove((*it));
+	{		
+		delete(*it);
 		it = this->subTasks.erase(it);
 	}
 }

@@ -19,8 +19,9 @@ protected:
 	double cost;
 	Coalition* coalition;	
 public:
-	//constructors
+	//constructors and destructors
 	Task();
+	~Task();
 	
 	//setters
 	virtual void setCoalition(Coalition* coalition);
@@ -39,8 +40,8 @@ public:
 
 	//-
 	virtual void assign() = 0;
-	virtual void act();
-	virtual void update();
+	virtual void act() = 0;
+	virtual void update() = 0;
 	virtual void cleanSubTasks();
 	virtual void addSubTask(Task* task);
 	virtual std::string toString() const;

@@ -17,9 +17,10 @@ private:
 	bool active;
 	int age;
 public:
-	//constructors
+	//constructors and destructors;
 	Coalition();
 	Coalition(Composition targetComp, TaskType taskType);
+	Coalition::~Coalition();
 
 	//setters
 	void setUnitSet(BWAPI::Unitset unitSet);
@@ -41,5 +42,4 @@ public:
 	void removeUnit(BWAPI::Unit unit);
 	void removeAgent(Agent* agent);
 	void updateFreeAgents();
-	void Coalition::disband();
 };

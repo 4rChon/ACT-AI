@@ -10,6 +10,14 @@ Attack::Attack(Zone* target)
 	this->target = target;
 }
 
+Attack::~Attack()
+{
+	std::cout << "Attack Destructor\n";
+
+	delete this->target;		
+	this->target = nullptr;
+}
+
 // assign an attacking coalition
 void Attack::assign()
 {
@@ -38,15 +46,17 @@ void Attack::act()
 
 void Attack::update()
 {
+	if (this->complete)
+	{
+		this->cleanSubTasks();
+		return;
+	}
+	
 	if (this->assigned && this->coalition->isActive())
 		act();
-	
-	if ((!this->complete && this->target->getConfidence() > 0.8 && this->target->getEnemyScore() == 0))
-	{
+	if (this->target->getConfidence() > 0.8 && this->target->getEnemyScore() == 0)
+	{		
+		this->complete = true;		
 		std::cout << "Attack: Complete\n";
-		this->complete = true;
-		this->coalition->disband();
-		this->cleanSubTasks();
-		g_Tasks.remove(this);		
-	}
+	}	
 }

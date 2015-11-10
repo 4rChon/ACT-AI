@@ -12,6 +12,11 @@ CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 	this->unitCount = unitCount;
 }
 
+CreateUnit::~CreateUnit()
+{
+	std::cout << "CreateUnit Destructor\n";
+}
+
 // assign a producer coalition
 void CreateUnit::assign()
 {	
@@ -33,7 +38,7 @@ void CreateUnit::act()
 	{
 		while (this->unitCount > 0)
 		{	
-			if (!(this->unitType.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && this->unitType.gasPrice() <= BWAPI::Broodwar->self()->gas() && this->unitType.supplyRequired() <= BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()))
+			if (!(this->unitType.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && this->unitType.gasPrice() <= BWAPI::Broodwar->self()->gas() && this->unitType.supplyRequired() <= BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed())) 
 				return;
 			if (this->unitType.isBuilding() && this->unitType.whatBuilds().first == BWAPI::Broodwar->self()->getRace().getWorker())
 			{
@@ -78,10 +83,10 @@ void CreateUnit::act()
 					{
 						if (this->coalition->getUnitSet().train(this->unitType)) this->unitCount--;
 					}
-					else
+					else 
 						return;
 				}
-			}			
+			}
 		}
 		this->acting = true;
 	}
@@ -91,14 +96,18 @@ void CreateUnit::update()
 {
 	//double abandonChance = (((double)rand() / RAND_MAX) * this->getCost() + (BWAPI::Broodwar->getFrameCount() - this->age));
 	//if (abandonChance <= 100000)
-		if (this->coalition->isActive())
-			act();
-	if (!this->complete && (this->acting))// || abandonChance > 100000))
+	if (this->complete)
 	{
-		std::cout << "CreateUnit: Complete\n";
-		this->complete = true;		
 		this->cleanSubTasks();
-		this->coalition->disband();
-		g_Tasks.remove(this);
+		return;
 	}
+	
+	if (this->coalition->isActive())
+		act();
+	
+	if (this->acting)// || abandonChance > 100000))
+	{
+		this->complete = true;
+		std::cout << "CreateUnit: Complete\n";
+	}	
 }

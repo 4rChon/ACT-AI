@@ -7,8 +7,9 @@ class Attack : public Task
 private:
 	Zone* target;
 public:
-	//constructors
+	//constructors and destructors
 	Attack(Zone* target);
+	~Attack();
 
 	//-
 	void assign();

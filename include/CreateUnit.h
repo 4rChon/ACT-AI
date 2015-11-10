@@ -5,11 +5,11 @@ class CreateUnit : public Task
 {
 private:
 	BWAPI::UnitType unitType;
-	bool satisfied = true;
 	int unitCount;
 public:
-	//constructors
+	//constructors and destructors
 	CreateUnit(BWAPI::UnitType unitType, int unitCount = 1);
+	~CreateUnit();
 
 	//-
 	void assign();

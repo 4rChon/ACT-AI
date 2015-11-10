@@ -162,7 +162,8 @@ void Core::onFrame()
 	for (auto coalition : g_Coalitions)
 		coalition->updateFreeAgents();	
 
-	updateTaskTree(attack);
+	if (attack)
+		updateTaskTree(attack);
 }
 
 void Core::onSendText(std::string text)

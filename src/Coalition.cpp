@@ -15,6 +15,16 @@ Coalition::Coalition(Composition targetComp, TaskType taskType)
 	age = BWAPI::Broodwar->getFrameCount();
 }
 
+Coalition::~Coalition()
+{
+	std::cout << "Coalition Destructor\n";
+	if (this->active)
+		g_FreeAgents.insert(this->agentSet.begin(), this->agentSet.end());
+
+	this->agentSet.clear();
+	this->unitSet.clear();	
+}
+
 void Coalition::setUnitSet(BWAPI::Unitset unitSet)
 {
 	this->unitSet = unitSet;	
@@ -76,13 +86,11 @@ void Coalition::addUnit(BWAPI::Unit unit)
 {
 	this->unitSet.insert(unitSet.begin(), unit);
 	this->currentComp += unit;
-	if (!active)
+
+	if (!active && currentComp == targetComp)
 	{
-		if (currentComp == targetComp)
-		{
-			std::cout << "A coalition has been activated!\n";
-			active = true;
-		}
+		std::cout << "A coalition has been activated!\n";
+		active = true;
 	}
 }
 
@@ -126,13 +134,4 @@ void Coalition::updateFreeAgents()
 			g_FreeAgents.erase(agent);
 		}
 	}
-}
-
-void Coalition::disband()
-{
-	this->active = false;
-	g_FreeAgents.insert(this->agentSet.begin(), this->agentSet.end());
-	this->agentSet.clear();
-	this->unitSet.clear();
-	g_Coalitions.erase(this);
 }
