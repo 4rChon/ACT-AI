@@ -16,11 +16,6 @@ CreateCoalition::CreateCoalition(Composition composition, Task* task)
 	this->assign();
 }
 
-CreateCoalition::~CreateCoalition()
-{
-	std::cout << "CreateCoalition Destructor\n";	
-}
-
 bool CreateCoalition::getCoalitionState()
 {
 	return this->taskCoalition->isActive();

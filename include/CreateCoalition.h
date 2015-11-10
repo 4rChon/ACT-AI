@@ -8,9 +8,8 @@ class CreateCoalition : public Task
 private:
 	Coalition* taskCoalition;
 public:
-	//constructors and destructors
+	//constructors
 	CreateCoalition(Composition targetComposition, Task* task);
-	~CreateCoalition();
 
 	//getters
 	bool getCoalitionState();

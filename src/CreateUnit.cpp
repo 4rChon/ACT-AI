@@ -12,11 +12,6 @@ CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 	this->unitCount = unitCount;
 }
 
-CreateUnit::~CreateUnit()
-{
-	std::cout << "CreateUnit Destructor\n";
-}
-
 // assign a producer coalition
 void CreateUnit::assign()
 {	

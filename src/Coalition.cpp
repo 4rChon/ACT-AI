@@ -17,7 +17,6 @@ Coalition::Coalition(Composition targetComp, TaskType taskType)
 
 Coalition::~Coalition()
 {
-	std::cout << "Coalition Destructor\n";
 	if (this->active)
 		g_FreeAgents.insert(this->agentSet.begin(), this->agentSet.end());
 

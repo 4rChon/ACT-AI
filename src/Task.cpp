@@ -15,8 +15,6 @@ Task::Task()
 
 Task::~Task()
 {
-	std::cout << "Task Destructor\n";
-	std::cout << taskName << "\n";	
 	this->cleanSubTasks();
 	g_Coalitions.erase(this->coalition);
 	this->coalition = nullptr;
@@ -90,6 +88,7 @@ void Task::cleanSubTasks()
 	while (it != this->subTasks.end())
 	{		
 		delete(*it);
+		(*it) = nullptr;
 		it = this->subTasks.erase(it);
 	}
 }

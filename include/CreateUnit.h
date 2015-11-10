@@ -7,9 +7,8 @@ private:
 	BWAPI::UnitType unitType;
 	int unitCount;
 public:
-	//constructors and destructors
+	//constructors
 	CreateUnit(BWAPI::UnitType unitType, int unitCount = 1);
-	~CreateUnit();
 
 	//-
 	void assign();

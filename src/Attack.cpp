@@ -12,8 +12,6 @@ Attack::Attack(Zone* target)
 
 Attack::~Attack()
 {
-	std::cout << "Attack Destructor\n";
-
 	delete this->target;		
 	this->target = nullptr;
 }
