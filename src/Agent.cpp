@@ -5,6 +5,7 @@
 #include <chrono>
 Agent::Agent(BWAPI::Unit unit, double freewill)
 {
+	this->produceTotalChance = 0;
 	this->unit = unit;
 	this->freewill = freewill;
 	if (this->unit->getType().isWorker())
@@ -22,15 +23,23 @@ Agent::Agent(BWAPI::Unit unit, double freewill)
 	for (auto unitType : this->unit->getType().buildsWhat())
 	{
 		if (!g_isUnlocked[unitType])
-			this->produceMap[unitType] = 0.0001;
+			this->produceMap[unitType] = 0;
 		else
-			this->produceMap[unitType] = 1.0 / (double)this->unit->getType().buildsWhat().size();
+		{
+			if (unitType == BWAPI::Broodwar->self()->getRace().getWorker() && this->unit->getType().isResourceDepot())
+			{
+				this->produceMap[unitType] = 1.0;
+				this->produceTotalChance += 1.0;
+			}
+			else
+			{
+				this->produceMap[unitType] = 1.0 / (double)this->unit->getType().buildsWhat().size();
+				this->produceTotalChance += this->produceMap[unitType];
+			}
+		}
 		//std::cout << unitType.c_str() << " : " << this->produceMap[unitType] << "\n";
 	}
 
-	if (this->unit->getType().isResourceDepot())
-		this->produceMap[BWAPI::Broodwar->self()->getRace().getWorker()] = 1.0;
-	
 	this->commandType = BWAPI::UnitCommandTypes::None;
 }
 
@@ -84,14 +93,24 @@ void Agent::act()
 		this->commandType = BWAPI::UnitCommandTypes::None;
 
 	this->produceType = BWAPI::UnitTypes::None;
+	this->produceTotalChance = 0.0;
 	if (this->commandType == BWAPI::UnitCommandTypes::Build || this->commandType == BWAPI::UnitCommandTypes::Train)
 	{
 		std::vector<double> produceWeights;
 		produceWeights.reserve(produceMap.size());
 		for (auto produce : produceMap)
+		{
+			if (produce.first.mineralPrice() > BWAPI::Broodwar->self()->minerals() - g_MinReserve
+				&& produce.first.gasPrice() > BWAPI::Broodwar->self()->gas() - g_GasReserve)
+			{
+				produceWeights.push_back(0.0);
+				return;
+			}
+			produceTotalChance += produce.second;
 			produceWeights.push_back(produce.second);
+		}
 	
-		if (produceWeights.size() > 0)
+		if (produceWeights.size() > 0 && produceTotalChance > 0.0)
 		{
 			std::size_t i = 0;
 			std::discrete_distribution<> dist(produceWeights.size(), 0.0, 1.0, [&produceWeights, &i](double){return produceWeights[i++]; });
@@ -101,13 +120,15 @@ void Agent::act()
 			advance(it, number);
 			//std::cout << "\t" << (*it).first.c_str() << "\n";
 			this->produceType = (*it).first;
-		}
+			std::cout << produceTotalChance << "\n";
+		}		
 	}
 
 	bool hasCommand = false;
 
 	if (this->commandType == BWAPI::UnitCommandTypes::Build && produceType != BWAPI::UnitTypes::None)
 	{				
+		std::cout << produceTotalChance << "\n";
 		if (produceType == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
 			g_Supply *= 0.25;
 

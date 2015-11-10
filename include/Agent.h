@@ -30,6 +30,7 @@ private:
 	BWAPI::UnitCommandType commandType;
 	std::unordered_map<BWAPI::UnitType, double> produceMap;
 	BWAPI::UnitType produceType;
+	double produceTotalChance;
 	double freewill;
 public:
 	//constructors

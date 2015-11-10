@@ -33,7 +33,7 @@ void CreateUnit::act()
 	{
 		while (this->unitCount > 0)
 		{	
-			if (!(this->unitType.mineralPrice() <= BWAPI::Broodwar->self()->minerals() && this->unitType.gasPrice() <= BWAPI::Broodwar->self()->gas() && this->unitType.supplyRequired() <= BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed())) 
+			if (!(this->unitType.mineralPrice() <= (BWAPI::Broodwar->self()->minerals() - g_MinReserve) && this->unitType.gasPrice() <= (BWAPI::Broodwar->self()->gas() - g_GasReserve) && this->unitType.supplyRequired() <= BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed())) 
 				return;
 			if (this->unitType.isBuilding() && this->unitType.whatBuilds().first == BWAPI::Broodwar->self()->getRace().getWorker())
 			{
@@ -52,7 +52,9 @@ void CreateUnit::act()
 						else
 						{
 							if (!builder->build(this->unitType, targetBuildLocation)) return;
-							std::cout << "I found a suitable location to build a " << this->unitType.c_str() << "\n";							
+							std::cout << "I found a suitable location to build a " << this->unitType.c_str() << "\n";
+							g_MinReserve += this->unitType.mineralPrice();
+							g_GasReserve += this->unitType.gasPrice();
 							this->unitCount--;
 						}
 

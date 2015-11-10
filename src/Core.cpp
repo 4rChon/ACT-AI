@@ -101,6 +101,8 @@ void Core::onFrame()
 	Broodwar->drawTextScreen(200, 60, "Agent Count: %d", g_Agents.size());
 	Broodwar->drawTextScreen(200, 70, "Free Agent Count: %d", g_FreeAgents.size());
 	Broodwar->drawTextScreen(200, 80, "Supply Desire: %.5f", g_Supply);
+	Broodwar->drawTextScreen(200, 90, "Mineral Reserve: %.5f", g_MinReserve);
+	Broodwar->drawTextScreen(200, 100, "Gas Reserve: %.5f", g_GasReserve);
 
 	for (auto coalition : g_Coalitions)
 		for (auto unit : coalition->getUnitSet())
