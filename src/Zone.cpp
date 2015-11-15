@@ -73,11 +73,10 @@ void Zone::setRegion(BWAPI::Region region)
 void Zone::updateZone()
 {
 	/* get all friendly units in zone*/
-	auto unitSet = this->region->getUnits(BWAPI::Filter::IsOwned);
-
+	auto unitSet = this->region->getUnits(BWAPI::Filter::IsOwned);	
 	if (BWAPI::Broodwar->elapsedTime() == this->lastVisited)
 		return;
-	/* get all opposing units in zone and adjust threat*/
+	/* get all opposing units in zone and adjust threat*/	
 	this->friendScore = 0;
 	this->enemyScore = 0;
 	this->resourceScore = 0;

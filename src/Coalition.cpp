@@ -17,7 +17,6 @@ Coalition::Coalition(Composition targetComp, TaskType taskType)
 
 Coalition::~Coalition()
 {
-	std::cout << "....Removing Coalition\n";
 	if (this->active)
 		g_FreeAgents.insert(this->agentSet.begin(), this->agentSet.end());
 
@@ -25,7 +24,6 @@ Coalition::~Coalition()
 
 	this->agentSet.clear();
 	this->unitSet.clear();
-	std::cout << "....Coalition Removed\n";
 }
 
 void Coalition::setUnitSet(BWAPI::Unitset unitSet)
@@ -102,22 +100,16 @@ void Coalition::addAgent(Agent* agent)
 	if (this->agentSet.find(agent) == agentSet.end())
 	{
 		for (auto type : this->targetComp.getTypes())
+		{
 			if (agent->getUnit()->getType() == type)
 			{
 				std::cout << agent->getUnit()->getType().c_str() << " is joining a coalition\n";
 				this->agentSet.insert(this->agentSet.begin(), agent);
 				this->addUnit(agent->getUnit());
 
-				BWAPI::Broodwar->registerEvent([this, agent](BWAPI::Game*)
-				{
-					BWAPI::Broodwar->drawTextMap(agent->getUnit()->getPosition(), this->getCurrentTaskString().c_str());
-				},
-					[agent, this](BWAPI::Game*)
-				{
-					return agent->getUnit()->exists() && this->agentSet.find(agent) != this->agentSet.end(); 
-				});
 				return;
 			}
+		}
 	}
 }
 
@@ -142,7 +134,7 @@ void Coalition::updateFreeAgents()
 		for (auto agent : this->agentSet)
 		{
 			if (!agent->getUnit()->exists())
-				g_Agents.erase(agent);
+				g_Agents.erase(agent);				
 			g_FreeAgents.erase(agent);
 		}
 	}

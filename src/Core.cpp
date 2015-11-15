@@ -7,8 +7,9 @@ using namespace Filter;
 
 void updateTaskTree(Task* task)
 {	
-	for (auto t : task->getSubTasks())
-		updateTaskTree(t);
+	if (task->getSubTasks().size() > 0)
+		for (auto t : task->getSubTasks())
+			updateTaskTree(t);
 	task->assign();
 	task->update();
 }
@@ -85,9 +86,7 @@ void Core::onStart()
 void Core::onEnd(bool isWinner)
 {
 	delete threatField;
-	std::cout << "Removing Attack\n";	
 	delete attack;
-	std::cout << "Attack Removed\n";
 	if (isWinner)
 	{
 	}
@@ -123,6 +122,7 @@ void Core::onFrame()
 	{
 		if (!(*agent)->getUnit()->exists())
 		{
+			//delete (*agent);
 			g_Agents.erase((*agent));
 			agent = g_FreeAgents.erase(agent);
 			continue;
@@ -145,7 +145,7 @@ void Core::onFrame()
 			++agent;
 			continue;
 		}
-
+		
 		std::unordered_set<Coalition*>::iterator coalition = g_OpenCoalitions.begin();
 		while (coalition != g_OpenCoalitions.end())
 		{
@@ -159,17 +159,26 @@ void Core::onFrame()
 		}
 
 		(*agent)->act();
-
+		
 		threatField->getZone((*agent)->getUnit()->getRegion()->getID())->updateZone();
 
 		++agent;
 	}
-
+	
 	for (auto coalition : g_Coalitions)
 		coalition->updateFreeAgents();	
 
-	if (attack)
-		updateTaskTree(attack);
+
+	if (attack != nullptr)
+	{
+		if (attack->isComplete())
+		{
+			delete attack;
+			attack = nullptr;
+		}
+		else
+			updateTaskTree(attack);
+	}		
 }
 
 void Core::onSendText(std::string text)
@@ -225,9 +234,7 @@ void Core::onUnitDestroy(BWAPI::Unit unit)
 {
 	updateSatisfied();
 	if (unit->getPlayer() == Broodwar->self())
-	{
 		g_TotalCount[unit->getType()]--;
-	}
 }
 
 void Core::onUnitMorph(BWAPI::Unit unit)

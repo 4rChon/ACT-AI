@@ -21,7 +21,7 @@ protected:
 public:
 	//constructors and destructors
 	Task();
-	~Task();
+	virtual ~Task();
 	
 	//setters
 	virtual void setCoalition(Coalition* coalition);

@@ -34,7 +34,7 @@ void CreateCoalition::assign()
 
 // attempt to activate coalition
 void CreateCoalition::act()
-{
+{	
 	if (!this->acting)
 	{		
 		std::cout << "CreateCoalition: Acting\n";
@@ -57,7 +57,7 @@ void CreateCoalition::update()
 	/*double abandonChance = (((double)rand() / RAND_MAX) * this->getCost() + ((BWAPI::Broodwar->getFrameCount() - this->age) / this->getCost()));
 	if (abandonChance <= 100000)*/
 	if (this->complete)
-	{
+	{		
 		this->cleanSubTasks();
 		return;
 	}
@@ -69,7 +69,7 @@ void CreateCoalition::update()
 	{		
 		this->complete = true;
 		std::cout << "CreateCoalition: Complete\n";
-	}	
+	}
 }
 
 double CreateCoalition::getCost()

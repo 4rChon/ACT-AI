@@ -9,7 +9,6 @@ private:
 public:
 	//constructors and destructors
 	Attack(Zone* target);
-	~Attack();
 
 	//-
 	void assign();

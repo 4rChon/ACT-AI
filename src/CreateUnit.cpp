@@ -31,10 +31,8 @@ void CreateUnit::act()
 {		
 	if (!this->acting)
 	{
-		std::cout << "CreateUnit: Act\n";
 		while (this->unitCount > 0)
 		{	
-			std::cout << "In the while loop..." << this->unitCount << "\n";
 			if (!(this->unitType.mineralPrice() <= (BWAPI::Broodwar->self()->minerals() - g_MinReserve) && this->unitType.gasPrice() <= (BWAPI::Broodwar->self()->gas() - g_GasReserve) && this->unitType.supplyRequired() <= BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed())) 
 				return;
 			if (this->unitType.isBuilding() && this->unitType.whatBuilds().first == BWAPI::Broodwar->self()->getRace().getWorker())
@@ -71,16 +69,16 @@ void CreateUnit::act()
 						}
 
 						// Register an event that draws the target build location
-						BWAPI::Broodwar->registerEvent([this, targetBuildLocation, builder](BWAPI::Game*)
-						{
-							BWAPI::Broodwar->drawBoxMap(BWAPI::Position(targetBuildLocation),
-								BWAPI::Position(targetBuildLocation + this->unitType.tileSize()),
-								BWAPI::Colors::Red);
-							BWAPI::Broodwar->drawDotMap(builder->getPosition(), BWAPI::Colors::Red);
-							BWAPI::Broodwar->drawLineMap(builder->getPosition(), BWAPI::Position(targetBuildLocation), BWAPI::Colors::Red);
-						},
-							nullptr,  // condition
-							this->unitType.buildTime() + 100);  // frames to run
+						//BWAPI::Broodwar->registerEvent([this, targetBuildLocation, builder](BWAPI::Game*)
+						//{
+						//	BWAPI::Broodwar->drawBoxMap(BWAPI::Position(targetBuildLocation),
+						//		BWAPI::Position(targetBuildLocation + this->unitType.tileSize()),
+						//		BWAPI::Colors::Red);
+						//	BWAPI::Broodwar->drawDotMap(builder->getPosition(), BWAPI::Colors::Red);
+						//	BWAPI::Broodwar->drawLineMap(builder->getPosition(), BWAPI::Position(targetBuildLocation), BWAPI::Colors::Red);
+						//},
+						//	nullptr,  // condition
+						//	this->unitType.buildTime() + 100);  // frames to run
 					}
 				}
 			}
@@ -119,7 +117,7 @@ void CreateUnit::update()
 	
 	if (this->acting)// || abandonChance > 100000))
 	{
-		this->complete = true;
+		this->complete = true;		
 		std::cout << "CreateUnit: Complete\n";
 	}	
 }

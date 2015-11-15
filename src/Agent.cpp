@@ -10,7 +10,7 @@ Agent::Agent()
 }
 
 Agent::Agent(BWAPI::Unit unit, double freewill)
-{
+{	
 	this->unit = unit;
 	this->freewill = freewill;	
 	this->commandType = BWAPI::UnitCommandTypes::None;
@@ -54,7 +54,6 @@ void Agent::chooseCommand()
 		int number = dist(generator);
 		advance(it, number);
 		this->commandType = (*it).first;
-		//std::cout << this->commandType.c_str() << "\n";
 	}
 	else
 		this->commandType = BWAPI::UnitCommandTypes::None;	

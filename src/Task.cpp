@@ -16,8 +16,9 @@ Task::Task()
 Task::~Task()
 {
 	this->cleanSubTasks();
-	g_OpenCoalitions.erase(this->coalition);
+	delete this->coalition;
 	g_Coalitions.erase(this->coalition);
+	g_OpenCoalitions.erase(this->coalition);
 	this->coalition = nullptr;
 	g_Tasks.remove(this);
 }
@@ -59,7 +60,6 @@ bool Task::isComplete() const
 
 std::list<Task*> Task::getSubTasks() const
 {
-	//std::cout << "Task: Getting Subtasks\n";
 	return this->subTasks;
 }
 
@@ -87,11 +87,12 @@ void Task::cleanSubTasks()
 {
 	std::list<Task*>::iterator it = this->subTasks.begin();
 	while (it != this->subTasks.end())
-	{		
+	{	
 		delete(*it);
 		(*it) = nullptr;
 		it = this->subTasks.erase(it);
 	}
+	//subTasks.resize(0);
 }
 
 void Task::addSubTask(Task* task)

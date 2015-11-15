@@ -70,7 +70,7 @@ bool Worker::build()
 	chooseBuilding();
 	if (this->buildType == BWAPI::UnitTypes::None)
 		return false;
-	std::cout << buildTotalChance << "\n";
+	//std::cout << buildTotalChance << "\n";
 	if (buildType == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
 		g_Supply *= 0.25;
 	
@@ -107,6 +107,7 @@ void Worker::updateBuildWeights()
 	//set production weights and choose production type
 	this->buildType = BWAPI::UnitTypes::None;
 	this->buildTotalChance = 0.0;
+	buildMap[BWAPI::Broodwar->self()->getRace().getSupplyProvider()] = g_Supply;
 	if (this->commandType == BWAPI::UnitCommandTypes::Build)
 	{
 		buildWeights.clear();
@@ -118,9 +119,21 @@ void Worker::updateBuildWeights()
 				buildWeights.push_back(0.0);
 			}
 			else
-			{
-				buildTotalChance += build.second;
-				buildWeights.push_back(build.second);
+			{	
+				if (build.first == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
+				{
+					buildTotalChance += build.second;
+					buildWeights.push_back(build.second);
+				}
+				else if (build.second - g_Supply > 0)
+				{
+					buildTotalChance += build.second - g_Supply;
+					buildWeights.push_back(build.second - g_Supply);
+				}
+				else
+				{
+					buildWeights.push_back(0);
+				}
 			}
 		}
 	}	
@@ -139,7 +152,7 @@ void Worker::chooseBuilding()
 		advance(it, number);
 		//std::cout << "\t" << (*it).first.c_str() << "\n";
 		this->buildType = (*it).first;
-		std::cout << this->buildType.c_str() << "\n";
+		//std::cout << this->buildType.c_str() << "\n";
 	}
 	else
 		this->buildType = BWAPI::UnitTypes::None;
