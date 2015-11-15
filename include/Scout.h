@@ -2,16 +2,12 @@
 #include "Task.h"
 #include "Zone.h"
 
-class Attack : public Task
+class Scout : public Task
 {
 private:
 	Zone* target;
-	bool scouting;
 public:
-	//constructors and destructors
-	Attack(Zone* target);
-
-	//-
+	Scout(Zone* target);
 	void assign();
 	void act();
 	void update();

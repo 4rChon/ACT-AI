@@ -47,13 +47,15 @@ void Core::onStart()
 {
 	std::cout << "\n------------ MATCH STARTED --------------\n";
 	initSatisifed();
-	updateSatisfied();
+	updateSatisfied();	
 
 	drawGui = false;
 
-	threatField = new ThreatField(Broodwar->getAllRegions());
-	attack = new Attack(threatField->getZone(20));
+	threatField = new ThreatField(Broodwar->getAllRegions());	
 	
+	defend = new Defend(threatField->getZone(140));
+	attack = nullptr;
+
 	Broodwar->sendText("gl hf");
 	Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
 
@@ -97,6 +99,11 @@ void Core::onEnd(bool isWinner)
 
 void Core::onFrame()
 {	
+	for (auto coalition : g_Coalitions)
+		if (g_OpenCoalitions.find(coalition) == g_OpenCoalitions.end())
+			for (auto unit : coalition->getUnitSet())
+				Broodwar->drawTextMap(unit->getPosition(), coalition->getCurrentTaskString().c_str());
+
 	if (drawGui)
 		drawRegions();
 	
@@ -115,16 +122,16 @@ void Core::onFrame()
 		return;
 
 	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
-		return;
+		return;	
 
-	std::unordered_set<Agent*>::iterator agent = g_FreeAgents.begin();
-	while (agent != g_FreeAgents.end())
-	{
+	std::unordered_set<Agent*>::iterator agent = g_Agents.begin();
+	while (agent != g_Agents.end())
+	{		
 		if (!(*agent)->getUnit()->exists())
 		{
-			//delete (*agent);
-			g_Agents.erase((*agent));
-			agent = g_FreeAgents.erase(agent);
+			//delete (*agent);			
+			g_FreeAgents.erase((*agent));
+			agent = g_Agents.erase(agent);
 			continue;
 		}
 
@@ -146,19 +153,22 @@ void Core::onFrame()
 			continue;
 		}
 		
-		std::unordered_set<Coalition*>::iterator coalition = g_OpenCoalitions.begin();
-		while (coalition != g_OpenCoalitions.end())
+		if (g_FreeAgents.find((*agent)) != g_FreeAgents.end())
 		{
-			(*coalition)->addAgent((*agent)); //probability parameter
-			if ((*coalition)->isActive())
+			std::unordered_set<Coalition*>::iterator coalition = g_OpenCoalitions.begin();
+			while (coalition != g_OpenCoalitions.end())
 			{
-				coalition = g_OpenCoalitions.erase(coalition);
-				break;
+				(*coalition)->addAgent((*agent)); //probability parameter
+				if ((*coalition)->isActive())
+				{
+					coalition = g_OpenCoalitions.erase(coalition);
+					break;
+				}
+				++coalition;
 			}
-			++coalition;
-		}
 
-		(*agent)->act();
+			(*agent)->act();
+		}
 		
 		threatField->getZone((*agent)->getUnit()->getRegion()->getID())->updateZone();
 
@@ -175,10 +185,23 @@ void Core::onFrame()
 		{
 			delete attack;
 			attack = nullptr;
+			defend = new Defend(threatField->getZone(140));
 		}
 		else
 			updateTaskTree(attack);
 	}		
+
+	if (defend != nullptr)
+	{
+		if (defend->isComplete())
+		{
+			delete defend;
+			defend = nullptr;
+			attack = new Attack(threatField->getZone(20));
+
+		}
+		else updateTaskTree(defend);
+	}
 }
 
 void Core::onSendText(std::string text)
@@ -220,6 +243,7 @@ void Core::onUnitEvade(BWAPI::Unit unit)
 
 void Core::onUnitShow(BWAPI::Unit unit)
 {
+
 }
 
 void Core::onUnitHide(BWAPI::Unit unit)

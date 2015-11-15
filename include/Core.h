@@ -7,6 +7,7 @@
 #include "Attack.h"
 #include "Composition.h"
 #include "CreateUnit.h"
+#include "Defend.h"
 #include "GlobalSets.h"
 #include "GlobalVariables.h"
 #include "Task.h"
@@ -41,6 +42,7 @@ private:
 	bool drawGui;
 	ThreatField* threatField;
 	Attack* attack;
+	Defend* defend;
 	//CreateUnit* createUnit;
 
 	//Composition attackComp;

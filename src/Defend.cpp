@@ -1,34 +1,18 @@
-#include "Attack.h"
-#include "Composition.h"
-#include "GlobalSets.h"
+#include "Defend.h"
 #include "CreateCoalition.h"
-#include "Scout.h"
 
-Attack::Attack(Zone* target)
-{	
-	this->taskType = ATT;
-	this->taskName = "Attack(Zone*)";
+Defend::Defend(Zone* target)
+{
+	this->taskType = DEF;
+	this->taskName = "Defend(Zone*)";
 	this->target = target;
-	this->scouting = false;
 }
 
-// assign an attacking coalition
-void Attack::assign()
+void Defend::assign()
 {
 	if (!this->assigned)
 	{
-		if (target->getConfidence() < 0.8)
-		{
-			if (!scouting)
-			{
-				Scout* scout = new Scout(target);
-				this->addSubTask(scout);
-				scouting = true;
-			}
-			return;
-		}
-
-		std::cout << "Attack: Assign\n";
+		std::cout << "Defend: Assign\n";
 		Composition c;
 		c.addType(BWAPI::UnitTypes::Terran_Marine, 5 + g_TotalCount[BWAPI::UnitTypes::Terran_Marine]);
 		for (auto unitType : g_TotalCount)
@@ -43,40 +27,30 @@ void Attack::assign()
 	}
 }
 
-// attack with coalition
-void Attack::act()
+void Defend::act()
 {
 	if (!this->acting)
 	{
-		std::cout << "Attack: Act\n";
+		std::cout << "Defend: Act\n";
 		this->coalition->getUnitSet().attack(this->target->getRegion()->getCenter());
 		this->acting = true;
 	}
 }
 
-void Attack::update()
+void Defend::update()
 {
 	if (this->complete)
 	{
 		this->cleanSubTasks();
 		return;
 	}
-	
+
 	if (this->assigned && this->coalition->isActive())
 		act();
 
-	if (this->target->getConfidence() > 0.8 && this->target->getEnemyScore() == 0)
+	if (this->target->getConfidence() > 0.8 && this->target->getEnemyScore() == 0 )
 	{
 		this->complete = true;
-		std::cout << "Attack: Complete\n";
-	}
-	else if (this->acting)
-	{
-		std::cout << "Acting with " << this->coalition->getUnitSet().size() << "\n";
-		if (this->coalition->getUnitSet().size() == 0)
-		{
-			this->complete = true;
-			std::cout << "Attack: Failed\n";
-		}
+		std::cout << "Defend: Complete\n";
 	}
 }

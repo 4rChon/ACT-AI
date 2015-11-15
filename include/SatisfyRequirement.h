@@ -10,4 +10,6 @@ private:
 public:
 	SatisfyRequirement(BWAPI::UnitType unitType);
 	void assign();
+	void act();
+	void update();
 };

@@ -10,6 +10,7 @@ CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 	this->taskName = "CreateUnit(unitType)";
 	this->unitType = unitType;
 	this->unitCount = unitCount;
+	this->satisfied = false;
 }
 
 // assign a producer coalition
@@ -33,6 +34,16 @@ void CreateUnit::act()
 	{
 		while (this->unitCount > 0)
 		{	
+			if (!g_isUnlocked[unitType])
+			{
+				if (satisfied)
+					return;
+				std::cout << unitType.c_str() << " is locked\n";
+				SatisfyRequirement* satisfyRequirement = new SatisfyRequirement(unitType);
+				this->addSubTask(satisfyRequirement);
+				satisfied = true;
+				return;
+			}
 			if (!(this->unitType.mineralPrice() <= (BWAPI::Broodwar->self()->minerals() - g_MinReserve) && this->unitType.gasPrice() <= (BWAPI::Broodwar->self()->gas() - g_GasReserve) && this->unitType.supplyRequired() <= BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed())) 
 				return;
 			if (this->unitType.isBuilding() && this->unitType.whatBuilds().first == BWAPI::Broodwar->self()->getRace().getWorker())
@@ -56,7 +67,6 @@ void CreateUnit::act()
 							g_MinReserve += this->unitType.mineralPrice();
 							g_GasReserve += this->unitType.gasPrice();
 							std::cout << "Reserving " << this->unitType.mineralPrice() << " Minerals and " << this->unitType.gasPrice() << " Gas to build a " << this->unitType.c_str() << "\n";
-				//			this->unitCount--;
 							BWAPI::Broodwar->registerEvent([this, builder](BWAPI::Game*)
 							{
 								std::cout << "Releasing " << this->unitType.mineralPrice() << " Minerals and " << this->unitType.gasPrice() << " Gas after placing a " << this->unitType.c_str() << "\n";
@@ -67,18 +77,6 @@ void CreateUnit::act()
 								[builder](BWAPI::Game*){return builder->getOrder() == BWAPI::Orders::ConstructingBuilding; },
 								1);
 						}
-
-						// Register an event that draws the target build location
-						//BWAPI::Broodwar->registerEvent([this, targetBuildLocation, builder](BWAPI::Game*)
-						//{
-						//	BWAPI::Broodwar->drawBoxMap(BWAPI::Position(targetBuildLocation),
-						//		BWAPI::Position(targetBuildLocation + this->unitType.tileSize()),
-						//		BWAPI::Colors::Red);
-						//	BWAPI::Broodwar->drawDotMap(builder->getPosition(), BWAPI::Colors::Red);
-						//	BWAPI::Broodwar->drawLineMap(builder->getPosition(), BWAPI::Position(targetBuildLocation), BWAPI::Colors::Red);
-						//},
-						//	nullptr,  // condition
-						//	this->unitType.buildTime() + 100);  // frames to run
 					}
 				}
 			}
