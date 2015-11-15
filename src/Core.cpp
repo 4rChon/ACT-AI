@@ -1,4 +1,6 @@
 #include "Core.h"
+#include "Worker.h"
+#include "Producer.h"
 
 using namespace BWAPI;
 using namespace Filter;
@@ -34,6 +36,10 @@ void updateSatisfied()
 
 	if (Broodwar->self()->getRace() == Races::Zerg)
 		g_isUnlocked[UnitTypes::Zerg_Larva] = true;
+
+	//update unlocked weights
+	for (auto agent : g_Agents)
+		agent->updateUnlocked();
 }
 
 void Core::onStart()
@@ -79,7 +85,9 @@ void Core::onStart()
 void Core::onEnd(bool isWinner)
 {
 	delete threatField;
+	std::cout << "Removing Attack\n";	
 	delete attack;
+	std::cout << "Attack Removed\n";
 	if (isWinner)
 	{
 	}
@@ -102,11 +110,7 @@ void Core::onFrame()
 	Broodwar->drawTextScreen(200, 70, "Free Agent Count: %d", g_FreeAgents.size());
 	Broodwar->drawTextScreen(200, 80, "Supply Desire: %.5f", g_Supply);
 	Broodwar->drawTextScreen(200, 90, "Mineral Reserve: %.5f", g_MinReserve);
-	Broodwar->drawTextScreen(200, 100, "Gas Reserve: %.5f", g_GasReserve);
-
-	for (auto coalition : g_Coalitions)
-		for (auto unit : coalition->getUnitSet())
-			Broodwar->drawTextMap(unit->getPosition(), coalition->getCurrentTaskString().c_str());
+	Broodwar->drawTextScreen(200, 100, "Gas Reserve: %.5f", g_GasReserve);	
 
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
 		return;
@@ -251,12 +255,24 @@ void Core::onUnitComplete(BWAPI::Unit unit)
 {	
 	if (unit->getPlayer() == Broodwar->self())
 	{
-		if (!(unit->getType().supplyProvided() == 8))
+		if (unit->getType().isBuilding() && unit->getType().canProduce())
+		{
+			Producer* producer = new Producer(unit, 1);
+			g_Agents.insert(producer);
+			g_FreeAgents.insert(producer);
+		}
+		else if (unit->getType().isWorker()) //refactor
+		{
+			Worker* worker = new Worker(unit, 0.01);
+			g_Agents.insert(worker);
+			g_FreeAgents.insert(worker);
+		}		
+		else
 		{
 			Agent* agent = new Agent(unit, 1);
 			g_Agents.insert(agent);
 			g_FreeAgents.insert(agent);
-		}
+		}		
 		g_TotalCount[unit->getType()]++;
 
 	}

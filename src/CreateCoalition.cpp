@@ -54,8 +54,8 @@ void CreateCoalition::act()
 
 void CreateCoalition::update()
 {
-	//double abandonChance = (((double)rand() / RAND_MAX) * this->getCost() + ((BWAPI::Broodwar->getFrameCount() - this->age) / this->getCost()));
-	//if (abandonChance <= 100000)
+	/*double abandonChance = (((double)rand() / RAND_MAX) * this->getCost() + ((BWAPI::Broodwar->getFrameCount() - this->age) / this->getCost()));
+	if (abandonChance <= 100000)*/
 	if (this->complete)
 	{
 		this->cleanSubTasks();

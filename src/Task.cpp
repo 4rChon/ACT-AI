@@ -16,6 +16,7 @@ Task::Task()
 Task::~Task()
 {
 	this->cleanSubTasks();
+	g_OpenCoalitions.erase(this->coalition);
 	g_Coalitions.erase(this->coalition);
 	this->coalition = nullptr;
 	g_Tasks.remove(this);

@@ -12,8 +12,11 @@ Attack::Attack(Zone* target)
 
 Attack::~Attack()
 {
-	delete this->target;		
+	delete this->target;	
+	g_OpenCoalitions.erase(this->coalition);
+	g_Coalitions.erase(this->coalition);
 	this->target = nullptr;
+	this->coalition = nullptr;
 }
 
 // assign an attacking coalition
@@ -23,7 +26,9 @@ void Attack::assign()
 	{
 		std::cout << "Attack: Assign\n";
 		Composition c;
-		c.addType(BWAPI::UnitTypes::Terran_Marine, 10);
+		c.addType(BWAPI::UnitTypes::Terran_Marine, 20);
+		//c.addType(BWAPI::UnitTypes::Terran_Firebat, 10);
+		//c.addType(BWAPI::UnitTypes::Terran_Medic, 10);
 		//c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 10);
 		CreateCoalition *createCoalition = new CreateCoalition(c, this);
 		addSubTask(createCoalition);
@@ -47,6 +52,7 @@ void Attack::update()
 	if (this->complete)
 	{
 		this->cleanSubTasks();
+		g_Tasks.remove(this);
 		return;
 	}
 	

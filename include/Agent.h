@@ -1,5 +1,6 @@
 #pragma once
 #include <BWAPI.h>
+#include <random>
 #include "Composition.h"
 #include "GlobalVariables.h"
 
@@ -24,16 +25,17 @@ namespace std
 
 class Agent
 {
-private:
+protected:
 	BWAPI::Unit unit;
-	std::unordered_map<BWAPI::UnitCommandType, double> commandMap;
 	BWAPI::UnitCommandType commandType;
-	std::unordered_map<BWAPI::UnitType, double> produceMap;
-	BWAPI::UnitType produceType;
-	double produceTotalChance;
-	double freewill;
+	std::unordered_map<BWAPI::UnitCommandType, double> commandMap;	
+	std::vector<double> commandWeights;
+	std::default_random_engine generator;
+	double freewill;	
+
 public:
 	//constructors
+	Agent();
 	Agent(BWAPI::Unit unit, double freewill);
 
 	//setters
@@ -43,6 +45,11 @@ public:
 	BWAPI::Unit getUnit() const;
 
 	//-
-	void Agent::act();
+	virtual void act();
+
+	//helpers
+	virtual void updateUnlocked();
+	void updateCommandWeights();
+	void chooseCommand();
 	
 };

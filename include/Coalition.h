@@ -20,7 +20,7 @@ public:
 	//constructors and destructors;
 	Coalition();
 	Coalition(Composition targetComp, TaskType taskType);
-	Coalition::~Coalition();
+	~Coalition();
 
 	//setters
 	void setUnitSet(BWAPI::Unitset unitSet);

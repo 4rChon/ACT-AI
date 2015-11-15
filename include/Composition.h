@@ -26,7 +26,7 @@ class Composition
 {
 private:
 	std::unordered_map<BWAPI::UnitType, int> unitMap;
-	double cost = 0;
+	double cost;
 public:
 	//constructors
 	Composition();

@@ -2,7 +2,7 @@
 #include "GlobalSets.h"
 
 Coalition::Coalition()
-{ 
+{ 	
 	active = false;
 	age = BWAPI::Broodwar->getFrameCount();
 }
@@ -17,11 +17,15 @@ Coalition::Coalition(Composition targetComp, TaskType taskType)
 
 Coalition::~Coalition()
 {
+	std::cout << "....Removing Coalition\n";
 	if (this->active)
 		g_FreeAgents.insert(this->agentSet.begin(), this->agentSet.end());
 
+	this->active = false;
+
 	this->agentSet.clear();
-	this->unitSet.clear();	
+	this->unitSet.clear();
+	std::cout << "....Coalition Removed\n";
 }
 
 void Coalition::setUnitSet(BWAPI::Unitset unitSet)
@@ -95,14 +99,23 @@ void Coalition::addUnit(BWAPI::Unit unit)
 
 void Coalition::addAgent(Agent* agent)
 {
-	if (agentSet.find(agent) == agentSet.end())
+	if (this->agentSet.find(agent) == agentSet.end())
 	{
-		for (auto type : targetComp.getTypes())
+		for (auto type : this->targetComp.getTypes())
 			if (agent->getUnit()->getType() == type)
 			{
 				std::cout << agent->getUnit()->getType().c_str() << " is joining a coalition\n";
-				agentSet.insert(agentSet.begin(), agent);
-				addUnit(agent->getUnit());
+				this->agentSet.insert(this->agentSet.begin(), agent);
+				this->addUnit(agent->getUnit());
+
+				BWAPI::Broodwar->registerEvent([this, agent](BWAPI::Game*)
+				{
+					BWAPI::Broodwar->drawTextMap(agent->getUnit()->getPosition(), this->getCurrentTaskString().c_str());
+				},
+					[agent, this](BWAPI::Game*)
+				{
+					return agent->getUnit()->exists() && this->agentSet.find(agent) != this->agentSet.end(); 
+				});
 				return;
 			}
 	}
