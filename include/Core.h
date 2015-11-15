@@ -19,7 +19,6 @@ namespace std
 	{
 		size_t operator()(const Agent &a) const
 		{
-			std::cout << "Get Unit.. Hash\n";
 			return (51 * (std::hash<int>()(a.getUnit()->getID())));
 		}
 	};
@@ -28,7 +27,6 @@ namespace std
 	{
 		bool operator()(const Agent &lhs, const Agent &rhs) const
 		{
-			std::cout << "Get Unit.. Equal To\n";
 			return lhs.getUnit()->getID() == rhs.getUnit()->getID();
 		}
 	};

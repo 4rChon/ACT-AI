@@ -9,9 +9,7 @@ Composition::Composition(BWAPI::Unitset unitSet)
 {
 	cost = 0;
 	for (auto unit : unitSet)
-	{
 		this->addUnit(unit);		
-	}
 }
 
 Composition::Composition(std::unordered_map<BWAPI::UnitType, int> unitMap)
