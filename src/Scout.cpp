@@ -52,7 +52,6 @@ void Scout::update()
 	}
 	else if (this->acting)
 	{
-		std::cout << "Acting with " << this->coalition->getUnitSet().size() << "\n";
 		if (this->coalition->getUnitSet().size() == 0)
 		{
 			this->complete = true;

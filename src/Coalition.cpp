@@ -85,7 +85,7 @@ int Coalition::getAge() const
 
 void Coalition::addUnit(BWAPI::Unit unit)
 {
-	this->unitSet.insert(unit);
+	this->unitSet.insert(this->unitSet.begin(), unit);
 	this->currentComp += unit;
 
 	if (!active && currentComp == targetComp)

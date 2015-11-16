@@ -100,9 +100,18 @@ void Core::onEnd(bool isWinner)
 void Core::onFrame()
 {	
 	for (auto coalition : g_Coalitions)
-		if (g_OpenCoalitions.find(coalition) == g_OpenCoalitions.end())
+	{
+		if (coalition->isActive())
+		{
 			for (auto unit : coalition->getUnitSet())
+			{
+				if (!unit->exists())
+					coalition->removeUnit(unit);
+		
 				Broodwar->drawTextMap(unit->getPosition(), coalition->getCurrentTaskString().c_str());
+			}
+		}
+	}
 
 	if (drawGui)
 		drawRegions();
@@ -259,6 +268,7 @@ void Core::onUnitDestroy(BWAPI::Unit unit)
 	updateSatisfied();
 	if (unit->getPlayer() == Broodwar->self())
 		g_TotalCount[unit->getType()]--;
+
 }
 
 void Core::onUnitMorph(BWAPI::Unit unit)

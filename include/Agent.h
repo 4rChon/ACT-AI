@@ -53,3 +53,22 @@ public:
 	void chooseCommand();
 	
 };
+
+namespace std
+{
+	template<> struct hash < Agent >
+	{
+		size_t operator()(const Agent &a) const
+		{
+			return (51 * (std::hash<int>()(a.getUnit()->getID())));
+		}
+	};
+
+	template<> struct equal_to < Agent >
+	{
+		bool operator()(const Agent &lhs, const Agent &rhs) const
+		{
+			return lhs.getUnit()->getID() == rhs.getUnit()->getID();
+		}
+	};
+}

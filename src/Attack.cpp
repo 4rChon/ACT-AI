@@ -24,16 +24,15 @@ void Attack::assign()
 				Scout* scout = new Scout(target);
 				this->addSubTask(scout);
 				scouting = true;
-			}
-			return;
+			}			
 		}
 
 		std::cout << "Attack: Assign\n";
 		Composition c;
 		c.addType(BWAPI::UnitTypes::Terran_Marine, 5 + g_TotalCount[BWAPI::UnitTypes::Terran_Marine]);
-		for (auto unitType : g_TotalCount)
-			if (!unitType.first.isWorker() && !unitType.first.isBuilding() && !unitType.first != BWAPI::UnitTypes::Terran_Marine)
-				c.addType(unitType.first, unitType.second);
+		//for (auto unitType : g_TotalCount)
+		//	if (!unitType.first.isWorker() && !unitType.first.isBuilding() && unitType.first != BWAPI::UnitTypes::Terran_Marine)
+		//		c.addType(unitType.first, unitType.second);
 		//c.addType(BWAPI::UnitTypes::Terran_Firebat, 5);
 		//c.addType(BWAPI::UnitTypes::Terran_Medic, 5);
 		//c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 10);
@@ -72,7 +71,6 @@ void Attack::update()
 	}
 	else if (this->acting)
 	{
-		std::cout << "Acting with " << this->coalition->getUnitSet().size() << "\n";
 		if (this->coalition->getUnitSet().size() == 0)
 		{
 			this->complete = true;
