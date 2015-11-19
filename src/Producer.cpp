@@ -74,7 +74,6 @@ void Producer::updateTrainWeights()
 
 void Producer::chooseUnit()
 {	
-	updateUnlocked();
 	updateTrainWeights();
 	if (trainWeights.size() > 0 && trainTotalChance > 0.0)
 	{		

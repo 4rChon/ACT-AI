@@ -27,5 +27,6 @@ public:
 	Agentset::iterator removeAgent(Agentset::iterator agent);
 	void freeAgent(Agent* agent);
 	void bindAgent(Agent* agent);
+	void updateUnlocked();
 	void act();
 };

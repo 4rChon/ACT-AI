@@ -40,9 +40,7 @@ void updateSatisfied()
 	if (Broodwar->self()->getRace() == Races::Zerg)
 		g_isUnlocked[UnitTypes::Zerg_Larva] = true;
 
-	//update unlocked weights
-	for (auto agent : g_Agents)
-		agent->updateUnlocked();
+	AgentManager::getInstance()->updateUnlocked();
 }
 
 void Core::onStart()

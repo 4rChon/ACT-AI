@@ -100,3 +100,9 @@ void AgentManager::act()
 		if (agent->isFree())
 			agent->act();
 }
+
+void AgentManager::updateUnlocked()
+{
+	for (auto &agent : this->agentSet)
+		agent->updateUnlocked();
+}
