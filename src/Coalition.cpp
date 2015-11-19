@@ -1,5 +1,6 @@
 #include "Coalition.h"
 #include "GlobalSets.h"
+#include "AgentManager.h"
 
 Coalition::Coalition()
 { 	
@@ -7,8 +8,9 @@ Coalition::Coalition()
 	age = BWAPI::Broodwar->getFrameCount();
 }
 
-Coalition::Coalition(Composition targetComp, TaskType taskType)
+Coalition::Coalition(Composition targetComp, int taskID, TaskType taskType)
 {
+	this->taskID = taskID;
 	active = false;
 	this->targetComp = targetComp;
 	this->currentTask = taskType;
@@ -17,10 +19,9 @@ Coalition::Coalition(Composition targetComp, TaskType taskType)
 
 Coalition::~Coalition()
 {
-	if (this->active)
-		g_FreeAgents.insert(this->agentSet.begin(), this->agentSet.end());
-
 	this->active = false;
+	for (auto agent : agentSet)
+		AgentManager::getInstance()->freeAgent(agent);
 
 	this->agentSet.clear();
 	this->unitSet.clear();
@@ -122,20 +123,15 @@ void Coalition::removeUnit(BWAPI::Unit unit)
 
 void Coalition::removeAgent(Agent* agent)
 {
-	this->agentSet.erase(agent);
-	g_FreeAgents.insert(agent);
-	removeUnit(agent->getUnit());
+	this->agentSet.erase(agent);	
+	removeUnit(agent->getUnit());	
+	if (active)
+		AgentManager::getInstance()->freeAgent(agent);
 }
 
 void Coalition::updateFreeAgents()
-{
+{	
 	if (active)
-	{
 		for (auto agent : this->agentSet)
-		{
-			if (!agent->getUnit()->exists())
-				g_Agents.erase(agent);				
-			g_FreeAgents.erase(agent);
-		}
-	}
+			AgentManager::getInstance()->bindAgent(agent);
 }

@@ -2,6 +2,8 @@
 #include <unordered_set>
 
 #include <BWAPI.h>
+#include <BWTA.h>
+#include <Windows.h>
 
 #include "Agent.h"
 #include "Attack.h"
@@ -21,7 +23,7 @@
 class Core : public BWAPI::AIModule
 {
 private:
-	int tempCounter = 0;
+	//int tempCounter = 0;
 	bool drawGui;
 	ThreatField* threatField;
 	Attack* attack;
@@ -51,4 +53,6 @@ public:
 	virtual void onUnitComplete(BWAPI::Unit unit);
 	// Everything below this line is safe to modify.
 	void drawRegions();
+	void drawTextInfo();
+	void drawTerrainData();
 };

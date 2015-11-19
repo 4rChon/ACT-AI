@@ -1,6 +1,7 @@
 #include "Core.h"
 #include "Worker.h"
 #include "Producer.h"
+#include "AgentManager.h"
 
 using namespace BWAPI;
 using namespace Filter;
@@ -20,6 +21,7 @@ void initSatisifed()
 	for each(BWAPI::UnitType t in BWAPI::UnitTypes::allUnitTypes())
 		g_isUnlocked[t] = false;
 }
+
 void updateSatisfied()
 {
 	for (auto unit : g_TotalCount)
@@ -44,10 +46,13 @@ void updateSatisfied()
 }
 
 void Core::onStart()
-{
-	std::cout << "\n------------ MATCH STARTED --------------\n";
+{	
+	std::cout << "\n------------ MATCH STARTED --------------\n";	
+
 	initSatisifed();
-	updateSatisfied();	
+	updateSatisfied();
+
+	AgentManager::getInstance();
 
 	drawGui = false;
 
@@ -58,6 +63,7 @@ void Core::onStart()
 
 	Broodwar->sendText("gl hf");
 	Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
+
 
 	Broodwar->enableFlag(Flag::UserInput);
 	
@@ -72,17 +78,14 @@ void Core::onStart()
 
 		Playerset players = Broodwar->getPlayers();
 		for (auto p : players)
-		{
 			if (!p->isObserver())
 				Broodwar << p->getName() << ", playing as " << p->getRace() << std::endl;
-		}
 
 	}
 	else
-	{
 		if (Broodwar->enemy())
 			Broodwar << "The matchup is " << Broodwar->self()->getRace() << " vs " << Broodwar->enemy()->getRace() << std::endl;
-	}
+
 }
 
 void Core::onEnd(bool isWinner)
@@ -99,48 +102,24 @@ void Core::onEnd(bool isWinner)
 
 void Core::onFrame()
 {	
-	for (auto coalition : g_Coalitions)
-	{
-		if (coalition->isActive())
-		{
-			for (auto unit : coalition->getUnitSet())
-			{
-				if (!unit->exists())
-					coalition->removeUnit(unit);
-		
-				Broodwar->drawTextMap(unit->getPosition(), coalition->getCurrentTaskString().c_str());
-			}
-		}
-	}
+	//display text with information at the top of the screen
+	drawTextInfo();
+
+	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
+		return;	
+
+	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
+		return;
 
 	if (drawGui)
 		drawRegions();
 	
-	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
-	Broodwar->drawTextScreen(200, 10, "Average FPS: %f", Broodwar->getAverageFPS());
-	Broodwar->drawTextScreen(200, 30, "Active Tasks: %d", g_Tasks.size());
-	Broodwar->drawTextScreen(200, 40, "Coalition Count: %d", g_Coalitions.size());
-	Broodwar->drawTextScreen(200, 50, "Open Coalition Count: %d", g_OpenCoalitions.size());
-	Broodwar->drawTextScreen(200, 60, "Agent Count: %d", g_Agents.size());
-	Broodwar->drawTextScreen(200, 70, "Free Agent Count: %d", g_FreeAgents.size());
-	Broodwar->drawTextScreen(200, 80, "Supply Desire: %.5f", g_Supply);
-	Broodwar->drawTextScreen(200, 90, "Mineral Reserve: %.5f", g_MinReserve);
-	Broodwar->drawTextScreen(200, 100, "Gas Reserve: %.5f", g_GasReserve);	
-
-	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
-		return;
-
-	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
-		return;	
-
-	std::unordered_set<Agent*>::iterator agent = g_Agents.begin();
-	while (agent != g_Agents.end())
+	std::unordered_set<Agent*>::iterator agent = AgentManager::getInstance()->getAgentset().begin();
+	while (agent != AgentManager::getInstance()->getAgentset().end())
 	{		
 		if (!(*agent)->getUnit()->exists())
-		{
-			//delete (*agent);			
-			g_FreeAgents.erase((*agent));
-			agent = g_Agents.erase(agent);
+		{			
+			agent = AgentManager::getInstance()->removeAgent(agent);
 			continue;
 		}
 
@@ -162,8 +141,8 @@ void Core::onFrame()
 			continue;
 		}
 		
-		if (g_FreeAgents.find((*agent)) != g_FreeAgents.end())
-		{
+		if ((*agent)->isFree())
+		{			
 			std::unordered_set<Coalition*>::iterator coalition = g_OpenCoalitions.begin();
 			while (coalition != g_OpenCoalitions.end())
 			{
@@ -175,7 +154,6 @@ void Core::onFrame()
 				}
 				++coalition;
 			}
-
 			(*agent)->act();
 		}
 		
@@ -183,6 +161,8 @@ void Core::onFrame()
 
 		++agent;
 	}
+
+	//AgentManager::getInstance()->act();
 	
 	for (auto coalition : g_Coalitions)
 		coalition->updateFreeAgents();	
@@ -194,7 +174,7 @@ void Core::onFrame()
 		{
 			delete attack;
 			attack = nullptr;
-			defend = new Defend(threatField->getZone(140));
+			defend = new Defend(threatField->getZone(135));
 		}
 		else
 			updateTaskTree(attack);
@@ -220,6 +200,7 @@ void Core::onSendText(std::string text)
 		drawGui = !drawGui;
 		return;
 	}
+
 	Broodwar->sendText("%s", text.c_str());
 }
 
@@ -260,15 +241,17 @@ void Core::onUnitHide(BWAPI::Unit unit)
 }
 
 void Core::onUnitCreate(BWAPI::Unit unit)
-{
+{	
 }
 
 void Core::onUnitDestroy(BWAPI::Unit unit)
-{
-	updateSatisfied();
+{	
 	if (unit->getPlayer() == Broodwar->self())
+	{
 		g_TotalCount[unit->getType()]--;
-
+		AgentManager::getInstance()->removeAgent(unit);
+	}
+	updateSatisfied();
 }
 
 void Core::onUnitMorph(BWAPI::Unit unit)
@@ -293,29 +276,12 @@ void Core::onSaveGame(std::string gameName)
 }
 
 void Core::onUnitComplete(BWAPI::Unit unit)
-{	
+{		
 	if (unit->getPlayer() == Broodwar->self())
 	{
-		if (unit->getType().isBuilding() && unit->getType().canProduce())
-		{
-			Producer* producer = new Producer(unit, 1);
-			g_Agents.insert(producer);
-			g_FreeAgents.insert(producer);
-		}
-		else if (unit->getType().isWorker()) //refactor
-		{
-			Worker* worker = new Worker(unit, 0.01);
-			g_Agents.insert(worker);
-			g_FreeAgents.insert(worker);
-		}		
-		else
-		{
-			Agent* agent = new Agent(unit, 1);
-			g_Agents.insert(agent);
-			g_FreeAgents.insert(agent);
-		}		
+		AgentManager::getInstance()->addAgent(unit);
 		g_TotalCount[unit->getType()]++;
-
+		std::cout << g_TotalCount[unit->getType()];
 	}
 	updateSatisfied();
 	g_Supply = (1 / (double)((BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()) + 1));
@@ -348,4 +314,28 @@ void Core::drawRegions()
 			s.c_str()
 			);
 	}
+}
+
+void Core::drawTextInfo()
+{
+	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
+	Broodwar->drawTextScreen(200, 10, "Average FPS: %f", Broodwar->getAverageFPS());
+	Broodwar->drawTextScreen(200, 30, "Active Tasks: %d", g_Tasks.size());
+	Broodwar->drawTextScreen(200, 40, "Coalition Count: %d", g_Coalitions.size());
+	Broodwar->drawTextScreen(200, 50, "Open Coalition Count: %d", g_OpenCoalitions.size());
+	Broodwar->drawTextScreen(200, 60, "Agent Count: %d", AgentManager::getInstance()->getAgentset().size());
+	Broodwar->drawTextScreen(200, 70, "Free Agent Count: %d", AgentManager::getInstance()->getFreeCount());
+	Broodwar->drawTextScreen(200, 80, "Supply Desire: %.5f", g_Supply);
+	Broodwar->drawTextScreen(200, 90, "Mineral Reserve: %.5f", g_MinReserve);
+	Broodwar->drawTextScreen(200, 100, "Gas Reserve: %.5f", g_GasReserve);
+
+	for (auto coalition : g_Coalitions)
+		if (coalition->isActive())
+			for (auto unit : coalition->getUnitSet())
+			{
+				if (!unit->exists())
+					coalition->removeUnit(unit);
+
+				Broodwar->drawTextMap(unit->getPosition(), coalition->getCurrentTaskString().c_str());
+			}
 }

@@ -16,10 +16,11 @@ private:
 	TaskType currentTask;
 	bool active;
 	int age;
+	int taskID;
 public:
 	//constructors and destructors;
 	Coalition();
-	Coalition(Composition targetComp, TaskType taskType);
+	Coalition(Composition targetComp, int taskID, TaskType taskType);
 	~Coalition();
 
 	//setters

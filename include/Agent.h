@@ -26,6 +26,9 @@ namespace std
 class Agent
 {
 protected:
+	bool freeAgent;
+	int unitID;
+	int coalitionID;
 	BWAPI::Unit unit;
 	BWAPI::UnitCommandType commandType;
 	std::unordered_map<BWAPI::UnitCommandType, double> commandMap;	
@@ -39,10 +42,13 @@ public:
 	Agent(BWAPI::Unit unit, double freewill);
 
 	//setters
+	void setFree(bool free);
 	void setUnit(BWAPI::Unit unit);
 
 	//getters
-	BWAPI::Unit getUnit() const;
+	bool isFree() const;
+	int getID() const;
+	BWAPI::Unit getUnit() const;	
 
 	//-
 	virtual void act();

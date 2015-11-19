@@ -17,7 +17,7 @@ Producer::Producer(BWAPI::Unit unit, double freewill)
 }
 
 void Producer::act()
-{		
+{			
 	if (this->commandType == BWAPI::UnitCommandTypes::Train)
 	{
 		chooseUnit();
@@ -45,44 +45,45 @@ void Producer::updateUnlocked()
 	for (auto unitType : this->unit->getType().buildsWhat())
 	{
 		if (!g_isUnlocked[unitType])
+		{
 			this->trainMap[unitType] = 0.0;
+		}
 		else
 			this->trainMap[unitType] = 1.0 / (double)this->unit->getType().buildsWhat().size();
-		//std::cout << unitType.c_str() << " : " << this->produceMap[unitType] << "\n";
 	}
 }
 
 void Producer::updateTrainWeights()
 {
-	//set production weights and choose production type
 	this->trainType = BWAPI::UnitTypes::None;
 	this->trainTotalChance = 0.0;
-	trainWeights.clear();
+	this->trainWeights.clear();
 	for (auto train : trainMap)
 	{
-		if (train.first.mineralPrice() > BWAPI::Broodwar->self()->minerals() - g_MinReserve
-			|| train.first.gasPrice() > BWAPI::Broodwar->self()->gas() - g_GasReserve)
-			trainWeights.push_back(0.0);
+		double currentMinerals = BWAPI::Broodwar->self()->minerals() - g_MinReserve;
+		double currentGas = BWAPI::Broodwar->self()->gas() - g_GasReserve;
+		if (train.first.mineralPrice() > currentMinerals || train.first.gasPrice() > currentGas)
+			this->trainWeights.push_back(0.0);
 		else
 		{
-			trainTotalChance += train.second;
-			trainWeights.push_back(train.second);
+			this->trainTotalChance += train.second;
+			this->trainWeights.push_back(train.second);
 		}
 	}
 }
 
 void Producer::chooseUnit()
-{
+{	
+	updateUnlocked();
 	updateTrainWeights();
 	if (trainWeights.size() > 0 && trainTotalChance > 0.0)
-	{
+	{		
 		std::size_t i = 0;
 		std::discrete_distribution<> dist(trainWeights.size(), 0.0, 1.0, [this, &i](double){return this->trainWeights[i++]; });
 
 		auto it = trainMap.begin();
 		int number = dist(generator);
 		advance(it, number);
-		//std::cout << "\t" << (*it).first.c_str() << "\n";
 		this->trainType = (*it).first;
 	}
 	else

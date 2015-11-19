@@ -20,7 +20,7 @@ Worker::Worker(BWAPI::Unit unit, double freewill)
 }
 
 void Worker::act()
-{
+{	
 	//this->commandMap[BWAPI::UnitCommandTypes::Build] = g_Supply *(int)(BWAPI::Broodwar->self()->getRace().getSupplyProvider().mineralPrice() < BWAPI::Broodwar->self()->minerals());
 	//this->commandMap[BWAPI::UnitCommandTypes::Gather] = 1 - this->commandMap[BWAPI::UnitCommandTypes::Build];
 	//this->buildMap[BWAPI::Broodwar->self()->getRace().getSupplyProvider()] = g_Supply *(int)(BWAPI::Broodwar->self()->getRace().getSupplyProvider().mineralPrice() < BWAPI::Broodwar->self()->minerals());
@@ -97,7 +97,10 @@ void Worker::updateUnlocked()
 		if (!g_isUnlocked[unitType])
 			this->buildMap[unitType] = 0.0;
 		else
-			this->buildMap[unitType] = 1.0 / (double)this->unit->getType().buildsWhat().size();
+		{
+			if (unitType == BWAPI::UnitTypes::Terran_Barracks || unitType == BWAPI::UnitTypes::Terran_Supply_Depot)
+				this->buildMap[unitType] = 1.0 / (double)this->unit->getType().buildsWhat().size();
+		}
 		//std::cout << unitType.c_str() << " : " << this->produceMap[unitType] << "\n";
 	}
 }

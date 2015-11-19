@@ -16,6 +16,7 @@ protected:
 	bool complete;
 	bool acting;
 	int age;
+	int taskID;
 	double cost;
 	Coalition* coalition;	
 public:
@@ -33,6 +34,7 @@ public:
 	virtual bool isAssigned() const;
 	virtual bool isActing() const;
 	virtual bool isComplete() const;
+	virtual int getID() const;
 	virtual std::list<Task*> getSubTasks() const;
 	virtual TaskType getType() const;
 	virtual Coalition* getCoalition() const;

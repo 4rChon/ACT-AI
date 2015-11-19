@@ -3,6 +3,7 @@
 
 Task::Task()
 {
+	this->taskID = g_NextTaskID++;
 	this->taskType = NON;
 	this->taskName = "Task";
 	this->complete = false;
@@ -56,6 +57,11 @@ bool Task::isActing() const
 bool Task::isComplete() const
 {
 	return this->complete;
+}
+
+int Task::getID() const
+{
+	return this->taskID;
 }
 
 std::list<Task*> Task::getSubTasks() const
