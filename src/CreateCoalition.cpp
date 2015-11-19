@@ -1,16 +1,17 @@
 #include "CreateCoalition.h"
+#include "CoalitionManager.h"
 #include "CreateUnit.h"
 #include "GlobalSets.h"
 
 CreateCoalition::CreateCoalition(Composition composition, Task* task)
 {	
 	this->taskType = CRC;
-	this->taskName = "CreateCoalition(Composition, Task*)";
+	this->taskName = "CreateCoalition(Composition, Task*)";	
 
-	this->taskCoalition = new Coalition(composition, task->getID(), task->getType());
+	int coalitionID = CoalitionManager::getInstance()->addCoalition(composition, task);	
+
+	this->taskCoalition = CoalitionManager::getInstance()->getCoalition(coalitionID);
 	task->setCoalition(this->taskCoalition);
-
-	g_Coalitions.insert(this->taskCoalition);	
 
 	this->cost = composition.getCost();
 	this->assign();
@@ -25,11 +26,7 @@ bool CreateCoalition::getCoalitionState()
 void CreateCoalition::assign()
 {
 	if (!this->assigned)
-	{		
-		std::cout << "CreateCoalition: Assign\n";
-		g_OpenCoalitions.insert(this->taskCoalition);
-		this->assigned = true;
-	}
+		this->assigned = true;	
 }
 
 // attempt to activate coalition

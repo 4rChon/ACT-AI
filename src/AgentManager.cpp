@@ -15,22 +15,6 @@ AgentManager::~AgentManager()
 	this->instance = nullptr;
 }
 
-void AgentManager::freeAgent(Agent* agent)
-{
-	if (agent->isFree() || !agent->getUnit()->exists())
-		return;
-	agent->setFree(true);
-	this->freeAgents++;
-}
-
-void AgentManager::bindAgent(Agent* agent)
-{
-	if (!agent->isFree() || !agent->getUnit()->exists())
-		return;
-	agent->setFree(false);
-	this->freeAgents--;
-}
-
 AgentManager* AgentManager::getInstance()
 {
 	if (!instance)
@@ -93,6 +77,23 @@ Agentset::iterator AgentManager::removeAgent(Agentset::iterator agent)
 		this->freeAgents--;
 	return this->agentSet.erase(agent);
 }
+
+void AgentManager::freeAgent(Agent* agent)
+{
+	if (agent->isFree() || !agent->getUnit()->exists())
+		return;
+	agent->setFree(true);
+	this->freeAgents++;
+}
+
+void AgentManager::bindAgent(Agent* agent)
+{
+	if (!agent->isFree() || !agent->getUnit()->exists())
+		return;
+	agent->setFree(false);
+	this->freeAgents--;
+}
+
 
 void AgentManager::act()
 {

@@ -17,9 +17,11 @@ private:
 	bool active;
 	int age;
 	int taskID;
+	int coalitionID;
 public:
 	//constructors and destructors;
 	Coalition();
+	//Target Composition, Task ID, and Task Type
 	Coalition(Composition targetComp, int taskID, TaskType taskType);
 	~Coalition();
 
@@ -36,6 +38,7 @@ public:
 	Composition getCurrentComp() const;
 	Composition getTargetComp() const;
 	int getAge() const;
+	int getID() const;
 
 	//-
 	void addUnit(BWAPI::Unit unit);

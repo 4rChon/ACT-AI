@@ -1,5 +1,6 @@
 #include "Task.h"
 #include "GlobalSets.h"
+#include "CoalitionManager.h"
 
 Task::Task()
 {
@@ -18,8 +19,8 @@ Task::~Task()
 {
 	this->cleanSubTasks();
 	delete this->coalition;
-	g_Coalitions.erase(this->coalition);
-	g_OpenCoalitions.erase(this->coalition);
+
+	CoalitionManager::getInstance()->removeCoalition(this->coalition);
 	this->coalition = nullptr;
 	g_Tasks.remove(this);
 }

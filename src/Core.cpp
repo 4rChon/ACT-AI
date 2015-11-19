@@ -2,6 +2,7 @@
 #include "Worker.h"
 #include "Producer.h"
 #include "AgentManager.h"
+#include "CoalitionManager.h"
 
 using namespace BWAPI;
 using namespace Filter;
@@ -51,6 +52,7 @@ void Core::onStart()
 	updateSatisfied();
 
 	AgentManager::getInstance();
+	CoalitionManager::getInstance();
 
 	drawGui = false;
 
@@ -141,15 +143,12 @@ void Core::onFrame()
 		
 		if ((*agent)->isFree())
 		{			
-			std::unordered_set<Coalition*>::iterator coalition = g_OpenCoalitions.begin();
-			while (coalition != g_OpenCoalitions.end())
+			auto coalition = CoalitionManager::getInstance()->getCoalitionset().begin();
+			while (coalition != CoalitionManager::getInstance()->getCoalitionset().end())
 			{
-				(*coalition)->addAgent((*agent)); //probability parameter
-				if ((*coalition)->isActive())
-				{
-					coalition = g_OpenCoalitions.erase(coalition);
-					break;
-				}
+				if (!(*coalition)->isActive())
+					(*coalition)->addAgent((*agent)); //probability parameter
+
 				++coalition;
 			}
 			(*agent)->act();
@@ -159,12 +158,6 @@ void Core::onFrame()
 
 		++agent;
 	}
-
-	//AgentManager::getInstance()->act();
-	
-	for (auto coalition : g_Coalitions)
-		coalition->updateFreeAgents();	
-
 
 	if (attack != nullptr)
 	{
@@ -319,15 +312,15 @@ void Core::drawTextInfo()
 	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
 	Broodwar->drawTextScreen(200, 10, "Average FPS: %f", Broodwar->getAverageFPS());
 	Broodwar->drawTextScreen(200, 30, "Active Tasks: %d", g_Tasks.size());
-	Broodwar->drawTextScreen(200, 40, "Coalition Count: %d", g_Coalitions.size());
-	Broodwar->drawTextScreen(200, 50, "Open Coalition Count: %d", g_OpenCoalitions.size());
+	Broodwar->drawTextScreen(200, 40, "Coalition Count: %d", CoalitionManager::getInstance()->getCoalitionset().size());
+	Broodwar->drawTextScreen(200, 50, "Open Coalition Count: %d", CoalitionManager::getInstance()->getOpenCount());
 	Broodwar->drawTextScreen(200, 60, "Agent Count: %d", AgentManager::getInstance()->getAgentset().size());
 	Broodwar->drawTextScreen(200, 70, "Free Agent Count: %d", AgentManager::getInstance()->getFreeCount());
 	Broodwar->drawTextScreen(200, 80, "Supply Desire: %.5f", g_Supply);
 	Broodwar->drawTextScreen(200, 90, "Mineral Reserve: %.5f", g_MinReserve);
 	Broodwar->drawTextScreen(200, 100, "Gas Reserve: %.5f", g_GasReserve);
 
-	for (auto coalition : g_Coalitions)
+	for (auto coalition : CoalitionManager::getInstance()->getCoalitionset())
 		if (coalition->isActive())
 			for (auto unit : coalition->getUnitSet())
 			{

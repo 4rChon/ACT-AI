@@ -11,6 +11,7 @@ Coalition::Coalition()
 Coalition::Coalition(Composition targetComp, int taskID, TaskType taskType)
 {
 	this->taskID = taskID;
+	this->coalitionID = g_NextCoalitionID++;
 	active = false;
 	this->targetComp = targetComp;
 	this->currentTask = taskType;
@@ -41,6 +42,11 @@ void Coalition::setActive(bool active)
 bool Coalition::isActive() const
 {
 	return this->active;
+}
+
+int Coalition::getID() const
+{
+	return this->coalitionID;
 }
 
 TaskType Coalition::getCurrentTaskType() const
@@ -93,6 +99,7 @@ void Coalition::addUnit(BWAPI::Unit unit)
 	{
 		std::cout << "A coalition has been activated!\n";
 		active = true;
+		this->updateFreeAgents();
 	}
 }
 
@@ -131,7 +138,6 @@ void Coalition::removeAgent(Agent* agent)
 
 void Coalition::updateFreeAgents()
 {	
-	if (active)
-		for (auto agent : this->agentSet)
-			AgentManager::getInstance()->bindAgent(agent);
+	for (auto agent : this->agentSet)
+		AgentManager::getInstance()->bindAgent(agent);
 }
