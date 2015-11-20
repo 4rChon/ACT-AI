@@ -1,11 +1,13 @@
 #include "Scout.h"
 #include "CreateCoalition.h"
+#include "Threatfield.h"
+#include "GlobalVariables.h"
 
 Scout::Scout(Zone* target)
 {
-	this->taskType = SCO;
-	this->taskName = "Scout(Zone*)";
 	this->target = target;
+	this->taskType = SCO;
+	this->taskName = "Scout()";
 }
 
 void Scout::assign()
@@ -28,8 +30,9 @@ void Scout::act()
 {
 	if (!this->acting)
 	{
-		std::cout << "Scout: Acting\n";
+		std::cout << "Scout: Acting - Scouting " << this->target->getRegion()->getCenter() << "\n";
 		this->coalition->getUnitSet().move(this->target->getRegion()->getCenter());
+			
 		this->acting = true;
 	}
 }
@@ -42,6 +45,8 @@ void Scout::update()
 		return;
 	}
 
+	if (this->assigned)
+	if (this->coalition->isActive())
 	if (this->assigned && this->coalition->isActive())
 		this->act();
 
@@ -57,6 +62,14 @@ void Scout::update()
 			this->complete = true;
 			std::cout << "Scout: Failed\n";
 		}
+
+		for (auto &unit : this->coalition->getUnitSet())
+		{
+			if (unit->isMoving())
+				return;
+		}
+		this->complete = true;
+		std::cout << "Scout: Failed\n";
 	}
 }
 

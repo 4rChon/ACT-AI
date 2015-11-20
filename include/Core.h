@@ -15,6 +15,7 @@
 #include "Task.h"
 #include "Threatfield.h"
 #include "Zone.h"
+#include "Scout.h"
 
 
 
@@ -25,9 +26,9 @@ class Core : public BWAPI::AIModule
 private:
 	//int tempCounter = 0;
 	bool drawGui;
-	ThreatField* threatField;
 	Attack* attack;
-	Defend* defend;
+	Defend* defend;	
+	Scout* scout;
 	//CreateUnit* createUnit;
 
 	//Composition attackComp;

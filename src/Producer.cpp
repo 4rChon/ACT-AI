@@ -3,12 +3,12 @@
 #include <iterator>
 #include <chrono>
 Producer::Producer(BWAPI::Unit unit, double freewill)
-{	
+{
 	trainTotalChance = 0.0;
 	this->unit = unit;
 	this->freewill = freewill;
-	commandMap[BWAPI::UnitCommandTypes::Train] = 1.0;	
-	
+	commandMap[BWAPI::UnitCommandTypes::Train] = 1.0;
+
 	updateUnlocked();
 	updateCommandWeights();
 	updateTrainWeights();
@@ -17,7 +17,7 @@ Producer::Producer(BWAPI::Unit unit, double freewill)
 }
 
 void Producer::act()
-{			
+{
 	if (this->commandType == BWAPI::UnitCommandTypes::Train)
 	{
 		chooseUnit();
@@ -41,7 +41,7 @@ bool Producer::train()
 }
 
 void Producer::updateUnlocked()
-{		
+{
 	for (auto unitType : this->unit->getType().buildsWhat())
 	{
 		if (!g_isUnlocked[unitType])
@@ -73,10 +73,10 @@ void Producer::updateTrainWeights()
 }
 
 void Producer::chooseUnit()
-{	
+{
 	updateTrainWeights();
 	if (trainWeights.size() > 0 && trainTotalChance > 0.0)
-	{		
+	{
 		std::size_t i = 0;
 		std::discrete_distribution<> dist(trainWeights.size(), 0.0, 1.0, [this, &i](double){return this->trainWeights[i++]; });
 
@@ -86,5 +86,5 @@ void Producer::chooseUnit()
 		this->trainType = (*it).first;
 	}
 	else
-		this->trainType = BWAPI::UnitTypes::None;	
+		this->trainType = BWAPI::UnitTypes::None;
 }

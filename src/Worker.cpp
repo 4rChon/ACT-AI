@@ -20,7 +20,7 @@ Worker::Worker(BWAPI::Unit unit, double freewill)
 }
 
 void Worker::act()
-{	
+{
 	//this->commandMap[BWAPI::UnitCommandTypes::Build] = g_Supply *(int)(BWAPI::Broodwar->self()->getRace().getSupplyProvider().mineralPrice() < BWAPI::Broodwar->self()->minerals());
 	//this->commandMap[BWAPI::UnitCommandTypes::Gather] = 1 - this->commandMap[BWAPI::UnitCommandTypes::Build];
 	//this->buildMap[BWAPI::Broodwar->self()->getRace().getSupplyProvider()] = g_Supply *(int)(BWAPI::Broodwar->self()->getRace().getSupplyProvider().mineralPrice() < BWAPI::Broodwar->self()->minerals());
@@ -36,11 +36,11 @@ void Worker::act()
 	if (this->commandType == BWAPI::UnitCommandTypes::Attack_Unit)
 		if (attack())
 			return;
-	
+
 	if (this->commandType == BWAPI::UnitCommandTypes::Repair)
 		if (repair())
 			return;
-	
+
 	if (this->commandType == BWAPI::UnitCommandTypes::Gather)
 		if (gather())
 			return;
@@ -59,7 +59,7 @@ bool Worker::repair()
 }
 
 bool Worker::gather()
-{	
+{
 	return this->unit->gather(this->unit->getClosestUnit(BWAPI::Filter::IsMineralField || (BWAPI::Filter::IsOwned && BWAPI::Filter::IsResourceContainer)));
 }
 
@@ -73,7 +73,7 @@ bool Worker::build()
 	//std::cout << buildTotalChance << "\n";
 	if (buildType == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
 		g_Supply *= 0.25;
-	
+
 	BWAPI::TilePosition targetBuildLocation = BWAPI::Broodwar->getBuildLocation(this->buildType, this->unit->getTilePosition());
 
 	if (targetBuildLocation)
@@ -83,10 +83,10 @@ bool Worker::build()
 			this->unit->move(BWAPI::Position(targetBuildLocation.x, targetBuildLocation.y));
 			return this->unit->morph(true);
 		}
-		
+
 		return this->unit->build(this->buildType, targetBuildLocation);
 	}
-	else 
+	else
 		return false;
 }
 
@@ -122,7 +122,7 @@ void Worker::updateBuildWeights()
 				buildWeights.push_back(0.0);
 			}
 			else
-			{	
+			{
 				if (build.first == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
 				{
 					buildTotalChance += build.second;
@@ -134,12 +134,10 @@ void Worker::updateBuildWeights()
 					buildWeights.push_back(build.second - g_Supply);
 				}
 				else
-				{
 					buildWeights.push_back(0);
-				}
 			}
 		}
-	}	
+	}
 }
 
 void Worker::chooseBuilding()

@@ -7,6 +7,7 @@ class Scout : public Task
 private:
 	Zone* target;
 public:
+	Scout();
 	Scout(Zone* target);
 	void assign();
 	void act();

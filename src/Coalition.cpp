@@ -3,7 +3,7 @@
 #include "AgentManager.h"
 
 Coalition::Coalition()
-{ 	
+{
 	active = false;
 	age = BWAPI::Broodwar->getFrameCount();
 }
@@ -30,7 +30,7 @@ Coalition::~Coalition()
 
 void Coalition::setUnitSet(BWAPI::Unitset unitSet)
 {
-	this->unitSet = unitSet;	
+	this->unitSet = unitSet;
 	currentComp = Composition(unitSet);
 }
 
@@ -57,7 +57,7 @@ TaskType Coalition::getCurrentTaskType() const
 std::string Coalition::getCurrentTaskString() const
 {
 	switch (this->currentTask)
-	{	
+	{
 	case ATT: return "ATT";
 	case DEF: return "DEF";
 	case SCO: return "SCO";
@@ -130,14 +130,14 @@ void Coalition::removeUnit(BWAPI::Unit unit)
 
 void Coalition::removeAgent(Agent* agent)
 {
-	this->agentSet.erase(agent);	
-	removeUnit(agent->getUnit());	
+	this->agentSet.erase(agent);
+	removeUnit(agent->getUnit());
 	if (active)
 		AgentManager::getInstance()->freeAgent(agent);
 }
 
 void Coalition::updateFreeAgents()
-{	
+{
 	for (auto agent : this->agentSet)
 		AgentManager::getInstance()->bindAgent(agent);
 }

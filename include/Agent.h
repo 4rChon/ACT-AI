@@ -31,10 +31,10 @@ protected:
 	int coalitionID;
 	BWAPI::Unit unit;
 	BWAPI::UnitCommandType commandType;
-	std::unordered_map<BWAPI::UnitCommandType, double> commandMap;	
+	std::unordered_map<BWAPI::UnitCommandType, double> commandMap;
 	std::vector<double> commandWeights;
 	std::default_random_engine generator;
-	double freewill;	
+	double freewill;
 
 public:
 	//constructors
@@ -48,7 +48,7 @@ public:
 	//getters
 	bool isFree() const;
 	int getID() const;
-	BWAPI::Unit getUnit() const;	
+	BWAPI::Unit getUnit() const;
 
 	//-
 	virtual void act();
@@ -57,5 +57,5 @@ public:
 	virtual void updateUnlocked();
 	void updateCommandWeights();
 	void chooseCommand();
-	
+
 };

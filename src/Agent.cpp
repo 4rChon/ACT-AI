@@ -1,5 +1,6 @@
 #include "Agent.h"
 #include "GlobalVariables.h"
+#include "GlobalSets.h"
 #include <iterator>
 #include <chrono>
 
@@ -10,12 +11,12 @@ Agent::Agent()
 }
 
 Agent::Agent(BWAPI::Unit unit, double freewill)
-{	
+{
 	this->freeAgent = true;
 	this->unitID = unit->getID();
 	this->coalitionID = -1;
 	this->unit = unit;
-	this->freewill = freewill;	
+	this->freewill = freewill;
 	this->commandType = BWAPI::UnitCommandTypes::None;
 
 	Agent();
@@ -47,7 +48,7 @@ BWAPI::Unit Agent::getUnit() const
 }
 
 void Agent::act()
-{	
+{
 }
 
 void Agent::updateUnlocked()
@@ -61,7 +62,7 @@ void Agent::updateCommandWeights()
 }
 
 void Agent::chooseCommand()
-{	
+{
 	if (commandWeights.size() > 0)
 	{
 		std::size_t i = 0;
@@ -73,5 +74,5 @@ void Agent::chooseCommand()
 		this->commandType = (*it).first;
 	}
 	else
-		this->commandType = BWAPI::UnitCommandTypes::None;	
+		this->commandType = BWAPI::UnitCommandTypes::None;
 }

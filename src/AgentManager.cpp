@@ -51,7 +51,7 @@ void AgentManager::addAgent(BWAPI::Unit unit)
 		agent = new Agent(unit, 1);
 
 	this->agentSet.insert(agent);
-	this->freeAgents++;	
+	this->freeAgents++;
 }
 
 void AgentManager::removeAgent(BWAPI::Unit unit)
@@ -59,20 +59,20 @@ void AgentManager::removeAgent(BWAPI::Unit unit)
 	for (auto &agent : this->agentSet)
 		if (agent->getID() == unit->getID())
 		{
-			removeAgent(agent);			
+			removeAgent(agent);
 			return;
 		}
 }
 
 void AgentManager::removeAgent(Agent* agent)
-{	
+{
 	if (agent->isFree())
 		this->freeAgents--;
 	this->agentSet.erase(agent);
 }
 
 Agentset::iterator AgentManager::removeAgent(Agentset::iterator agent)
-{	
+{
 	if ((*agent)->isFree())
 		this->freeAgents--;
 	return this->agentSet.erase(agent);

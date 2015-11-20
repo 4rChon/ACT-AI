@@ -6,13 +6,13 @@
 class AgentManager
 {
 private:
-	Agentset agentSet;	
+	Agentset agentSet;
 	static AgentManager* instance;
 	int freeAgents;
 public:
 	//constructors and destructors
 	AgentManager();
-	~AgentManager();	
+	~AgentManager();
 
 	//getters
 	static AgentManager* getInstance();
@@ -22,7 +22,7 @@ public:
 
 	//-
 	void addAgent(BWAPI::Unit unit);
-	void removeAgent(BWAPI::Unit unit);	
+	void removeAgent(BWAPI::Unit unit);
 	void removeAgent(Agent* agent);
 	Agentset::iterator removeAgent(Agentset::iterator agent);
 	void freeAgent(Agent* agent);

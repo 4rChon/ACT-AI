@@ -3,12 +3,15 @@
 #include "Producer.h"
 #include "AgentManager.h"
 #include "CoalitionManager.h"
+#include "Scout.h"
 
 using namespace BWAPI;
 using namespace Filter;
 
+bool scouting = false;
+
 void updateTaskTree(Task* task)
-{	
+{
 	if (task->getSubTasks().size() > 0)
 		for (auto t : task->getSubTasks())
 			updateTaskTree(t);
@@ -45,28 +48,28 @@ void updateSatisfied()
 }
 
 void Core::onStart()
-{	
-	std::cout << "\n------------ MATCH STARTED --------------\n";	
+{
+	std::cout << "\n------------ MATCH STARTED --------------\n";
 
 	initSatisifed();
 	updateSatisfied();
 
 	AgentManager::getInstance();
 	CoalitionManager::getInstance();
+	ThreatField::getInstance();	
 
 	drawGui = false;
 
-	threatField = new ThreatField(Broodwar->getAllRegions());	
-	
-	defend = new Defend(threatField->getZone(140));
+	defend = new Defend(ThreatField::getInstance()->getZone(140));
 	attack = nullptr;
+	scout = nullptr;
 
 	Broodwar->sendText("gl hf");
 	Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
 
 
 	Broodwar->enableFlag(Flag::UserInput);
-	
+
 	// Uncomment the following line and the bot will know about everything through the fog of war (cheat).
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
 
@@ -90,7 +93,6 @@ void Core::onStart()
 
 void Core::onEnd(bool isWinner)
 {
-	delete threatField;
 	delete attack;
 	if (isWinner)
 	{
@@ -101,24 +103,24 @@ void Core::onEnd(bool isWinner)
 }
 
 void Core::onFrame()
-{	
+{
 	//display text with information at the top of the screen
 	drawTextInfo();
 
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
-		return;	
+		return;
 
 	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
 
 	if (drawGui)
 		drawRegions();
-	
+
 	std::unordered_set<Agent*>::iterator agent = AgentManager::getInstance()->getAgentset().begin();
 	while (agent != AgentManager::getInstance()->getAgentset().end())
-	{		
+	{
 		if (!(*agent)->getUnit()->exists())
-		{			
+		{
 			agent = AgentManager::getInstance()->removeAgent(agent);
 			continue;
 		}
@@ -140,9 +142,9 @@ void Core::onFrame()
 			++agent;
 			continue;
 		}
-		
+
 		if ((*agent)->isFree())
-		{			
+		{
 			auto coalition = CoalitionManager::getInstance()->getCoalitionset().begin();
 			while (coalition != CoalitionManager::getInstance()->getCoalitionset().end())
 			{
@@ -153,8 +155,8 @@ void Core::onFrame()
 			}
 			(*agent)->act();
 		}
-		
-		threatField->getZone((*agent)->getUnit()->getRegion()->getID())->updateZone();
+
+		ThreatField::getInstance()->getZone((*agent)->getUnit()->getRegion()->getID())->updateZone();
 
 		++agent;
 	}
@@ -165,22 +167,47 @@ void Core::onFrame()
 		{
 			delete attack;
 			attack = nullptr;
-			defend = new Defend(threatField->getZone(135));
+			defend = new Defend(ThreatField::getInstance()->getZone(135));
 		}
 		else
 			updateTaskTree(attack);
-	}		
+	}
 
+	
 	if (defend != nullptr)
 	{
 		if (defend->isComplete())
 		{
 			delete defend;
-			defend = nullptr;
-			attack = new Attack(threatField->getZone(20));
-
+			defend = nullptr;			
+			if (g_attackTarget >= 0)
+			{
+				std::cout << "Attack Task: " << g_attackTarget << "\n";
+				attack = new Attack(ThreatField::getInstance()->getZone(g_attackTarget));
+			}
 		}
 		else updateTaskTree(defend);
+	}
+
+	if (defend == nullptr && attack == nullptr && scout == nullptr)
+	{
+		if (g_attackTarget >= 0)
+		{
+			std::cout << "Attack Task: " << g_attackTarget << "\n";
+			attack = new Attack(ThreatField::getInstance()->getZone(g_attackTarget));
+		}
+		else
+			scout = new Scout(ThreatField::getInstance()->getRandomZone());
+	}
+
+	if (scout != nullptr)
+	{		
+		if (scout->isComplete())
+		{
+			delete scout;
+			scout = nullptr;
+		}
+		else updateTaskTree(scout);
 	}
 }
 
@@ -219,12 +246,16 @@ void Core::onUnitDiscover(BWAPI::Unit unit)
 }
 
 void Core::onUnitEvade(BWAPI::Unit unit)
-{
+{	
 }
 
 void Core::onUnitShow(BWAPI::Unit unit)
 {
-
+	if (unit->getType().isResourceDepot() && unit->getPlayer() != Broodwar->self())
+	{
+		std::cout << "Hey i found the town center\n";
+		g_attackTarget = unit->getRegion()->getID();
+	}
 }
 
 void Core::onUnitHide(BWAPI::Unit unit)
@@ -232,11 +263,11 @@ void Core::onUnitHide(BWAPI::Unit unit)
 }
 
 void Core::onUnitCreate(BWAPI::Unit unit)
-{	
+{
 }
 
 void Core::onUnitDestroy(BWAPI::Unit unit)
-{	
+{
 	if (unit->getPlayer() == Broodwar->self())
 	{
 		g_TotalCount[unit->getType()]--;
@@ -267,12 +298,11 @@ void Core::onSaveGame(std::string gameName)
 }
 
 void Core::onUnitComplete(BWAPI::Unit unit)
-{		
+{
 	if (unit->getPlayer() == Broodwar->self())
 	{
 		AgentManager::getInstance()->addAgent(unit);
 		g_TotalCount[unit->getType()]++;
-		std::cout << g_TotalCount[unit->getType()];
 	}
 	updateSatisfied();
 	g_Supply = (1 / (double)((BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()) + 1));
@@ -280,28 +310,28 @@ void Core::onUnitComplete(BWAPI::Unit unit)
 
 void Core::drawRegions()
 {
-	for (int i = 0; i < threatField->getSize(); i++)
+	for (int i = 0; i < ThreatField::getInstance()->getSize(); i++)
 	{
 		Color c = Color(255, 0, 0);
-		if (threatField->getZone(i)->getRegion()->getUnits(Filter::IsOwned).size() > 0)
+		if (ThreatField::getInstance()->getZone(i)->getRegion()->getUnits(Filter::IsOwned).size() > 0)
 			c = Color(0, 255, 0);
-		Broodwar->drawCircle(CoordinateType::Map, threatField->getZone(i)->getRegion()->getCenter().x, threatField->getZone(i)->getRegion()->getCenter().y, 2, c, true);
+		Broodwar->drawCircle(CoordinateType::Map, ThreatField::getInstance()->getZone(i)->getRegion()->getCenter().x, ThreatField::getInstance()->getZone(i)->getRegion()->getCenter().y, 2, c, true);
 
 		std::ostringstream oss;
-		oss << "getRegion() ID: " << threatField->getZone(i)->getRegion()->getID()
+		oss << "getRegion() ID: " << ThreatField::getInstance()->getZone(i)->getRegion()->getID()
 			<< "\nZone ID: " << i
-			<< "\nEnemy Score: " << threatField->getZone(i)->getEnemyScore()
-			<< "\nFriend Score: " << threatField->getZone(i)->getFriendScore()
-			<< "\nResource Score: " << threatField->getZone(i)->getResourceScore()
+			<< "\nEnemy Score: " << ThreatField::getInstance()->getZone(i)->getEnemyScore()
+			<< "\nFriend Score: " << ThreatField::getInstance()->getZone(i)->getFriendScore()
+			<< "\nResource Score: " << ThreatField::getInstance()->getZone(i)->getResourceScore()
 			//<< "\nConfidence Value " << threatField->getZone(i)->getConfidence()
-			<< "\nLast Visit " << threatField->getZone(i)->getLastVisit()
-			<< "\nPosition: " << "(" << threatField->getZone(i)->getRegion()->getCenter().x << ", " << threatField->getZone(i)->getRegion()->getCenter().y << ")"
-			<< "\nDefense Priority: " << threatField->getZone(i)->getRegion()->getDefensePriority()
+			<< "\nLast Visit " << ThreatField::getInstance()->getZone(i)->getLastVisit()
+			<< "\nPosition: " << "(" << ThreatField::getInstance()->getZone(i)->getRegion()->getCenter().x << ", " << ThreatField::getInstance()->getZone(i)->getRegion()->getCenter().y << ")"
+			<< "\nDefense Priority: " << ThreatField::getInstance()->getZone(i)->getRegion()->getDefensePriority()
 			<< std::endl;
 		std::string s = oss.str();
 
 		Broodwar->drawTextMap(
-			threatField->getZone(i)->getRegion()->getCenter().x, threatField->getZone(i)->getRegion()->getCenter().y,
+			ThreatField::getInstance()->getZone(i)->getRegion()->getCenter().x, ThreatField::getInstance()->getZone(i)->getRegion()->getCenter().y,
 			s.c_str()
 			);
 	}

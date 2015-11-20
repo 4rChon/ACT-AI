@@ -13,6 +13,8 @@ using namespace BWAPI;
 
 bool zoneCompare(Zone* a, Zone* b) { return a->getRegion()->getID() < b->getRegion()->getID(); }
 
+ThreatField* ThreatField::instance = nullptr;
+
 ThreatField::ThreatField(Regionset regionset)
 {	
 	std::cout << "ThreatField(regionSet)\n";
@@ -27,9 +29,22 @@ ThreatField::ThreatField(Regionset regionset)
 	size = field.size();
 }
 
+ThreatField* ThreatField::getInstance()
+{
+	if (!instance)
+		instance = new ThreatField(BWAPI::Broodwar->getAllRegions());
+	return instance;
+}
+
+
 int ThreatField::getSize()
 {
 	return size;
+}
+
+Zone* ThreatField::getRandomZone()
+{
+	return field[rand() % this->size];
 }
 
 Zone* ThreatField::getZone(int index)
