@@ -243,6 +243,18 @@ void Core::onNukeDetect(BWAPI::Position target)
 
 void Core::onUnitDiscover(BWAPI::Unit unit)
 {
+	if (unit->getType().isBuilding() && unit->getPlayer() == Broodwar->enemy())
+	{
+		if (g_AttackUnitSet.insert(std::pair<std::pair<int, int>, int>(std::pair<int, int>(unit->getID(), unit->getType()), unit->getRegion()->getID())).second)
+		{
+			std::cout << "New Building Target: " << unit->getType() << " : " << unit->getType().buildScore() << " : " << unit->getRegion()->getID() << "\n";
+			g_attackTarget = (*g_AttackUnitSet.begin()).second;
+		}
+		return;
+	}
+
+	if (g_AttackUnitSet.size() == 0)
+		g_attackTarget = -1;
 }
 
 void Core::onUnitEvade(BWAPI::Unit unit)
@@ -250,12 +262,15 @@ void Core::onUnitEvade(BWAPI::Unit unit)
 }
 
 void Core::onUnitShow(BWAPI::Unit unit)
-{
-	if (unit->getType().isResourceDepot() && unit->getPlayer() != Broodwar->self())
+{	
+
+
+	// : " << (*g_AttackUnitSet.begin())->getType() << "\n";
+	/*if (unit->getType().isResourceDepot() && unit->getPlayer() != Broodwar->self())
 	{
 		std::cout << "Hey i found the town center\n";
 		g_attackTarget = unit->getRegion()->getID();
-	}
+	}*/
 }
 
 void Core::onUnitHide(BWAPI::Unit unit)
@@ -268,6 +283,8 @@ void Core::onUnitCreate(BWAPI::Unit unit)
 
 void Core::onUnitDestroy(BWAPI::Unit unit)
 {
+	if (unit->getPlayer() == Broodwar->enemy() && unit->getType().isBuilding())
+		g_AttackUnitSet.erase(std::pair<int, int>(unit->getID(), unit->getType()));
 	if (unit->getPlayer() == Broodwar->self())
 	{
 		g_TotalCount[unit->getType()]--;
@@ -349,7 +366,10 @@ void Core::drawTextInfo()
 	Broodwar->drawTextScreen(200, 80, "Supply Desire: %.5f", g_Supply);
 	Broodwar->drawTextScreen(200, 90, "Mineral Reserve: %.5f", g_MinReserve);
 	Broodwar->drawTextScreen(200, 100, "Gas Reserve: %.5f", g_GasReserve);
-
+	Broodwar->drawTextScreen(70, 10, "Target List");
+	int i = 0;
+	for (auto &unit : g_AttackUnitSet)
+		Broodwar->drawTextScreen(70, (++i * 10) + 20, "%s : %d", BWAPI::UnitType(unit.first.second).c_str(), unit.second);
 	for (auto coalition : CoalitionManager::getInstance()->getCoalitionset())
 		if (coalition->isActive())
 			for (auto unit : coalition->getUnitSet())
