@@ -13,7 +13,6 @@ Agent::Agent()
 Agent::Agent(BWAPI::Unit unit, double freewill)
 {
 	this->freeAgent = true;
-	this->unitID = unit->getID();
 	this->coalitionID = -1;
 	this->unit = unit;
 	this->freewill = freewill;
@@ -39,7 +38,7 @@ bool Agent::isFree() const
 
 int Agent::getID() const
 {
-	return this->unitID;
+	return this->unit->getID();
 }
 
 BWAPI::Unit Agent::getUnit() const

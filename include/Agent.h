@@ -27,7 +27,6 @@ class Agent
 {
 protected:
 	bool freeAgent;
-	int unitID;
 	int coalitionID;
 	BWAPI::Unit unit;
 	BWAPI::UnitCommandType commandType;

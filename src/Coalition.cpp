@@ -109,7 +109,7 @@ void Coalition::addAgent(Agent* agent)
 	{
 		for (auto type : this->targetComp.getTypes())
 		{
-			if (agent->getUnit()->getType() == type)
+			if (agent->getUnit()->getType() == type && this->targetComp[type] > this->currentComp[type])
 			{
 				std::cout << agent->getUnit()->getType().c_str() << " is joining a coalition\n";
 				this->agentSet.insert(this->agentSet.begin(), agent);

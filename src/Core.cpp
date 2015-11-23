@@ -4,11 +4,12 @@
 #include "AgentManager.h"
 #include "CoalitionManager.h"
 #include "Scout.h"
+#include <chrono>
 
 using namespace BWAPI;
 using namespace Filter;
 
-bool scouting = false;
+auto currentTime = std::chrono::high_resolution_clock::now();
 
 void updateTaskTree(Task* task)
 {
@@ -59,8 +60,20 @@ void Core::onStart()
 	ThreatField::getInstance();	
 
 	drawGui = false;
+	
+	for (auto startPos : Broodwar->getStartLocations())
+	{
+		if (startPos != Broodwar->self()->getStartLocation())
+		{
+			g_scoutTarget = Broodwar->getRegionAt(Position(startPos))->getID();
+			std::cout << "Scout Target : " << g_scoutTarget << "\n";
+			break;
+		}
+	}
 
-	defend = new Defend(ThreatField::getInstance()->getZone(140));
+	g_defendTarget = Broodwar->getRegionAt(Position(Broodwar->self()->getStartLocation()))->getID();
+	defend = new Defend(ThreatField::getInstance()->getZone(g_defendTarget));
+	
 	attack = nullptr;
 	scout = nullptr;
 
@@ -104,9 +117,10 @@ void Core::onEnd(bool isWinner)
 
 void Core::onFrame()
 {
+	currentTime = std::chrono::high_resolution_clock::now();
 	//display text with information at the top of the screen
 	drawTextInfo();
-
+	Broodwar->getStartLocations();
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
 		return;
 
@@ -116,30 +130,30 @@ void Core::onFrame()
 	if (drawGui)
 		drawRegions();
 
-	std::unordered_set<Agent*>::iterator agent = AgentManager::getInstance()->getAgentset().begin();
+	auto agent = AgentManager::getInstance()->getLastServiced();
 	while (agent != AgentManager::getInstance()->getAgentset().end())
-	{
+	{		
 		if (!(*agent)->getUnit()->exists())
 		{
-			agent = AgentManager::getInstance()->removeAgent(agent);
+			AgentManager::getInstance()->setLastServiced(AgentManager::getInstance()->removeAgent(agent));			
 			continue;
 		}
 
 		if ((*agent)->getUnit()->isLockedDown() || (*agent)->getUnit()->isMaelstrommed() || (*agent)->getUnit()->isStasised())
-		{
-			++agent;
+		{			
+			AgentManager::getInstance()->setLastServiced(++agent);
 			continue;
 		}
 
 		if ((*agent)->getUnit()->isLoaded() || !(*agent)->getUnit()->isPowered() || (*agent)->getUnit()->isStuck())
-		{
-			++agent;
+		{			
+			AgentManager::getInstance()->setLastServiced(++agent);
 			continue;
 		}
 
 		if (!(*agent)->getUnit()->isCompleted() || (*agent)->getUnit()->isConstructing())
-		{
-			++agent;
+		{			
+			AgentManager::getInstance()->setLastServiced(++agent);
 			continue;
 		}
 
@@ -158,7 +172,12 @@ void Core::onFrame()
 
 		ThreatField::getInstance()->getZone((*agent)->getUnit()->getRegion()->getID())->updateZone();
 
-		++agent;
+		AgentManager::getInstance()->setLastServiced(++agent);
+
+		std::chrono::duration<double> diff = std::chrono::high_resolution_clock::now() - currentTime;
+
+		if (diff.count() > 0.005)
+			return;
 	}
 
 	if (attack != nullptr)
@@ -166,25 +185,21 @@ void Core::onFrame()
 		if (attack->isComplete())
 		{
 			delete attack;
-			attack = nullptr;
-			defend = new Defend(ThreatField::getInstance()->getZone(135));
+			attack = nullptr;			
 		}
 		else
 			updateTaskTree(attack);
 	}
-
 	
+	if (ThreatField::getInstance()->getZone(g_defendTarget)->getConfidence() < 0.8 && ThreatField::getInstance()->getZone(g_defendTarget)->getEnemyScore() > 0)
+		defend = new Defend(ThreatField::getInstance()->getZone(g_defendTarget));
+
 	if (defend != nullptr)
 	{
 		if (defend->isComplete())
 		{
 			delete defend;
 			defend = nullptr;			
-			if (g_attackTarget >= 0)
-			{
-				std::cout << "Attack Task: " << g_attackTarget << "\n";
-				attack = new Attack(ThreatField::getInstance()->getZone(g_attackTarget));
-			}
 		}
 		else updateTaskTree(defend);
 	}
@@ -196,8 +211,15 @@ void Core::onFrame()
 			std::cout << "Attack Task: " << g_attackTarget << "\n";
 			attack = new Attack(ThreatField::getInstance()->getZone(g_attackTarget));
 		}
+		else if (g_AttackUnitSet.size() > 0)
+			g_attackTarget = (*g_AttackUnitSet.begin()).second;
 		else
-			scout = new Scout(ThreatField::getInstance()->getRandomZone());
+		{
+			if (g_enemyStart == -1)
+				scout = new Scout(ThreatField::getInstance()->getZone(g_scoutTarget));
+			else
+				scout = new Scout(ThreatField::getInstance()->getRandomZone());
+		}
 	}
 
 	if (scout != nullptr)
@@ -285,6 +307,7 @@ void Core::onUnitDestroy(BWAPI::Unit unit)
 {
 	if (unit->getPlayer() == Broodwar->enemy() && unit->getType().isBuilding())
 		g_AttackUnitSet.erase(std::pair<int, int>(unit->getID(), unit->getType()));
+
 	if (unit->getPlayer() == Broodwar->self())
 	{
 		g_TotalCount[unit->getType()]--;
@@ -322,7 +345,12 @@ void Core::onUnitComplete(BWAPI::Unit unit)
 		g_TotalCount[unit->getType()]++;
 	}
 	updateSatisfied();
-	g_Supply = (1 / (double)((BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()) + 1));
+	if (Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed() <= 0)
+	{
+		g_Supply = 1.0;
+		return;
+	}
+	g_Supply = (1 / (double)((Broodwar->self()->supplyTotal() - Broodwar->self()->supplyUsed()) + 1));
 }
 
 void Core::drawRegions()
@@ -369,14 +397,26 @@ void Core::drawTextInfo()
 	Broodwar->drawTextScreen(70, 10, "Target List");
 	int i = 0;
 	for (auto &unit : g_AttackUnitSet)
+	{
 		Broodwar->drawTextScreen(70, (++i * 10) + 20, "%s : %d", BWAPI::UnitType(unit.first.second).c_str(), unit.second);
+		if(i > 4) break;
+	}
+	
+	int k = 0;	
 	for (auto coalition : CoalitionManager::getInstance()->getCoalitionset())
+	{		
 		if (coalition->isActive())
-			for (auto unit : coalition->getUnitSet())
+		{
+			for (auto &unit : coalition->getUnitSet())
 			{
 				if (!unit->exists())
 					coalition->removeUnit(unit);
 
 				Broodwar->drawTextMap(unit->getPosition(), coalition->getCurrentTaskString().c_str());
 			}
+		}
+		Broodwar->drawTextScreen(5, (10 * k++) + 100, "%d: Cost - %.2f", coalition->getID(), coalition->getTargetComp().getCost());		
+		for (auto &unitType : coalition->getTargetComp().getUnitMap())
+			Broodwar->drawTextScreen(10, (10 * k++) + 100, "%s : %d/%d", unitType.first.c_str(), coalition->getCurrentComp().getUnitMap()[unitType.first], unitType.second);
+	}
 }

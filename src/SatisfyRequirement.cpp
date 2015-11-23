@@ -31,7 +31,7 @@ void SatisfyRequirement::act()
 				//continue
 				//else
 				CreateUnit* createUnit = new CreateUnit(requirement.first, requirement.second - g_TotalCount[requirement.first]);
-				std::cout << "Creating Requirement: " << requirement.first.c_str() << "\n";
+				std::cout << "Creating Requirement: " << requirement.first.c_str() << " : " << requirement.second << "\n";
 				subTasks.push_back(createUnit);
 			}
 		}

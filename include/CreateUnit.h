@@ -7,6 +7,8 @@ private:
 	BWAPI::UnitType unitType;
 	int unitCount;
 	bool satisfied;
+	bool building;
+	bool reserved;
 public:
 	//constructors
 	CreateUnit(BWAPI::UnitType unitType, int unitCount = 1);

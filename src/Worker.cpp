@@ -98,7 +98,11 @@ void Worker::updateUnlocked()
 			this->buildMap[unitType] = 0.0;
 		else
 		{
-			if (unitType == BWAPI::UnitTypes::Terran_Barracks || unitType == BWAPI::UnitTypes::Terran_Supply_Depot)
+			if (unitType == BWAPI::UnitTypes::Terran_Barracks ||
+				unitType == BWAPI::UnitTypes::Terran_Supply_Depot ||
+				unitType == BWAPI::UnitTypes::Terran_Refinery ||
+				unitType == BWAPI::UnitTypes::Terran_Factory ||
+				unitType == BWAPI::UnitTypes::Terran_Starport)
 				this->buildMap[unitType] = 1.0 / (double)this->unit->getType().buildsWhat().size();
 		}
 		//std::cout << unitType.c_str() << " : " << this->produceMap[unitType] << "\n";

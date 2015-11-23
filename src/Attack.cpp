@@ -17,22 +17,25 @@ void Attack::assign()
 {
 	if (!this->assigned)
 	{
-		if (target->getConfidence() < 0.8)
-		{
-			if (!scouting)
-			{
-				Scout* scout = new Scout(target);
-				this->addSubTask(scout);
-				scouting = true;
-			}			
-		}
+		//if (target->getConfidence() < 0.8)
+		//{
+		//	if (!scouting)
+		//	{
+		//		Scout* scout = new Scout(target);
+		//		this->addSubTask(scout);
+		//		scouting = true;
+		//	}			
+		//}
 
 		std::cout << "Attack: Assign\n";
 		Composition c;
-		c.addType(BWAPI::UnitTypes::Terran_Marine, 5 + g_TotalCount[BWAPI::UnitTypes::Terran_Marine]);
-		//for (auto unitType : g_TotalCount)
-		//	if (!unitType.first.isWorker() && !unitType.first.isBuilding() && unitType.first != BWAPI::UnitTypes::Terran_Marine)
-		//		c.addType(unitType.first, unitType.second);
+		//c.addType(BWAPI::UnitTypes::Terran_Marine, 5 + g_TotalCount[BWAPI::UnitTypes::Terran_Marine]);
+		for (auto unitType : g_TotalCount)
+			if (!unitType.first.isWorker() && !unitType.first.isBuilding() && unitType.second > 0)
+				c.addType(unitType.first, unitType.second);
+		//c.addType(BWAPI::UnitTypes::Terran_Goliath, 5);
+		c.addType(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 1);
+		//c.addType(BWAPI::UnitTypes::Terran_Marine, 5);
 		//c.addType(BWAPI::UnitTypes::Terran_Firebat, 5);
 		//c.addType(BWAPI::UnitTypes::Terran_Medic, 5);
 		//c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 10);
@@ -68,13 +71,15 @@ void Attack::update()
 	{
 		this->complete = true;
 		std::cout << "Attack: Complete\n";
+		g_attackTarget = -1;
 	}
 	else if (this->acting)
 	{
 		if (this->coalition->getUnitSet().size() == 0)
 		{
-			this->complete = true;
+			this->complete = true;			
 			std::cout << "Attack: Failed\n";
+			g_attackTarget = -1;
 		}
 	}
 }

@@ -7,12 +7,18 @@ AgentManager* AgentManager::instance = nullptr;
 AgentManager::AgentManager()
 {
 	this->freeAgents = 0;
+	this->lastServiced = this->agentSet.begin();
 }
 
 AgentManager::~AgentManager()
 {
 	this->agentSet.clear();
 	this->instance = nullptr;
+}
+
+void AgentManager::setLastServiced(Agentset::iterator lastServiced)
+{
+	this->lastServiced = lastServiced;
 }
 
 AgentManager* AgentManager::getInstance()
@@ -38,6 +44,13 @@ Agent* AgentManager::getAgent(int unitID)
 Agentset& AgentManager::getAgentset()
 {
 	return this->agentSet;
+}
+
+Agentset::iterator AgentManager::getLastServiced()
+{
+	if (this->lastServiced == this->agentSet.end())
+		this->lastServiced = this->agentSet.begin();
+	return this->lastServiced;
 }
 
 void AgentManager::addAgent(BWAPI::Unit unit)
@@ -67,8 +80,9 @@ void AgentManager::removeAgent(BWAPI::Unit unit)
 void AgentManager::removeAgent(Agent* agent)
 {
 	if (agent->isFree())
-		this->freeAgents--;
+		this->freeAgents--;	
 	this->agentSet.erase(agent);
+	this->lastServiced = this->agentSet.begin();
 }
 
 Agentset::iterator AgentManager::removeAgent(Agentset::iterator agent)
@@ -106,4 +120,9 @@ void AgentManager::updateUnlocked()
 {
 	for (auto &agent : this->agentSet)
 		agent->updateUnlocked();
+}
+
+void AgentManager::incLastServiced()
+{
+	this->lastServiced++;
 }

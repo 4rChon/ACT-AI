@@ -11,6 +11,8 @@ CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 	this->unitType = unitType;
 	this->unitCount = unitCount;
 	this->satisfied = false;
+	this->building = false;
+	this->reserved = false;
 }
 
 // assign a producer coalition
@@ -46,15 +48,35 @@ void CreateUnit::act()
 			}
 			if (!(this->unitType.mineralPrice() <= (BWAPI::Broodwar->self()->minerals() - g_MinReserve) && this->unitType.gasPrice() <= (BWAPI::Broodwar->self()->gas() - g_GasReserve) && this->unitType.supplyRequired() <= BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed())) 
 				return;
+			if (this->unitType.isAddon())
+			{
+				if (!this->coalition->getUnitSet().buildAddon(this->unitType)) 
+					return;
+				this->unitCount--;
+			}
 			if (this->unitType.isBuilding() && this->unitType.whatBuilds().first == BWAPI::Broodwar->self()->getRace().getWorker())
 			{				
-				std::cout << "I have enough resources to build a " << this->unitType.c_str() << "\n";
-				for (auto builder : this->coalition->getUnitSet())
+				if (this->building)
+					return;				
+				
+				if (!reserved)
 				{
+					std::cout << "I have enough resources to build a " << this->unitType.c_str() << "\n";
+					std::cout << "Reserving " << this->unitType.mineralPrice() << " Minerals and " << this->unitType.gasPrice() << " Gas to build a " << this->unitType.c_str() << "\n";
+					g_MinReserve += this->unitType.mineralPrice();
+					g_GasReserve += this->unitType.gasPrice();
+					reserved = true;
+				}
+
+				for (auto builder : this->coalition->getUnitSet())
+				{					
+					std::cout << "Selecting Builder\n";
 					BWAPI::TilePosition targetBuildLocation = BWAPI::Broodwar->getBuildLocation(this->unitType, builder->getTilePosition());
 					if (targetBuildLocation)
 					{
-						if (!builder->move(BWAPI::Position(targetBuildLocation.x * BWAPI::TILEPOSITION_SCALE, targetBuildLocation.y * BWAPI::TILEPOSITION_SCALE))) return;
+						std::cout << "I found a suitable location to build a " << this->unitType.c_str() << "\n";
+						if (!builder->move(BWAPI::Position(targetBuildLocation.x * BWAPI::TILEPOSITION_SCALE, targetBuildLocation.y * BWAPI::TILEPOSITION_SCALE))) 
+							return;
 						if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
 						{							
 							if (!builder->morph(true)) return;
@@ -62,20 +84,22 @@ void CreateUnit::act()
 						}
 						else
 						{
-							if (!builder->build(this->unitType, targetBuildLocation)) return;
-							std::cout << "I found a suitable location to build a " << this->unitType.c_str() << "\n";
-							g_MinReserve += this->unitType.mineralPrice();
-							g_GasReserve += this->unitType.gasPrice();
-							std::cout << "Reserving " << this->unitType.mineralPrice() << " Minerals and " << this->unitType.gasPrice() << " Gas to build a " << this->unitType.c_str() << "\n";
-							BWAPI::Broodwar->registerEvent([this, builder](BWAPI::Game*)
+							this->building = builder->build(this->unitType, targetBuildLocation);
+							if (!this->building) return;
+							std::cout << "Moving to build a " << this->unitType.c_str() << "\n";							
+							int min = this->unitType.mineralPrice();
+							int gas = this->unitType.gasPrice();
+							auto uType = this->unitType;							
+							BWAPI::Broodwar->registerEvent([builder, min, gas, uType](BWAPI::Game*)
 							{
-								std::cout << "Releasing " << this->unitType.mineralPrice() << " Minerals and " << this->unitType.gasPrice() << " Gas after placing a " << this->unitType.c_str() << "\n";
-								g_MinReserve -= this->unitType.mineralPrice();
-								g_GasReserve -= this->unitType.gasPrice();
-								this->unitCount--;
+								std::cout << "Releasing " << min << " Minerals and " << gas << " Gas after placing a " << uType.c_str() << "\n";
+								g_MinReserve -= min;
+								g_GasReserve -= gas;								
 							},
 								[builder](BWAPI::Game*){return builder->getOrder() == BWAPI::Orders::ConstructingBuilding; },
 								1);
+
+							this->unitCount--;
 						}
 					}
 				}
@@ -94,7 +118,7 @@ void CreateUnit::act()
 					else 
 						return;
 				}
-			}			
+			}
 		}
 		this->acting = true;
 	}
