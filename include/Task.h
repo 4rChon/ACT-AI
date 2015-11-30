@@ -18,6 +18,7 @@ protected:
 	int age;
 	int taskID;
 	double cost;
+	double profit;
 	Coalition* coalition;	
 public:
 	//constructors and destructors
@@ -39,6 +40,7 @@ public:
 	virtual TaskType getType() const;
 	virtual Coalition* getCoalition() const;
 	virtual double getCost();
+	virtual double getProfit();
 
 	//-
 	virtual void assign() = 0;

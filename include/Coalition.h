@@ -5,11 +5,12 @@
 #include "Composition.h"
 #include "TaskType.h"
 #include "Agent.h"
+#include "Agentset.h"
 
 class Coalition
 {
 private:	
-	std::unordered_set<Agent*> agentSet;
+	Agentset agentSet;
 	BWAPI::Unitset unitSet;
 	Composition currentComp;
 	Composition targetComp;
@@ -18,6 +19,8 @@ private:
 	int age;
 	int taskID;
 	int coalitionID;
+	double cost;
+	double profit;
 public:
 	//constructors and destructors;
 	Coalition();
@@ -34,11 +37,13 @@ public:
 	std::string getCurrentTaskString() const;
 	TaskType getCurrentTaskType() const;
 	BWAPI::Unitset getUnitSet() const;
-	std::unordered_set<Agent*> getAgentSet() const;
+	Agentset getAgentSet() const;
 	Composition getCurrentComp() const;
 	Composition getTargetComp() const;
 	int getAge() const;
 	int getID() const;
+	double getCost();
+	double getProfit();
 
 	//-
 	void addUnit(BWAPI::Unit unit);

@@ -1,4 +1,5 @@
 #include "Worker.h"
+#include "ResourceManager.h"
 #include <random>
 #include <iterator>
 #include <chrono>
@@ -60,7 +61,7 @@ bool Worker::repair()
 
 bool Worker::gather()
 {
-	return this->unit->gather(this->unit->getClosestUnit(BWAPI::Filter::IsMineralField || (BWAPI::Filter::IsOwned && BWAPI::Filter::IsResourceContainer)));
+	return this->unit->gather(ResourceManager::getInstance()->chooseResource(this->unit));
 }
 
 bool Worker::build()
@@ -102,7 +103,11 @@ void Worker::updateUnlocked()
 				unitType == BWAPI::UnitTypes::Terran_Supply_Depot ||
 				unitType == BWAPI::UnitTypes::Terran_Refinery ||
 				unitType == BWAPI::UnitTypes::Terran_Factory ||
-				unitType == BWAPI::UnitTypes::Terran_Starport)
+				unitType == BWAPI::UnitTypes::Terran_Starport ||				
+				unitType == BWAPI::UnitTypes::Protoss_Gateway ||
+				unitType == BWAPI::UnitTypes::Protoss_Pylon ||
+				unitType == BWAPI::UnitTypes::Protoss_Robotics_Facility ||
+				unitType == BWAPI::UnitTypes::Protoss_Stargate)			
 				this->buildMap[unitType] = 1.0 / (double)this->unit->getType().buildsWhat().size();
 		}
 		//std::cout << unitType.c_str() << " : " << this->produceMap[unitType] << "\n";

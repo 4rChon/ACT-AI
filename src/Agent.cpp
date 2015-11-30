@@ -75,3 +75,8 @@ void Agent::chooseCommand()
 	else
 		this->commandType = BWAPI::UnitCommandTypes::None;
 }
+
+double Agent::getPrice() const
+{
+	return this->unit->getType().mineralPrice() + (1.5 * this->unit->getType().gasPrice());
+}

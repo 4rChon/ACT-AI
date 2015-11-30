@@ -54,6 +54,7 @@ public:
 	virtual void onUnitComplete(BWAPI::Unit unit);
 	// Everything below this line is safe to modify.
 	void drawRegions();
+	void drawResources();
 	void drawTextInfo();
 	void drawTerrainData();
 };

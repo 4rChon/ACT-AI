@@ -86,7 +86,7 @@ double Composition::getCost() const
 void Composition::addType(BWAPI::UnitType unitType, int count)
 {
 	unitMap[unitType] += count;
-	this->cost += (unitType.gasPrice() * 1.5) + (unitType.mineralPrice()) * count;
+	this->cost += ((unitType.gasPrice() * 1.5) + (unitType.mineralPrice())) * count;
 }
 
 void Composition::addUnit(BWAPI::Unit unit)

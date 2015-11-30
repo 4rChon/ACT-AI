@@ -3,6 +3,7 @@
 #include "Producer.h"
 #include "AgentManager.h"
 #include "CoalitionManager.h"
+#include "ResourceManager.h"
 #include "Scout.h"
 #include <chrono>
 
@@ -58,6 +59,7 @@ void Core::onStart()
 	AgentManager::getInstance();
 	CoalitionManager::getInstance();
 	ThreatField::getInstance();	
+	ResourceManager::getInstance();
 
 	drawGui = false;
 	
@@ -120,15 +122,17 @@ void Core::onFrame()
 	currentTime = std::chrono::high_resolution_clock::now();
 	//display text with information at the top of the screen
 	drawTextInfo();
+	if (drawGui)
+	{
+		drawResources();
+		//drawRegions();
+	}
 	Broodwar->getStartLocations();
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
 		return;
 
 	if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 		return;
-
-	if (drawGui)
-		drawRegions();
 
 	auto agent = AgentManager::getInstance()->getLastServiced();
 	while (agent != AgentManager::getInstance()->getAgentset().end())
@@ -305,8 +309,11 @@ void Core::onUnitCreate(BWAPI::Unit unit)
 
 void Core::onUnitDestroy(BWAPI::Unit unit)
 {
-	if (unit->getPlayer() == Broodwar->enemy() && unit->getType().isBuilding())
-		g_AttackUnitSet.erase(std::pair<int, int>(unit->getID(), unit->getType()));
+	if (unit->getPlayer() == Broodwar->enemy())
+	{
+		if (unit->getType().isBuilding())
+			g_AttackUnitSet.erase(std::pair<int, int>(unit->getID(), unit->getType()));
+	}
 
 	if (unit->getPlayer() == Broodwar->self())
 	{
@@ -382,6 +389,20 @@ void Core::drawRegions()
 	}
 }
 
+void Core::drawResources()
+{
+	for (auto &resource : ResourceManager::getInstance()->getResourceSet())
+	{
+		//Broodwar->drawTextMap(resource->getPosition(), "Miners: %d", ResourceManager::getInstance()->getResource(resource->getID())->miningCount);
+		Color c;
+		if (resource->isBeingGathered())
+			c = Color(0, 255, 0);
+		else
+			c = Color(255, 0, 0);
+		Broodwar->drawCircleMap(resource->getPosition().x, resource->getPosition().y, 30, c);
+	}
+}
+
 void Core::drawTextInfo()
 {
 	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
@@ -415,7 +436,7 @@ void Core::drawTextInfo()
 				Broodwar->drawTextMap(unit->getPosition(), coalition->getCurrentTaskString().c_str());
 			}
 		}
-		Broodwar->drawTextScreen(5, (10 * k++) + 100, "%d: Cost - %.2f", coalition->getID(), coalition->getTargetComp().getCost());		
+		Broodwar->drawTextScreen(5, (10 * k++) + 100, "%d: Cost - %.2f", coalition->getID(), coalition->getCost());		
 		for (auto &unitType : coalition->getTargetComp().getUnitMap())
 			Broodwar->drawTextScreen(10, (10 * k++) + 100, "%s : %d/%d", unitType.first.c_str(), coalition->getCurrentComp().getUnitMap()[unitType.first], unitType.second);
 	}

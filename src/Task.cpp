@@ -12,6 +12,8 @@ Task::Task()
 	this->acting = false;
 	this->coalition = nullptr;
 	this->age = BWAPI::Broodwar->getFrameCount();
+	this->cost = 0.0;
+	this->profit = 0.0;
 	g_Tasks.push_back(this);
 }
 
@@ -82,12 +84,19 @@ Coalition* Task::getCoalition() const
 
 double Task::getCost()
 {
-	this->cost = 0;
+	this->cost = 0.0;
 	
 	for (auto task : this->subTasks)
 		this->cost += task->getCost();
+	if (this->coalition)
+		this->cost += this->coalition->getCost();
 	
 	return this->cost;
+}
+
+double Task::getProfit()
+{
+	return this->profit;
 }
 
 void Task::cleanSubTasks()

@@ -59,7 +59,7 @@ void AgentManager::addAgent(BWAPI::Unit unit)
 	if (unit->getType().isBuilding() && unit->getType().canProduce())
 		agent = new Producer(unit, 1);
 	else if (unit->getType().isWorker()) //refactor
-		agent = new Worker(unit, 0.01);
+		agent = new Worker(unit, 0.1);
 	else
 		agent = new Agent(unit, 1);
 

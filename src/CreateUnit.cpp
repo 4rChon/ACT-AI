@@ -36,33 +36,55 @@ void CreateUnit::act()
 	{
 		while (this->unitCount > 0)
 		{	
+			//std::cout << "Unit Count > 0\n";
+
 			if (!g_isUnlocked[unitType])
 			{
 				if (satisfied)
+				{
+					//std::cout << "Is being satisfied\n";
 					return;
-				std::cout << unitType.c_str() << " is locked\n";
+				}
+
+				//std::cout << unitType.c_str() << " is locked\n";
 				SatisfyRequirement* satisfyRequirement = new SatisfyRequirement(unitType);
 				this->addSubTask(satisfyRequirement);
 				satisfied = true;
 				return;
 			}
-			if (!(this->unitType.mineralPrice() <= (BWAPI::Broodwar->self()->minerals() - g_MinReserve) && this->unitType.gasPrice() <= (BWAPI::Broodwar->self()->gas() - g_GasReserve) && this->unitType.supplyRequired() <= BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed())) 
+
+			if (!(this->unitType.mineralPrice() <= (BWAPI::Broodwar->self()->minerals() - g_MinReserve) && this->unitType.gasPrice() <= (BWAPI::Broodwar->self()->gas() - g_GasReserve) && this->unitType.supplyRequired() <= BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed()))
+			{
+				//std::cout << "Not enough minerals\n";
 				return;
+			}
+
 			if (this->unitType.isAddon())
 			{
-				if (!this->coalition->getUnitSet().buildAddon(this->unitType)) 
+				//std::cout << "Is an addon\n";
+				if (!this->coalition->getUnitSet().buildAddon(this->unitType))
+				{
+					//std::cout << "Can't build an addon\n";
 					return;
+				}
+				//std::cout << "Built an addon\n";
 				this->unitCount--;
 			}
+
 			if (this->unitType.isBuilding() && this->unitType.whatBuilds().first == BWAPI::Broodwar->self()->getRace().getWorker())
 			{				
+				//std::cout << "Is a building built by a worker\n";
+
 				if (this->building)
-					return;				
+				{
+					//std::cout << "Is currently building\n";
+					return;
+				}
 				
 				if (!reserved)
 				{
-					std::cout << "I have enough resources to build a " << this->unitType.c_str() << "\n";
-					std::cout << "Reserving " << this->unitType.mineralPrice() << " Minerals and " << this->unitType.gasPrice() << " Gas to build a " << this->unitType.c_str() << "\n";
+					//std::cout << "I have enough resources to build a " << this->unitType.c_str() << "\n";
+					//std::cout << "Reserving " << this->unitType.mineralPrice() << " Minerals and " << this->unitType.gasPrice() << " Gas to build a " << this->unitType.c_str() << "\n";
 					g_MinReserve += this->unitType.mineralPrice();
 					g_GasReserve += this->unitType.gasPrice();
 					reserved = true;
@@ -70,13 +92,16 @@ void CreateUnit::act()
 
 				for (auto builder : this->coalition->getUnitSet())
 				{					
-					std::cout << "Selecting Builder\n";
+					//std::cout << "Selecting Builder\n";
 					BWAPI::TilePosition targetBuildLocation = BWAPI::Broodwar->getBuildLocation(this->unitType, builder->getTilePosition());
+
 					if (targetBuildLocation)
 					{
-						std::cout << "I found a suitable location to build a " << this->unitType.c_str() << "\n";
+						//std::cout << "I found a suitable location to build a " << this->unitType.c_str() << "\n";
+
 						if (!builder->move(BWAPI::Position(targetBuildLocation.x * BWAPI::TILEPOSITION_SCALE, targetBuildLocation.y * BWAPI::TILEPOSITION_SCALE))) 
 							return;
+
 						if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
 						{							
 							if (!builder->morph(true)) return;
@@ -85,14 +110,18 @@ void CreateUnit::act()
 						else
 						{
 							this->building = builder->build(this->unitType, targetBuildLocation);
-							if (!this->building) return;
-							std::cout << "Moving to build a " << this->unitType.c_str() << "\n";							
+
+							if (!this->building) 
+								return;
+
+							//std::cout << "Moving to build a " << this->unitType.c_str() << "\n";							
 							int min = this->unitType.mineralPrice();
 							int gas = this->unitType.gasPrice();
 							auto uType = this->unitType;							
+							
 							BWAPI::Broodwar->registerEvent([builder, min, gas, uType](BWAPI::Game*)
 							{
-								std::cout << "Releasing " << min << " Minerals and " << gas << " Gas after placing a " << uType.c_str() << "\n";
+								//std::cout << "Releasing " << min << " Minerals and " << gas << " Gas after placing a " << uType.c_str() << "\n";
 								g_MinReserve -= min;
 								g_GasReserve -= gas;								
 							},
@@ -113,7 +142,10 @@ void CreateUnit::act()
 				{
 					if (producer->getTrainingQueue().size() < 1)
 					{
-						if (this->coalition->getUnitSet().train(this->unitType)) this->unitCount--;
+						if (this->coalition->getUnitSet().train(this->unitType))
+							this->unitCount--;
+						else
+							return;
 					}
 					else 
 						return;
@@ -141,5 +173,11 @@ void CreateUnit::update()
 	{
 		this->complete = true;		
 		std::cout << "CreateUnit: Complete\n";
-	}	
+	}
+
+	if (this->coalition->getAgentSet().size() == 0 && this->coalition->isActive())
+	{
+		this->complete = true;
+		std::cout << "CreateUnit: Failed\n";
+	}
 }

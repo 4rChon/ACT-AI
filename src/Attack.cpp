@@ -31,11 +31,24 @@ void Attack::assign()
 		Composition c;
 		//c.addType(BWAPI::UnitTypes::Terran_Marine, 5 + g_TotalCount[BWAPI::UnitTypes::Terran_Marine]);
 		for (auto unitType : g_TotalCount)
+		{
 			if (!unitType.first.isWorker() && !unitType.first.isBuilding() && unitType.second > 0)
 				c.addType(unitType.first, unitType.second);
-		//c.addType(BWAPI::UnitTypes::Terran_Goliath, 5);
-		c.addType(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 1);
-		//c.addType(BWAPI::UnitTypes::Terran_Marine, 5);
+		}
+
+		if (g_TotalCount[BWAPI::UnitTypes::Terran_Marine] < 5)
+			c.addType(BWAPI::UnitTypes::Terran_Marine, 5 - g_TotalCount[BWAPI::UnitTypes::Terran_Marine]);
+
+		
+		if (g_TotalCount[BWAPI::UnitTypes::Terran_Medic] < 5)
+			c.addType(BWAPI::UnitTypes::Terran_Medic, 5 - g_TotalCount[BWAPI::UnitTypes::Terran_Medic]);
+
+		//c.addType(BWAPI::UnitTypes::Terran_Vulture, 5);
+		//c.addType(BWAPI::UnitTypes::Terran_Science_Vessel, 1);
+		//c.addType(BWAPI::UnitTypes::Spell_Scanner_Sweep, 1);
+		//c.addType(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 1);
+		//c.addType(BWAPI::UnitTypes::Protoss_Dragoon, 1);
+		
 		//c.addType(BWAPI::UnitTypes::Terran_Firebat, 5);
 		//c.addType(BWAPI::UnitTypes::Terran_Medic, 5);
 		//c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 10);
@@ -72,6 +85,7 @@ void Attack::update()
 		this->complete = true;
 		std::cout << "Attack: Complete\n";
 		g_attackTarget = -1;
+		profit = 1.0;
 	}
 	else if (this->acting)
 	{
@@ -80,6 +94,7 @@ void Attack::update()
 			this->complete = true;			
 			std::cout << "Attack: Failed\n";
 			g_attackTarget = -1;
+			profit = 0.0;
 		}
 	}
 }

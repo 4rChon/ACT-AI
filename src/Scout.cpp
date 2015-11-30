@@ -16,10 +16,10 @@ void Scout::assign()
 	{
 		std::cout << "Scout: Assign\n";
 		Composition c;
-		c.addType(BWAPI::UnitTypes::Terran_SCV, 1);
+		//c.addType(BWAPI::UnitTypes::Terran_SCV, 1);
 		//c.addType(BWAPI::UnitTypes::Terran_Firebat, 5);
 		//c.addType(BWAPI::UnitTypes::Terran_Medic, 5);
-		//c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 10);
+		c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 1);
 		CreateCoalition *createCoalition = new CreateCoalition(c, this);
 		addSubTask(createCoalition);
 		this->assigned = true;
@@ -54,15 +54,16 @@ void Scout::update()
 	{
 		this->complete = true;
 		std::cout << "Scout: Complete\n";
+		this->profit = 1.0;
 	}
 	else if (this->acting)
 	{
-		if (this->coalition->getUnitSet().size() == 0)
+		/*if (this->coalition->getUnitSet().size() == 0)
 		{
 			this->complete = true;
 			std::cout << "Scout: Failed\n";
-		}
-
+			return;
+		}*/
 		for (auto &unit : this->coalition->getUnitSet())
 		{
 			if (unit->isMoving())
@@ -70,6 +71,7 @@ void Scout::update()
 		}
 		this->complete = true;
 		std::cout << "Scout: Failed\n";
+		this->profit = 0.0;
 	}
 }
 

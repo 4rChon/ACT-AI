@@ -4,18 +4,22 @@
 
 Coalition::Coalition()
 {
-	active = false;
-	age = BWAPI::Broodwar->getFrameCount();
+	this->active = false;
+	this->age = BWAPI::Broodwar->getFrameCount();
+	this->cost = 0.0;
+	this->profit = 0.0;
 }
 
 Coalition::Coalition(Composition targetComp, int taskID, TaskType taskType)
 {
 	this->taskID = taskID;
-	this->coalitionID = g_NextCoalitionID++;
-	active = false;
+	this->coalitionID = g_NextCoalitionID++;	
 	this->targetComp = targetComp;
 	this->currentTask = taskType;
-	age = BWAPI::Broodwar->getFrameCount();
+	this->active = false;
+	this->age = BWAPI::Broodwar->getFrameCount();		
+	this->cost = targetComp.getCost();
+	this->profit = 0.0;
 }
 
 Coalition::~Coalition()
@@ -31,7 +35,7 @@ Coalition::~Coalition()
 void Coalition::setUnitSet(BWAPI::Unitset unitSet)
 {
 	this->unitSet = unitSet;
-	currentComp = Composition(unitSet);
+	this->currentComp = Composition(unitSet);
 }
 
 void Coalition::setActive(bool active)
@@ -75,6 +79,11 @@ BWAPI::Unitset Coalition::getUnitSet() const
 	return this->unitSet;
 }
 
+Agentset Coalition::getAgentSet() const
+{
+	return this->agentSet;
+}
+
 Composition Coalition::getCurrentComp() const
 {
 	return this->currentComp;
@@ -98,7 +107,7 @@ void Coalition::addUnit(BWAPI::Unit unit)
 	if (!active && currentComp == targetComp)
 	{
 		std::cout << "A coalition has been activated!\n";
-		active = true;
+		active = true;		
 		this->updateFreeAgents();
 	}
 }
@@ -114,7 +123,6 @@ void Coalition::addAgent(Agent* agent)
 				std::cout << agent->getUnit()->getType().c_str() << " is joining a coalition\n";
 				this->agentSet.insert(this->agentSet.begin(), agent);
 				this->addUnit(agent->getUnit());
-
 				return;
 			}
 		}
@@ -140,4 +148,19 @@ void Coalition::updateFreeAgents()
 {
 	for (auto agent : this->agentSet)
 		AgentManager::getInstance()->bindAgent(agent);
+}
+
+double Coalition::getCost()
+{
+	if (!active)
+	{
+		this->cost += (BWAPI::Broodwar->getFrameCount() - age) / 24.0;
+		this->age = BWAPI::Broodwar->getFrameCount();
+	}
+	return 1 - (1 / ((this->cost + 500) / 500));
+}
+
+double Coalition::getProfit()
+{
+	return this->profit;
 }

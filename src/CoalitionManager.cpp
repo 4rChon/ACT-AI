@@ -20,6 +20,7 @@ CoalitionManager* CoalitionManager::getInstance()
 	return instance;
 }
 
+//get coalition by id
 Coalition* CoalitionManager::getCoalition(int coalitionID)
 {
 	for (auto &coalition : this->coalitionSet)
@@ -28,11 +29,13 @@ Coalition* CoalitionManager::getCoalition(int coalitionID)
 	return nullptr;
 }
 
+//get set of all coalitions
 Coalitionset& CoalitionManager::getCoalitionset()
 {
 	return this->coalitionSet;
 }
 
+//get open coalitions
 int CoalitionManager::getOpenCount()
 {
 	this->openCoalitions = 0;
@@ -50,16 +53,19 @@ int CoalitionManager::addCoalition(Composition composition, Task* task)
 	return coalition->getID();
 }
 
+//remove coalition by id
 void CoalitionManager::removeCoalition(int id)
 {
 	this->removeCoalition(this->getCoalition(id));
 }
 
+//remove coalition by object
 void CoalitionManager::removeCoalition(Coalition* coalition)
 {
 	this->coalitionSet.erase(coalition);
 }
 
+//remove coalition by iterator
 Coalitionset::iterator CoalitionManager::removeCoalition(Coalitionset::iterator coalition)
 {
 	return this->coalitionSet.erase(coalition);

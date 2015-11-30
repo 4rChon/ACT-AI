@@ -48,6 +48,7 @@ public:
 	bool isFree() const;
 	int getID() const;
 	BWAPI::Unit getUnit() const;
+	double getPrice() const;
 
 	//-
 	virtual void act();
@@ -56,5 +57,4 @@ public:
 	virtual void updateUnlocked();
 	void updateCommandWeights();
 	void chooseCommand();
-
 };

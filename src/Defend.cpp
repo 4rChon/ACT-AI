@@ -18,6 +18,8 @@ void Defend::assign()
 		for (auto unitType : g_TotalCount)
 			if (!unitType.first.isWorker() && !unitType.first.isBuilding())
 				c.addType(unitType.first, unitType.second);
+		//if (g_TotalCount[BWAPI::UnitTypes::Spell_Scanner_Sweep] == 0)
+		//	c.addType(BWAPI::UnitTypes::Spell_Scanner_Sweep, 1);
 		//c.addType(BWAPI::UnitTypes::Terran_Goliath, 1);
 		//c.addType(BWAPI::UnitTypes::Terran_Marine, 5);
 		//c.addType(BWAPI::UnitTypes::Terran_Medic, 5);
