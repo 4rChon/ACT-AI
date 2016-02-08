@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8'>
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="description" content="SwarmCAT : ">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>SwarmCAT</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/4rChon/SwarmCAT">View on GitHub</a>
+
+          <h1 id="project_title">SwarmCAT</h1>
+          <h2 id="project_tagline"></h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/4rChon/SwarmCAT/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/4rChon/SwarmCAT/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <h1>
+<a id="welcome-to-swarm-cat" class="anchor" href="#welcome-to-swarm-cat" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Welcome to Swarm-CAT</h1>
+
+<p>Swarm-CAT stands for Swarm-Coalitions, Agents, and Tasks.</p>
+
+<p>The project aims to construct a multi-agent solution accompanied by a learning mechanism.  Tasks are spawned depending on the state of the game and each task is assigned a coalition with a composition of unit types. The agents are constantly attempting to fulfill  the  requirements of a unit composition according to their capabilities. The final result will consist of an AI capable of improving its compositions and agent reactions as new information is learned over the course of multiple matches. This learning process will result in more wins for the AI over time.</p>
+
+<h2>
+<a id="what-are-coalitions" class="anchor" href="#what-are-coalitions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are Coalitions?</h2>
+
+<p>A coalition is a group of agents assigned to a common task. Each coalition is assigned a target composition which must be satisfied by the agents before the coalition is activated.</p>
+
+<h2>
+<a id="what-are-compositions" class="anchor" href="#what-are-compositions" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are Compositions?</h2>
+
+<p>A StarCraft player's strategy revolves around achieving a specific unit type composition in order to take advantage of the opponent's weaknesses and win the game. The composition contains information regarding its effectiveness at accomplishing certain tasks or engaging another composition. This information is used to improve the composition across multiple  games. Upon failure, a composition is capable of noting the reason for failure and improving itself in that direction.</p>
+
+<h2>
+<a id="what-are-agents" class="anchor" href="#what-are-agents" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are Agents?</h2>
+
+<p>Each unit in the game is represented by an agent capable of acting autonomously according to the unit's capabilities. The set of decisions that an agent can make are directly mapped to a unit's possible actions. Each individual agent has a separate weight mapped to each action. This mapping changes according to the state of the game. In order to prevent agents from ignoring current
+abstract tasks, a freewill parameter that modifies the likelihood of autonomous action is assigned at agent creation.</p>
+
+<h2>
+<a id="what-are-tasks" class="anchor" href="#what-are-tasks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are Tasks?</h2>
+
+<p>The most essential aspect of the solution is to formalise a set of tasks capable of representing any abstract intention that a player might have. There are two super-tasks which represent the most abstract intentions.</p>
+
+<ul>
+<li><p>Attack : An Attack task is initialised with a composition and a target location.  The task is complete when the designated location's enemy score is below a certain threshold.  The death of all units in the assigned coalition leads to failure of the
+task.</p></li>
+<li><p>Defend : If an agent is not assigned to any coalition, it will automatically take part in defending. A Defend task ends when the match is over, with its success depending  on  whether  the  player  has  won  or  lost  the game. </p></li>
+</ul>
+
+<p>In addition, a set of sub-tasks are used in order to aid the execution of the super-tasks.</p>
+
+<ul>
+<li><p>CreateCoalition : Creates a new coalition for the specified task with an applicable composition.</p></li>
+<li><p>Scout : Sends a unit to gather information from a specified location.</p></li>
+<li><p>Expand : Expanding is essential in increasing income. Town Hall agents are capable of initiating this task by looking at the worker saturation levels at the respective mining location.</p></li>
+<li><p>CreateUnit : Creates a coalition capable of producing a specified unit and commands the coalition to train the unit.</p></li>
+<li><p>ResearchTech : Equivalent of CreateUnit but for technology and upgrades.</p></li>
+<li><p>SatisfyRequirement : Called by CreateUnit and ResearchTech whenever the requirements  for  the  requested game entity have not yet been met.</p></li>
+</ul>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">SwarmCAT maintained by <a href="https://github.com/4rChon">4rChon</a></p>
+        <p>Published with <a href="https://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-58082725-2");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+
+  </body>
+</html>
