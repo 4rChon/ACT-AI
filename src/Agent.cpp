@@ -85,7 +85,7 @@ bool Agent::gather(BWAPI::Unit target)
 {
 	if (unit->canGather(target))
 		return unit->gather(target);
-	return false;
+	return false;	
 }
 
 bool Agent::buildAddon(BWAPI::UnitType addon)
@@ -113,6 +113,13 @@ bool Agent::upgrade(BWAPI::UpgradeType upgradeType)
 {
 	if (unit->canUpgrade(upgradeType) && EconHelper::haveMoney(upgradeType))
 		return unit->upgrade(upgradeType);
+	return false;
+}
+
+bool Agent::useAbility(BWAPI::TechType ability, BWAPI::PositionOrUnit target)
+{
+	if (unit->canUseTech(ability, target))
+		return unit->useTech(ability, target);
 	return false;
 }
 

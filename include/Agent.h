@@ -39,6 +39,7 @@ public:
 	virtual bool train(BWAPI::UnitType unitType);
 	virtual bool morph(BWAPI::UnitType unitType);
 	virtual bool upgrade(BWAPI::UpgradeType upgradeType);
+	virtual bool useAbility(BWAPI::TechType ability, BWAPI::PositionOrUnit target = nullptr);
 
 	//helpers
 	virtual void debugInfo() const;
