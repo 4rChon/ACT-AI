@@ -1,6 +1,5 @@
 #include "..\include\DesireHelper.h"
 #include "..\include\UtilHelper.h"
-#include "..\include\MapHelper.h"
 
 namespace DesireHelper
 {
@@ -11,23 +10,30 @@ namespace DesireHelper
 		std::unordered_map<BWAPI::TechType, double> techDesireMap;
 		std::unordered_map<BWTA::BaseLocation*, double, std::hash<void*>> expansionDesireMap;
 		std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> attackDesireMap;
-		std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> defendDesireMap;
-		
+		std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> defendDesireMap;		
 	}
 
 	void initialiseHelper()
 	{
 		for (auto &unitType : BWAPI::UnitTypes::allUnitTypes())
-			unitDesireMap.insert(std::pair<BWAPI::UnitType, double>(unitType, 0.0));
+			if(unitType.getRace() == BWAPI::Broodwar->self()->getRace())
+				unitDesireMap.insert(std::pair<BWAPI::UnitType, double>(unitType, 0.1));
 
 		for (auto &upgradeType : BWAPI::UpgradeTypes::allUpgradeTypes())
-			upgradeDesireMap.insert(std::pair<BWAPI::UpgradeType, double>(upgradeType, 0.0));
+			if(upgradeType.getRace() == BWAPI::Broodwar->self()->getRace())
+				upgradeDesireMap.insert(std::pair<BWAPI::UpgradeType, double>(upgradeType, 0.1));
 
 		for (auto &techType : BWAPI::TechTypes::allTechTypes())
-			techDesireMap.insert(std::pair<BWAPI::TechType, double>(techType, 0.0));
+			if (techType.getRace() == BWAPI::Broodwar->self()->getRace())
+				techDesireMap.insert(std::pair<BWAPI::TechType, double>(techType, 0.1));
 
 		for (auto &expansion : BWTA::getBaseLocations())
-			expansionDesireMap.insert(std::pair<BWTA::BaseLocation*, double>(expansion, 0.0));
+		{
+			double desire = 0.0;
+			if(!expansion->isStartLocation())
+				desire = 10 + std::log(1.0 / expansion->getGroundDistance(BWTA::getStartLocation(BWAPI::Broodwar->self())));
+			expansionDesireMap.insert(std::pair<BWTA::BaseLocation*, double>(expansion, desire));
+		}
 
 		for (auto &region : BWAPI::Broodwar->getAllRegions())
 		{
@@ -58,5 +64,45 @@ namespace DesireHelper
 		updateUpgradeDesireMap();
 		updateTechDesireMap();
 		updateExpansionDesireMap();
+	}
+
+	const std::unordered_map<BWAPI::UnitType, double>& getUnitDesireMap()
+	{
+		return unitDesireMap;
+	}
+
+	const std::unordered_map<BWAPI::UpgradeType, double>& getUpgradeDesireMap()
+	{
+		return upgradeDesireMap;
+	}
+
+	const std::unordered_map<BWAPI::TechType, double>& getTechDesireMap()
+	{
+		return techDesireMap;
+	}
+
+	const std::unordered_map<BWTA::BaseLocation*, double, std::hash<void*>>& getExpansionDesireMap()
+	{
+		return expansionDesireMap;
+	}
+
+	void setExpansionDesire(BWTA::BaseLocation* baseLocation, double desire)
+	{
+		expansionDesireMap[baseLocation] = desire;
+	}
+
+	double getExpansionDesire(BWTA::BaseLocation* baseLocation)
+	{
+		return expansionDesireMap[baseLocation];
+	}
+
+	const std::unordered_map<MapHelper::Zone*, double, std::hash<void*>>& getAttackDesireMap()
+	{
+		return attackDesireMap;
+	}
+
+	const std::unordered_map<MapHelper::Zone*, double, std::hash<void*>>& getDefendDesireMap()
+	{
+		return defendDesireMap;
 	}
 }

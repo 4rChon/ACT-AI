@@ -19,7 +19,7 @@ namespace AgentHelper
 	Agent* getAgent(int id);
 	const Agentset& getAgentset();
 	const Baseset& getResourceDepots();
-	std::set<BWTA::BaseLocation*>& getCandidateBases();
+	//std::set<BWTA::BaseLocation*>& getCandidateBases();
 	Agentset::iterator getLastServiced();
 
 	//-

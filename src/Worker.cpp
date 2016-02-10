@@ -2,6 +2,8 @@
 #include "..\include\ResourceDepot.h"
 #include "..\include\AgentHelper.h"
 #include "..\include\EconHelper.h"
+#include "..\include\DesireHelper.h"
+#include "..\include\UtilHelper.h"
 #include "BWAPI.h"
 
 Worker::Worker()
@@ -102,22 +104,23 @@ bool Worker::expand()
 {	
 	if (EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getCenter()))
 	{
-		//EconHelper::addDebt(BWAPI::Broodwar->self()->getRace().getCenter().mineralPrice(), 0);
-		if (AgentHelper::getCandidateBases().size() > 0)
+		BWTA::BaseLocation* bestLocation = (*DesireHelper::getExpansionDesireMap().begin()).first;
+		double bestScore = (*DesireHelper::getExpansionDesireMap().begin()).second;
+		for (auto &expansion : DesireHelper::getExpansionDesireMap())
+			if (bestScore < expansion.second)
+			{
+				bestLocation = expansion.first;
+				bestScore = expansion.second;
+			}
+
+		if (unit->move(bestLocation->getPosition()))
 		{
 			unsetMiningBase();
-			auto expandLocation = (*AgentHelper::getCandidateBases().begin());
-			for (auto base : AgentHelper::getCandidateBases())
-				if (expandLocation->getTilePosition().getDistance(unit->getTilePosition()) > (base->getTilePosition().getDistance(unit->getTilePosition())))
-					expandLocation = base;
-
-			if (unit->move(expandLocation->getPosition()))
+			if (unit->build(unit->getPlayer()->getRace().getCenter(), bestLocation->getTilePosition()))
 			{
-				if (unit->build(unit->getPlayer()->getRace().getCenter(), expandLocation->getTilePosition()))
-				{
-					AgentHelper::getCandidateBases().erase(expandLocation);
-					return true;
-				}
+				DesireHelper::setExpansionDesire(bestLocation, 0.0);
+				//MapHelper::getCandidateBases().erase(bestLocation);
+				return true;
 			}
 		}
 	}

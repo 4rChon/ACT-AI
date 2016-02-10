@@ -7,12 +7,16 @@ namespace MapHelper
 	namespace
 	{
 		Field regionField;
-	}
+		//static std::set<BWTA::BaseLocation*> candidateBases;
+	}		
 
 	void initialiseHelper()
 	{
 		/*std::cout << BWTA::getRegions().size() << "\n";
 		std::cout << BWAPI::Broodwar->getAllRegions().size() << "\n";*/
+		/*candidateBases = BWTA::getBaseLocations();
+		candidateBases.erase(BWTA::getStartLocation(BWAPI::Broodwar->self()));*/
+
 		for (auto &region : BWAPI::Broodwar->getAllRegions())
 		{			
 			Zone* zone = new Zone(region, region->getID());
@@ -40,4 +44,9 @@ namespace MapHelper
 	{
 		return regionField;
 	}
+
+	//std::set<BWTA::BaseLocation*>& getCandidateBases()
+	//{
+	//	return candidateBases;
+	//}
 }

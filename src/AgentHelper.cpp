@@ -9,15 +9,13 @@ namespace AgentHelper
 	{
 		static Agentset agentSet;
 		static Baseset resourceDepots;
-		static std::set<BWTA::BaseLocation*> candidateBases;
+		
 		static Agentset::iterator lastServiced;
 	}
 
 	void initialiseHelper()
 	{		
-		lastServiced = agentSet.begin();
-		candidateBases = BWTA::getBaseLocations();
-		candidateBases.erase(BWTA::getStartLocation(BWAPI::Broodwar->self()));
+		lastServiced = agentSet.begin();		
 	}
 
 	Agent* getAgent(int id)
@@ -36,11 +34,6 @@ namespace AgentHelper
 	const Baseset& getResourceDepots()
 	{
 		return resourceDepots;
-	}
-
-	std::set<BWTA::BaseLocation*>& getCandidateBases()
-	{
-		return candidateBases;
 	}
 
 	Agentset::iterator getLastServiced()

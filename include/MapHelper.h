@@ -91,8 +91,5 @@ namespace MapHelper
 	Zone* getZone(int id);
 	Zone* getZone(BWAPI::Region region);
 	const Field& getRegionField();
+	/*std::set<BWTA::BaseLocation*>& getCandidateBases();*/
 }
-
-
-//std::unordered_map<MapHelper::Zone*, double> AttackDesireMap;
-//std::unordered_map<MapHelper::Zone*, double> DefendDesireMap;

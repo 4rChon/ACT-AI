@@ -1,6 +1,7 @@
 #pragma once
 #include "BWAPI.h"
 #include "BWTA.h"
+#include "MapHelper.h"
 #include <unordered_map>
 
 namespace DesireHelper
@@ -11,4 +12,13 @@ namespace DesireHelper
 	void updateTechDesireMap();
 	void updateExpansionDesireMap();
 	void updateDesireMaps();
+
+	const std::unordered_map<BWAPI::UnitType, double>& getUnitDesireMap();
+	const std::unordered_map<BWAPI::UpgradeType, double>& getUpgradeDesireMap();
+	const std::unordered_map<BWAPI::TechType, double>& getTechDesireMap();
+	const std::unordered_map<BWTA::BaseLocation*, double, std::hash<void*>>& getExpansionDesireMap();
+	void setExpansionDesire(BWTA::BaseLocation* baseLocation, double desire);
+	double getExpansionDesire(BWTA::BaseLocation* baseLocation);
+	const std::unordered_map<MapHelper::Zone*, double, std::hash<void*>>& getAttackDesireMap();
+	const std::unordered_map<MapHelper::Zone*, double, std::hash<void*>>& getDefendDesireMap();
 }

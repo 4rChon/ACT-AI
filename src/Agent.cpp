@@ -29,7 +29,9 @@ Agent::~Agent()
 void Agent::initialiseCommandMap()
 {
 	for (auto &commandType : BWAPI::UnitCommandTypes::allUnitCommandTypes())
+	{		
 		commandMap.insert(std::pair<BWAPI::UnitCommandType, double>(commandType, 0.0));
+	}
 }
 
 void Agent::setCoalitionID(int id)

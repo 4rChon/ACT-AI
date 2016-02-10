@@ -80,7 +80,7 @@ namespace std
 	//{
 	//	bool operator()(const BWTA::BaseLocation &lhs, const BWTA::BaseLocation &rhs) const
 	//	{
-	//		return lhs->getPosition() == rhs->getPosition();
+	//		return lhs.getPosition() == rhs.getPosition();
 	//	}
 	//};
 }
