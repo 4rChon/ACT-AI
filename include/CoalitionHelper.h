@@ -3,10 +3,13 @@
 #include "Coalition.h"
 #include "Composition.h"
 #include "Task.h"
-#include "Coalitionset.h"
+
+typedef BWAPI::SetContainer < Coalition*, std::hash<void*>> Coalitionset;
 
 namespace CoalitionHelper
 {
+	void initialiseHelper();
+
 	//getters
 	Coalition* getCoalition(int coalitionID);
 	const Coalitionset& getCoalitionset();

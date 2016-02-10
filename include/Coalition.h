@@ -1,11 +1,9 @@
 #pragma once
 #include <BWAPI.h>
 #include <string>
-
 #include "Composition.h"
-//#include "TaskType.h"
 #include "Agent.h"
-#include "Agentset.h"
+#include "AgentHelper.h"
 
 class Task;
 

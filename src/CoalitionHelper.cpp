@@ -7,9 +7,13 @@ namespace CoalitionHelper
 	{
 		static Coalitionset coalitionSet;
 		static int nextID;
-		static int openCoalitions;
 	}
 	
+	void initialiseHelper()
+	{
+		nextID = 0;
+	}
+
 	Coalition* getCoalition(int coalitionID)
 	{
 		for (auto &coalition : coalitionSet)

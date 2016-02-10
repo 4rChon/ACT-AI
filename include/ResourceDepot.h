@@ -1,7 +1,9 @@
 #pragma once
 #include "BWTA.h"
 #include "Producer.h"
-#include "Workerset.h"
+#include "Worker.h"
+
+typedef BWAPI::SetContainer < Worker*, std::hash<void*>> Workerset;
 
 class ResourceDepot : public Producer
 {

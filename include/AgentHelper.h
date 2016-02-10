@@ -1,12 +1,13 @@
 #pragma once
 
 #include "Agent.h"
-#include "Agentset.h"
-#include "Baseset.h"
 #include "ResourceDepot.h"
 #include "Worker.h"
 #include <BWTA.h>
 #include <vector>
+
+typedef BWAPI::SetContainer < Agent*, std::hash<void*>> Agentset;
+typedef BWAPI::SetContainer < ResourceDepot*, std::hash<void*>> Baseset;
 
 namespace AgentHelper
 {
