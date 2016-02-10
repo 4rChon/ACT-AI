@@ -34,6 +34,7 @@ public:
 	//commands
 	virtual bool move(BWAPI::Position target);
 	virtual bool attack(BWAPI::PositionOrUnit target);
+	virtual bool gather(BWAPI::Unit target);
 	virtual bool buildAddon(BWAPI::UnitType addon);
 	virtual bool train(BWAPI::UnitType unitType);
 	virtual bool morph(BWAPI::UnitType unitType);

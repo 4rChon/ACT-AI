@@ -30,8 +30,7 @@ public:
 	//commands
 	bool build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPosition);
 	bool expand();
-	bool gather(BWAPI::Unit target);
 	
 	//helpers
-	void debugInfo();
+	void debugInfo() const;
 };

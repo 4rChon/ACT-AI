@@ -102,6 +102,7 @@ bool Worker::expand()
 {	
 	if (EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getCenter()))
 	{
+		//EconHelper::addDebt(BWAPI::Broodwar->self()->getRace().getCenter().mineralPrice(), 0);
 		if (AgentHelper::getCandidateBases().size() > 0)
 		{
 			unsetMiningBase();
@@ -123,12 +124,7 @@ bool Worker::expand()
 	return false;
 }
 
-bool Worker::gather(BWAPI::Unit target)
-{	
-	return unit->gather(target);
-}
-
-void Worker::debugInfo()
+void Worker::debugInfo() const
 {
 	std::cout << "\tID  : " << unitID << "\n";
 	std::cout << "\tUnit: " << unit->getType() << "\n";	

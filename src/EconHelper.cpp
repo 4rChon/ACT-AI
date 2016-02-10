@@ -34,13 +34,13 @@ namespace EconHelper
 		return BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed() >= unitType.supplyRequired();
 	}
 
-	int addDebt(int minerals, int gas)
+	void addDebt(int minerals, int gas)
 	{
 		mineralDebt += minerals;
 		gasDebt += gas;
 	}
 
-	int subtractDebt(int minerals, int gas)
+	void subtractDebt(int minerals, int gas)
 	{
 		mineralDebt -= minerals;
 		gasDebt -= gas;

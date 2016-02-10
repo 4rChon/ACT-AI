@@ -81,6 +81,13 @@ bool Agent::attack(BWAPI::PositionOrUnit target)
 	return false;
 }
 
+bool Agent::gather(BWAPI::Unit target)
+{
+	if (unit->canGather(target))
+		return unit->gather(target);
+	return false;
+}
+
 bool Agent::buildAddon(BWAPI::UnitType addon)
 {
 	if (unit->canBuildAddon(addon) && EconHelper::haveMoney(addon))
