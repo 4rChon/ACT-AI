@@ -29,7 +29,7 @@ namespace DesireHelper
 		for (auto &expansion : BWTA::getBaseLocations())
 			expansionDesireMap.insert(std::pair<BWTA::BaseLocation*, double>(expansion, 0.0));
 
-		for (auto &region : BWTA::getRegions())
+		for (auto &region : BWAPI::Broodwar->getAllRegions())
 		{
 			attackDesireMap.insert(std::pair<MapHelper::Zone*, double>(MapHelper::getZone(region), 0.0));
 			defendDesireMap.insert(std::pair<MapHelper::Zone*, double>(MapHelper::getZone(region), 0.0));

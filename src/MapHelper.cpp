@@ -1,26 +1,21 @@
 #include "BWTA.h"
+#include "BWAPI.h"
 #include "..\include\MapHelper.h"
 
 namespace MapHelper
-{
-
-	typedef BWAPI::SetContainer<Zone*, std::hash<void*>> Field;
-
+{	
 	namespace
 	{
-		//std::vector<Zone*> field;
-		//std::set<BWTA::Region*> regionField;
 		Field regionField;
-
-		//std::unordered_map<MapHelper::Zone*, double> AttackDesireMap;
-		//std::unordered_map<MapHelper::Zone*, double> DefendDesireMap;
 	}
 
 	void initialiseHelper()
 	{
-		for (auto &region : BWTA::getRegions())
+		/*std::cout << BWTA::getRegions().size() << "\n";
+		std::cout << BWAPI::Broodwar->getAllRegions().size() << "\n";*/
+		for (auto &region : BWAPI::Broodwar->getAllRegions())
 		{			
-			Zone* zone = new Zone(region, regionField.size());
+			Zone* zone = new Zone(region, region->getID());
 			regionField.insert(zone);
 		}
 	}
@@ -33,11 +28,16 @@ namespace MapHelper
 		return nullptr;
 	}
 
-	Zone* getZone(BWTA::Region* region)
+	Zone* getZone(BWAPI::Region region)
 	{
 		for (auto &zone : regionField)
 			if ((*zone).getRegion() == region)
 				return zone;
 		return nullptr;
+	}
+
+	const Field& getRegionField()
+	{
+		return regionField;
 	}
 }
