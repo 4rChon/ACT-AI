@@ -75,7 +75,7 @@ void Worker::act()
 		}
 	}
 	
-	if (BWAPI::Broodwar->self()->minerals() >= BWAPI::Broodwar->self()->getRace().getCenter().mineralPrice() && AgentHelper::getCandidateBases().size() > 0 && !mining)
+	if (!mining)
 	{
 		expand(AgentHelper::getCandidateBases());		
 		return;
@@ -103,20 +103,23 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 
 bool Worker::expand(std::set<BWTA::BaseLocation*>& candidateBases)
 {	
-	if (candidateBases.size() > 0)
+	if (EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getCenter()))
 	{
-		unsetMiningBase();
-		auto expandLocation = (*candidateBases.begin());
-		for (auto base : candidateBases)
-			if (expandLocation->getTilePosition().getDistance(unit->getTilePosition()) > (base->getTilePosition().getDistance(unit->getTilePosition())))
-				expandLocation = base;
-
-		if (unit->move(expandLocation->getPosition()))
+		if (candidateBases.size() > 0)
 		{
-			if (unit->build(unit->getPlayer()->getRace().getCenter(), expandLocation->getTilePosition()))
+			unsetMiningBase();
+			auto expandLocation = (*candidateBases.begin());
+			for (auto base : candidateBases)
+				if (expandLocation->getTilePosition().getDistance(unit->getTilePosition()) > (base->getTilePosition().getDistance(unit->getTilePosition())))
+					expandLocation = base;
+
+			if (unit->move(expandLocation->getPosition()))
 			{
-				candidateBases.erase(expandLocation);
-				return true;
+				if (unit->build(unit->getPlayer()->getRace().getCenter(), expandLocation->getTilePosition()))
+				{
+					candidateBases.erase(expandLocation);
+					return true;
+				}
 			}
 		}
 	}

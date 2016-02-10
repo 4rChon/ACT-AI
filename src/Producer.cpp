@@ -28,13 +28,7 @@ void Producer::act()
 
 bool Producer::train(BWAPI::UnitType unitType)
 {
-	std::cout << "Building train " << unitType.c_str() << "\n";
-	for (auto t : unit->getType().buildsWhat())
-		std::cout << "\tunit build types: " << t.c_str() << "\n";
 	if (EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType))
-	{
-		std::cout << unit->getType() << " : Attempting to train a " << unitType.c_str() << "\n";
 		return this->unit->train(unitType);
-	}
 	return false;
 }

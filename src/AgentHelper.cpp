@@ -1,6 +1,7 @@
 #include "..\include\AgentHelper.h"
 #include "..\include\CommandCenter.h"
 #include "..\include\Hatchery.h"
+#include "..\include\SCV.h"
 
 namespace AgentHelper
 {
@@ -103,8 +104,16 @@ namespace AgentHelper
 		{
 			if (unit->getType().isWorker())
 			{
-				agent = new Worker(unit);
-				std::cout << "Added new Worker : " << unit->getType() << " : " << unit->getID() << "\n";
+				if (unit->getType() == BWAPI::UnitTypes::Terran_SCV)
+				{
+					agent = new SCV(unit);
+					std::cout << "Added new SCV : " << unit->getType() << " : " << unit->getID() << "\n";
+				}
+				else
+				{
+					agent = new Worker(unit);
+					std::cout << "Added new Worker : " << unit->getType() << " : " << unit->getID() << "\n";
+				}
 			}
 			else
 			{

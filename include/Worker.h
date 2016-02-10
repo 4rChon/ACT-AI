@@ -4,8 +4,6 @@
 
 class ResourceDepot;
 
-class AgentManager;
-
 class Worker : public Agent
 {
 private:
@@ -26,7 +24,7 @@ public:
 	ResourceDepot* getMiningBase() const;
 
 	//-
-	void act();
+	virtual void act();
 
 	//commands
 	bool build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPosition);
