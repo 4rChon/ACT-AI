@@ -30,10 +30,7 @@ void SCV::act()
 	}
 
 	if (!mining)
-	{
-		expand(AgentHelper::getCandidateBases());
-		return;
-	}
+		expand();
 }
 
 bool SCV::repair(BWAPI::Unit damagedUnit)

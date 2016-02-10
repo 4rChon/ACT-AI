@@ -23,7 +23,7 @@ Agent::~Agent()
 
 void Agent::setCoalitionID(int id)
 {
-	coalitionID = id;
+	coalitionID = id;	
 }
 
 void Agent::setTaskID(int id)

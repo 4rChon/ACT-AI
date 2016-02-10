@@ -28,7 +28,7 @@ public:
 
 	//commands
 	bool build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPosition);
-	bool expand(std::set<BWTA::BaseLocation*>& candidateBases);
+	bool expand();
 	bool gather(BWAPI::Unit target);
 	
 	//helpers

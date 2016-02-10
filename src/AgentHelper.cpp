@@ -5,6 +5,14 @@
 
 namespace AgentHelper
 {
+	namespace
+	{
+		static Agentset agentSet;
+		static Baseset resourceDepots;
+		static std::set<BWTA::BaseLocation*> candidateBases;
+		static Agentset::iterator lastServiced;
+	}
+
 	void AgentHelper::initialiseHelper()
 	{		
 		lastServiced = agentSet.begin();
