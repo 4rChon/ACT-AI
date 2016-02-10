@@ -2,6 +2,12 @@
 
 namespace EconHelper
 {
+	namespace
+	{
+		static int mineralDebt;
+		static int gasDebt;
+	}
+
 	int EconHelper::haveMoney(BWAPI::UnitType unitType)
 	{
 		return ((BWAPI::Broodwar->self()->minerals() - mineralDebt) >= unitType.mineralPrice() && (BWAPI::Broodwar->self()->gas() - gasDebt) >= unitType.gasPrice());
