@@ -19,12 +19,13 @@ namespace AgentHelper
 	Agent* getAgent(int id);
 	const Agentset& getAgentset();
 	const Baseset& getResourceDepots();
-	//std::set<BWTA::BaseLocation*>& getCandidateBases();
 	Agentset::iterator getLastServiced();
 
 	//-
 	void resetLastServiced();	
 	void createAgent(BWAPI::Unit unit);
 	void removeAgent(int id);
+	void freeAgent(Agent* agent);
+	void unbind(Agent* agent);
 	Agentset::iterator removeAgent(Agentset::iterator agent);
 }

@@ -1,5 +1,10 @@
 #include "..\include\Composition.h"
 
+Composition::Composition()
+{
+	cost = 0;
+}
+
 Composition::Composition(BWAPI::Unitset unitSet)
 {
 	cost = 0;

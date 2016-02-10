@@ -1,22 +1,34 @@
 #include "..\include\Agent.h"
 #include "..\include\EconHelper.h"
+#include "..\include\Coalition.h"
+#include "..\include\Task.h"
 
 Agent::Agent()
 {
 	this->unit = nullptr;
-	this->unitID = -1;
-	this->coalitionID = -1;
-	this->taskID = -1;
-	
+	unitID = -1;
+	coalitionID = -1;
+	taskID = -1;
+
+	free = true;
+
+	task = nullptr;
+	coalition = nullptr;
+
 	initialiseCommandMap();
 }
 
 Agent::Agent(BWAPI::Unit unit)
 {
 	this->unit = unit;
-	this->unitID = unit->getID();
-	this->coalitionID = -1;
-	this->taskID = -1;
+	unitID = unit->getID();
+	coalitionID = -1;
+	taskID = -1;
+
+	free = true;
+
+	task = nullptr;
+	coalition = nullptr;
 
 	initialiseCommandMap();
 }
@@ -24,6 +36,8 @@ Agent::Agent(BWAPI::Unit unit)
 Agent::~Agent()
 {
 	std::cout << "~Agent\n";
+	delete task;	
+	delete coalition;
 }
 
 void Agent::initialiseCommandMap()
@@ -49,6 +63,22 @@ void Agent::setUnit(BWAPI::Unit unit)
 	this->unit = unit;
 }
 
+void Agent::bindCheck()
+{
+	if (coalitionID != -1)
+		if (coalition->isActive())
+			free = false;
+}
+
+void Agent::unbind()
+{
+	coalitionID = -1;
+	coalition = nullptr;
+	taskID = -1;
+	task = nullptr;
+	free = true;
+}
+
 int Agent::getID() const
 {
 	return unitID;
@@ -72,6 +102,11 @@ BWAPI::Unit Agent::getUnit() const
 double Agent::getPrice() const
 {
 	return unit->getType().mineralPrice() + (unit->getType().gasPrice() * 1.5);
+}
+
+bool Agent::isFree() const
+{
+	return free;
 }
 
 void Agent::act()

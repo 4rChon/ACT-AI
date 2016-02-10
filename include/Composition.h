@@ -13,6 +13,7 @@ private:
 	double cost;
 public:
 	//constructors
+	Composition();
 	Composition(BWAPI::Unitset unitSet);
 	Composition(UnitMap unitMap);
 

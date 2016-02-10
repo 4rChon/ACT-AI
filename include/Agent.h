@@ -3,16 +3,26 @@
 #include <BWAPI.h>
 #include <unordered_map>
 
+class Task;
+class Coalition;
+
+typedef std::unordered_map<BWAPI::UnitCommandType, double> CommandMap;
+
 class Agent
 {
 protected:
 	BWAPI::Unit unit;
 
+	Coalition* coalition;
+	Task* task;
+
 	int unitID;
 	int coalitionID;	
 	int taskID;
 
-	std::unordered_map<BWAPI::UnitCommandType, double> commandMap;
+	bool free;
+
+	CommandMap commandMap;
 
 	void initialiseCommandMap();
 
@@ -33,6 +43,7 @@ public:
 	int getTaskID() const;
 	BWAPI::Unit getUnit() const;
 	double getPrice() const;
+	bool isFree() const;
 
 	//-
 	virtual void act();
@@ -48,5 +59,7 @@ public:
 	virtual bool useAbility(BWAPI::TechType ability, BWAPI::PositionOrUnit target = nullptr);
 
 	//helpers
+	void bindCheck();
+	void unbind();
 	virtual void debugInfo() const;
 };

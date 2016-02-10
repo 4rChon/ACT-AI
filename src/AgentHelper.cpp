@@ -141,6 +141,11 @@ namespace AgentHelper
 		resetLastServiced();
 	}
 
+	void unbind(Agent* agent)
+	{		
+		agent->unbind();
+	}
+
 	Agentset::iterator removeAgent(Agentset::iterator agent)
 	{
 		return agentSet.erase(agent);
