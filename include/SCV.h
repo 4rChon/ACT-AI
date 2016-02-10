@@ -12,4 +12,5 @@ public:
 
 	//commands
 	bool repair(BWAPI::Unit unit);
+	bool repair();
 };

@@ -10,22 +10,8 @@ SCV::SCV(BWAPI::Unit unit)
 
 void SCV::act()
 {
-	if (!unit->isRepairing())
-	{		
-		auto repairSet = unit->getUnitsInRadius(unit->getType().sightRange(), BWAPI::Filter::IsOwned && BWAPI::Filter::HP_Percent < 100);
-		if (repairSet.size())
-		{			
-			for (auto &damagedUnit : repairSet)
-			{
-				std::cout << "found repair target : " << damagedUnit->getID() << "\n";
-				if (repair(damagedUnit))
-				{
-					std::cout << "repairing : " << damagedUnit->getID() << "\n";
-					return;
-				}
-			}			
-		}		
-	}
+	if (repair())
+		return;
 
 	if (BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed() <= 2 && BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::Broodwar->self()->getRace().getSupplyProvider()) < 1)
 		if(build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr))
@@ -49,9 +35,19 @@ void SCV::act()
 		return;
 	}
 }
+
 bool SCV::repair(BWAPI::Unit damagedUnit)
 {
-	if(EconHelper::haveMoney(1, damagedUnit->getType().gasPrice() > 0))
+	int costsGas = damagedUnit->getType().gasPrice() > 0;
+	if (EconHelper::haveMoney(1, costsGas))
 		return unit->repair(damagedUnit, true);
+	return false;
+}
+
+bool SCV::repair()
+{
+	auto repairSet = unit->getUnitsInRadius(unit->getType().sightRange(), BWAPI::Filter::IsOwned && BWAPI::Filter::HP_Percent < 100);
+	for (auto &damagedUnit : repairSet)
+		return(repair(damagedUnit));
 	return false;
 }
