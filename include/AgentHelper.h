@@ -5,8 +5,8 @@
 #include "Baseset.h"
 #include "ResourceDepot.h"
 #include "Worker.h"
-#include "vector"
-#include "BWTA.h"
+#include <BWTA.h>
+#include <vector>
 
 namespace AgentHelper
 {
