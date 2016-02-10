@@ -1,6 +1,6 @@
 #include "..\include\Worker.h"
 #include "..\include\ResourceDepot.h"
-#include "..\include\AgentManager.h"
+#include "..\include\AgentHelper.h"
 #include "..\include\EconHelper.h"
 #include "BWAPI.h"
 
@@ -64,7 +64,7 @@ void Worker::act()
 	}
 
 	bool mining = false;
-	auto resourceDepots = AgentManager::getInstance()->getResourceDepots();
+	auto resourceDepots = AgentHelper::getResourceDepots();
 	for (auto &base : resourceDepots)
 	{
 		if (!base->isMineralSaturated())
@@ -75,9 +75,9 @@ void Worker::act()
 		}
 	}
 	
-	if (BWAPI::Broodwar->self()->minerals() >= BWAPI::Broodwar->self()->getRace().getCenter().mineralPrice() && AgentManager::getInstance()->getCandidateBases().size() > 0 && !mining)
+	if (BWAPI::Broodwar->self()->minerals() >= BWAPI::Broodwar->self()->getRace().getCenter().mineralPrice() && AgentHelper::getCandidateBases().size() > 0 && !mining)
 	{
-		expand(AgentManager::getInstance()->getCandidateBases());		
+		expand(AgentHelper::getCandidateBases());		
 		return;
 	}
 }

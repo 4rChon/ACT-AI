@@ -8,25 +8,19 @@
 #include "vector"
 #include "BWTA.h"
 
-class AgentManager
+namespace AgentHelper
 {
-private:
-	Agentset agentSet;
-	Baseset resourceDepots;
-	std::set<BWTA::BaseLocation*> candidateBases;
-
-	static AgentManager* instance;
-	Agentset::iterator lastServiced;
-public:
-	//constructors and destructors
-	AgentManager();
-	~AgentManager();
+	static Agentset agentSet;
+	static Baseset resourceDepots;
+	static std::set<BWTA::BaseLocation*> candidateBases;
+	static Agentset::iterator lastServiced;
+	
+	void initialiseHelper();
 
 	//setters
 	void setLastServiced(Agentset::iterator lastServiced);
 
 	//getters
-	static AgentManager* getInstance();
 	Agent* getAgent(int id);
 	const Agentset& getAgentset();
 	const Baseset& getResourceDepots();
@@ -38,4 +32,4 @@ public:
 	void createAgent(BWAPI::Unit unit);
 	void removeAgent(int id);
 	Agentset::iterator removeAgent(Agentset::iterator agent);
-};
+}
