@@ -7,6 +7,8 @@ Agent::Agent()
 	this->unitID = -1;
 	this->coalitionID = -1;
 	this->taskID = -1;
+	
+	initialiseCommandMap();
 }
 
 Agent::Agent(BWAPI::Unit unit)
@@ -15,11 +17,19 @@ Agent::Agent(BWAPI::Unit unit)
 	this->unitID = unit->getID();
 	this->coalitionID = -1;
 	this->taskID = -1;
+
+	initialiseCommandMap();
 }
 
 Agent::~Agent()
 {
 	std::cout << "~Agent\n";
+}
+
+void Agent::initialiseCommandMap()
+{
+	for (auto &commandType : BWAPI::UnitCommandTypes::allUnitCommandTypes())
+		commandMap.insert(std::pair<BWAPI::UnitCommandType, double>(commandType, 0.0));
 }
 
 void Agent::setCoalitionID(int id)

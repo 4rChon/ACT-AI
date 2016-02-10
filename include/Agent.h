@@ -1,5 +1,7 @@
 #pragma once
+#include "UtilHelper.h"
 #include <BWAPI.h>
+#include <unordered_map>
 
 class Agent
 {
@@ -10,11 +12,15 @@ protected:
 	int coalitionID;	
 	int taskID;
 
+	std::unordered_map<BWAPI::UnitCommandType, double> commandMap;
+
+	void initialiseCommandMap();
+
 public:
 	//constructors	and destructors
 	Agent();
 	Agent(BWAPI::Unit unit);
-	virtual ~Agent();
+	virtual ~Agent();	
 
 	//setters	
 	void setCoalitionID(int id);

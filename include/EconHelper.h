@@ -1,5 +1,7 @@
 #pragma once
 #include "BWAPI.h"
+#include "UtilHelper.h"
+
 namespace EconHelper
 {
 	void initialiseHelper();

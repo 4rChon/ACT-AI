@@ -55,9 +55,9 @@ namespace AgentHelper
 		lastServiced = agentSet.begin();
 	}
 
-	void setLastServiced(Agentset::iterator lastServiced)
+	void setLastServiced(Agentset::iterator newLastServiced)
 	{
-		lastServiced = lastServiced;
+		lastServiced = newLastServiced;
 	}
 
 	void createAgent(BWAPI::Unit unit)
