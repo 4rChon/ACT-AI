@@ -4,15 +4,9 @@
 class CommandCenter : public ResourceDepot
 {
 public:
+	//constructor
 	CommandCenter(BWAPI::Unit unit);
-
-	//getters
 
 	//-
 	void act();
-
-	//commands
-	bool buildAddon(BWAPI::UnitType);
-
-	//helpers
 };

@@ -11,6 +11,7 @@ protected:
 	int mineralMiners;
 	int gasMiners;
 public:
+	//constructors and destructors
 	ResourceDepot();
 	ResourceDepot(BWAPI::Unit unit);
 

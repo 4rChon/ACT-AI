@@ -14,7 +14,6 @@ public:
 	//constructors	and destructors
 	Agent();
 	Agent(BWAPI::Unit unit);
-
 	virtual ~Agent();
 
 	//setters	
@@ -26,12 +25,20 @@ public:
 	int getID() const;
 	int getCoalitionID() const;
 	int getTaskID() const;
-
 	BWAPI::Unit getUnit() const;
-
 	double getPrice() const;
 
 	//-
 	virtual void act();
-	virtual void debugInfo();
+
+	//commands
+	virtual bool move(BWAPI::Position target);
+	virtual bool attack(BWAPI::PositionOrUnit target);
+	virtual bool buildAddon(BWAPI::UnitType addon);
+	virtual bool train(BWAPI::UnitType unitType);
+	virtual bool morph(BWAPI::UnitType unitType);
+	virtual bool upgrade(BWAPI::UpgradeType upgradeType);
+
+	//helpers
+	virtual void debugInfo() const;
 };

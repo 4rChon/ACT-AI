@@ -4,17 +4,9 @@
 class Hatchery : public ResourceDepot
 {
 public:
+	//constructor
 	Hatchery(BWAPI::Unit unit);
 
-	//getters	
-
 	//-	
-	void act();
-
-	//commands
-	bool train(BWAPI::UnitType unitType);
-	bool morph();
-	bool upgrade(BWAPI::UpgradeType upgradeType);
-
-	//helpers
+	void act();	
 };

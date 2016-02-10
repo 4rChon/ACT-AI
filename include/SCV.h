@@ -5,6 +5,7 @@
 class SCV : public Worker
 {	
 public:
+	//constructor
 	SCV(BWAPI::Unit unit);
 			
 	//-

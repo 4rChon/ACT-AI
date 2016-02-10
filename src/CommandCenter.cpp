@@ -13,10 +13,3 @@ void CommandCenter::act()
 	buildAddon(BWAPI::UnitTypes::Terran_Comsat_Station);
 	train(unit->getPlayer()->getRace().getWorker());
 }
-
-bool CommandCenter::buildAddon(BWAPI::UnitType addon)
-{
-	if(EconHelper::haveMoney(addon))
-		return unit->buildAddon(addon);
-	return false;
-}

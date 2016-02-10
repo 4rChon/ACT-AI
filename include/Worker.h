@@ -10,6 +10,7 @@ private:
 	bool gasMiner;
 	ResourceDepot* miningBase;
 public:
+	//constructors and desctructors
 	Worker();
 	Worker(BWAPI::Unit unit);
 

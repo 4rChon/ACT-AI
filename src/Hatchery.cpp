@@ -12,31 +12,7 @@ void Hatchery::act()
 {	
 	if(!train(BWAPI::UnitTypes::Zerg_Drone))
 		unit->train(BWAPI::UnitTypes::Zerg_Overlord);
-	morph();
+	if(unit->getType() != BWAPI::UnitTypes::Zerg_Hive)
+		morph(*unit->getType().buildsWhat().begin());
 	upgrade(*unit->getType().upgradesWhat().begin());
-}
-
-bool Hatchery::train(BWAPI::UnitType unitType)
-{
-	if (EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType))
-		return this->unit->train(unitType);
-	return false;	
-}
-
-bool Hatchery::morph()
-{
-	if (unit->getType() != BWAPI::UnitTypes::Zerg_Hive)
-	{
-		BWAPI::UnitType unitMorph = *unit->getType().buildsWhat().begin();
-		if (EconHelper::haveMoney(unitMorph))
-			return(unit->morph(unitMorph));
-	}
-	return false;
-}
-
-bool Hatchery::upgrade(BWAPI::UpgradeType upgradeType)
-{
-	if(EconHelper::haveMoney(upgradeType))
-		return unit->upgrade(upgradeType);
-	return false;
 }
