@@ -8,14 +8,20 @@ namespace EconHelper
 		static int gasDebt;
 	}
 
-	int EconHelper::haveMoney(BWAPI::UnitType unitType)
+	void initialiseHelper()
 	{
-		return ((BWAPI::Broodwar->self()->minerals() - mineralDebt) >= unitType.mineralPrice() && (BWAPI::Broodwar->self()->gas() - gasDebt) >= unitType.gasPrice());
+		gasDebt = 0;
+		mineralDebt = 0;
 	}
 
-	int EconHelper::haveMoney(BWAPI::UpgradeType upgradeType)
+	int haveMoney(BWAPI::UnitType unitType)
 	{
-		return ((BWAPI::Broodwar->self()->minerals() - mineralDebt) >= upgradeType.mineralPrice() && (BWAPI::Broodwar->self()->gas() - gasDebt) >= upgradeType.gasPrice());
+		return (BWAPI::Broodwar->self()->minerals() - mineralDebt) >= unitType.mineralPrice() && (BWAPI::Broodwar->self()->gas() - gasDebt) >= unitType.gasPrice();
+	}
+
+	int haveMoney(BWAPI::UpgradeType upgradeType)
+	{
+		return (BWAPI::Broodwar->self()->minerals() - mineralDebt) >= upgradeType.mineralPrice() && (BWAPI::Broodwar->self()->gas() - gasDebt) >= upgradeType.gasPrice();
 	}
 
 	int haveMoney(int minerals, int gas)
@@ -23,8 +29,20 @@ namespace EconHelper
 		return BWAPI::Broodwar->self()->minerals() >= minerals && BWAPI::Broodwar->self()->gas() >= gas;
 	}
 
-	int EconHelper::haveSupply(BWAPI::UnitType unitType)
+	int haveSupply(BWAPI::UnitType unitType)
 	{
-		return (BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed() >= unitType.supplyRequired());
+		return BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed() >= unitType.supplyRequired();
+	}
+
+	int addDebt(int minerals, int gas)
+	{
+		mineralDebt += minerals;
+		gasDebt += gas;
+	}
+
+	int subtractDebt(int minerals, int gas)
+	{
+		mineralDebt -= minerals;
+		gasDebt -= gas;
 	}
 }

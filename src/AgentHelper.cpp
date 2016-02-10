@@ -13,14 +13,14 @@ namespace AgentHelper
 		static Agentset::iterator lastServiced;
 	}
 
-	void AgentHelper::initialiseHelper()
+	void initialiseHelper()
 	{		
 		lastServiced = agentSet.begin();
 		candidateBases = BWTA::getBaseLocations();
 		candidateBases.erase(BWTA::getStartLocation(BWAPI::Broodwar->self()));
 	}
 
-	Agent* AgentHelper::getAgent(int id)
+	Agent* getAgent(int id)
 	{
 		for (auto &a : agentSet)
 			if (a->getID() == id)
@@ -28,39 +28,39 @@ namespace AgentHelper
 		return nullptr;
 	}
 
-	const Agentset& AgentHelper::getAgentset()
+	const Agentset& getAgentset()
 	{
 		return agentSet;
 	}
 
-	const Baseset& AgentHelper::getResourceDepots()
+	const Baseset& getResourceDepots()
 	{
 		return resourceDepots;
 	}
 
-	std::set<BWTA::BaseLocation*>& AgentHelper::getCandidateBases()
+	std::set<BWTA::BaseLocation*>& getCandidateBases()
 	{
 		return candidateBases;
 	}
 
-	Agentset::iterator AgentHelper::getLastServiced()
+	Agentset::iterator getLastServiced()
 	{
 		if (lastServiced == agentSet.end())
 			resetLastServiced();
 		return lastServiced;
 	}
 
-	void AgentHelper::resetLastServiced()
+	void resetLastServiced()
 	{
 		lastServiced = agentSet.begin();
 	}
 
-	void AgentHelper::setLastServiced(Agentset::iterator lastServiced)
+	void setLastServiced(Agentset::iterator lastServiced)
 	{
 		lastServiced = lastServiced;
 	}
 
-	void AgentHelper::createAgent(BWAPI::Unit unit)
+	void createAgent(BWAPI::Unit unit)
 	{
 		Agent* agent = nullptr;
 		if (unit->getType() == BWAPI::UnitTypes::Zerg_Larva
@@ -132,7 +132,7 @@ namespace AgentHelper
 		agentSet.insert(agent);
 	}
 
-	void AgentHelper::removeAgent(int id)
+	void removeAgent(int id)
 	{
 		//std::cout << "Removing Agent : " << id << "\n";
 		Agent* agent = getAgent(id);
@@ -148,7 +148,7 @@ namespace AgentHelper
 		resetLastServiced();
 	}
 
-	Agentset::iterator AgentHelper::removeAgent(Agentset::iterator agent)
+	Agentset::iterator removeAgent(Agentset::iterator agent)
 	{
 		return agentSet.erase(agent);
 	}
