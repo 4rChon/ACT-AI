@@ -62,12 +62,16 @@ ResourceDepot* Worker::getMiningBase() const
 
 void Worker::act()
 {
+	//temp contents
 	if (unit->isIdle())
 	{
-		if (BWAPI::Broodwar->self()->getRace() != BWAPI::Races::Zerg && BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed() <= 2 && BWAPI::Broodwar->self()->minerals() >= 100 && BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::Broodwar->self()->getRace().getSupplyProvider()) < 1)
+		if (BWAPI::Broodwar->self()->getRace() != BWAPI::Races::Zerg 
+			&& BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed() <= 2 
+			&& EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getSupplyProvider())
+			&& BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::Broodwar->self()->getRace().getSupplyProvider()) < 1)
 		{
-			build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr);
-			return;
+			if(build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr))
+				return;
 		}
 
 		bool mining = false;
@@ -106,8 +110,7 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 bool Worker::expand()
 {	
 	if (EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getCenter()))
-	{
-		movingToBuild = true;
+	{		
 		BWTA::BaseLocation* bestLocation = (*DesireHelper::getExpansionDesireMap().begin()).first;
 		double bestScore = (*DesireHelper::getExpansionDesireMap().begin()).second;
 		for (auto &expansion : DesireHelper::getExpansionDesireMap())
@@ -121,8 +124,9 @@ bool Worker::expand()
 		{
 			unsetMiningBase();
 			if (unit->build(unit->getPlayer()->getRace().getCenter(), bestLocation->getTilePosition()))
-			{
+			{								
 				DesireHelper::setExpansionDesire(bestLocation, 0.0);
+				task->succeed();
 				return true;
 			}
 		}

@@ -19,8 +19,8 @@ Task::Task()
 
 Task::~Task()
 {
+	std::cout << "~" << taskName.c_str() << "\n";
 	cleanSubTasks();	
-	CoalitionHelper::removeCoalition(coalition);
 	delete coalition;
 	coalition = nullptr;
 	TaskHelper::removeTask(this);
@@ -44,7 +44,7 @@ int Task::getID() const
 
 std::string Task::getName() const
 {
-	return this->taskName;
+	return taskName;
 }
 
 Taskset Task::getSubTasks() const
@@ -76,25 +76,14 @@ double Task::getProfit()
 
 void Task::cleanSubTasks()
 {
-	auto &it = subTasks.begin();
-	while (it != subTasks.end())
-	{
-		it = subTasks.erase(it);
-		delete(*it);
-		//(*it) = nullptr;
-	}
-	//subTasks.resize(0);
+	for(auto &task : subTasks)
+		TaskHelper::removeTask(task);
+	subTasks.clear();
 }
 
 void Task::addSubTask(Task* task)
 {
 	subTasks.insert(task);
-}
-
-std::string Task::toString() const
-{
-	std::cout << "Task: Getting Name\n";
-	return taskName;
 }
 
 void Task::succeed()
@@ -113,4 +102,25 @@ void Task::fail()
 	std::cout << taskID << " : " << taskName << " : Failure!\n";
 
 	cleanSubTasks();
+}
+
+void Task::updateTaskTree()
+{
+	if (subTasks.size() > 0)
+	{
+		for (auto it = subTasks.begin(); it != subTasks.end();)
+		{
+			if ((*it)->isComplete())
+			{
+				auto tempIt = subTasks.erase(it);
+				delete (*it);
+				it = tempIt; //BRB GETTING SOME TEA
+			}
+			else
+			{
+				(*it)->updateTaskTree();
+			}
+		}
+	}
+	update();
 }

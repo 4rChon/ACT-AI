@@ -18,10 +18,8 @@ Producer::~Producer()
 
 void Producer::act()
 {	
-	if (unit->getType() == BWAPI::UnitTypes::Terran_Barracks)
-		train(BWAPI::UnitTypes::Terran_Marine);
-	else
-		train(*unit->getType().buildsWhat().begin());
+	//temp contents
+	train(*unit->getType().buildsWhat().begin());
 	/*if (!train(unit->getPlayer()->getRace().getWorker()))
 	unit->train(unit->getPlayer()->getRace().getSupplyProvider());*/
 }

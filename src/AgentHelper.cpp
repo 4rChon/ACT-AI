@@ -125,6 +125,12 @@ namespace AgentHelper
 		agentSet.insert(agent);
 	}
 
+	void removeAgent(Agent* agent)
+	{
+		agent->unbind();
+		agentSet.erase(agent);
+	}
+
 	void removeAgent(int id)
 	{
 		//std::cout << "Removing Agent : " << id << "\n";
@@ -133,21 +139,17 @@ namespace AgentHelper
 			std::cout << "\tAgent not found\n";
 		else
 		{
+			agent->unbind();
 			agentSet.erase(agent);
 			if (resourceDepots.count((ResourceDepot*)agent))
 				resourceDepots.erase((ResourceDepot*)agent);
-			delete agent;
 		}
 		resetLastServiced();
 	}
 
-	void unbind(Agent* agent)
-	{		
-		agent->unbind();
-	}
-
 	Agentset::iterator removeAgent(Agentset::iterator agent)
 	{
-		return agentSet.erase(agent);
+		(*agent)->unbind();
+		auto nextAgent = agentSet.erase(agent);
 	}
 }

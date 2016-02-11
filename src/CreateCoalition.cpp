@@ -1,5 +1,6 @@
 #include "..\include\CreateCoalition.h"
 #include "..\include\CoalitionHelper.h"
+#include "..\include\TaskHelper.h"
 #include "..\include\CreateUnit.h"
 
 CreateCoalition::CreateCoalition(Composition composition, Task* task)
@@ -43,12 +44,19 @@ void CreateCoalition::act()
 
 void CreateCoalition::update()
 {
-	if (complete)
-		return;
+	//if (complete)
+	//{
+	//	std::cout << "CreateCoalition Complete\n";
+	//	TaskHelper::removeTask(this);
+	//	return;
+	//}
 	if (!assigned)
 		assign();
 	if (taskCoalition->isActive())
+	{
 		succeed();
+		return;
+	}
 	if (assigned && !acting)
 		act();
 	//if(age > x) fail();

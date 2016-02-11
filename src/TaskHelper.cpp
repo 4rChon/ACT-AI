@@ -38,26 +38,20 @@ namespace TaskHelper
 
 	void removeTask(Task* task)
 	{		
+		std::cout << "Removing " << task->getName().c_str() << " from root taskset\n";
 		rootTaskSet.erase(task);
-		fullTaskSet.erase(task);
-		delete task;
-	}
-
-	void updateTaskTree(Task* task)
-	{
-		if (task->getSubTasks().size() > 0)
-		{
-			for (auto t : task->getSubTasks())
-				updateTaskTree(t);
-			if (task->isComplete())
-				removeTask(task);
-		}
-		task->update();
+		std::cout << "Removing " << task->getName().c_str() << " from full taskset\n";
+		fullTaskSet.erase(task);		
+		/*std::cout << "Deleting " << task->getName().c_str() << "\n";
+		delete task;*/
 	}
 
 	void updateRootTasks()
 	{
 		for (auto &task : rootTaskSet)
-			updateTaskTree(task);
+			if (task->isComplete())
+				delete task;
+			else
+				task->updateTaskTree();
 	}
 }

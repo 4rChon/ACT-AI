@@ -25,8 +25,7 @@ namespace AgentHelper
 	//-
 	void resetLastServiced();	
 	void createAgent(BWAPI::Unit unit);
+	void removeAgent(Agent* agent);
 	void removeAgent(int id);
-	void freeAgent(Agent* agent);
-	void unbind(Agent* agent);
 	Agentset::iterator removeAgent(Agentset::iterator agent);
 }

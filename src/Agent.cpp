@@ -38,7 +38,7 @@ Agent::Agent(BWAPI::Unit unit)
 Agent::~Agent()
 {
 	std::cout << "~Agent\n";
-	unbind();
+	AgentHelper::removeAgent(this);	
 }
 
 void Agent::initialiseCommandMap()
@@ -74,9 +74,6 @@ void Agent::bind()
 
 void Agent::unbind()
 {
-	if (coalitionID != -1)
-		coalition->removeAgent(this);
-
 	coalitionID = -1;
 	coalition = nullptr;
 	taskID = -1;
@@ -121,7 +118,7 @@ bool Agent::isFree() const
 
 void Agent::act()
 {
-	//do stuff
+	//temp contents
 }
 
 bool Agent::pollCoalitions()

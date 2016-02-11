@@ -8,7 +8,7 @@ Coalition::Coalition()
 	active = false;
 	creationFrame = BWAPI::Broodwar->getFrameCount();	
 	task = nullptr;
-	//taskID = -1; //TODO:
+	taskID = -1;
 	coalitionID = CoalitionHelper::getNextID();
 	cost = 0.0;
 	profit = 0.0;
@@ -21,7 +21,7 @@ Coalition::Coalition(Composition targetComp, Task* task)
 
 	coalitionID = CoalitionHelper::getNextID();
 	active = false;
-	//this->taskID = task->getID(); //TODO:	
+	taskID = task->getID();
 	creationFrame = BWAPI::Broodwar->getFrameCount();
 	cost = targetComp.getCost();
 	profit = 0.0;
@@ -32,12 +32,14 @@ Coalition::~Coalition()
 	std::cout << "~Coalition : " << coalitionID << "\n";
 	active = false;
 	for (auto agent : agentSet)
-		AgentHelper::unbind(agent);
+		agent->unbind();
 
+	taskID = -1;
 	task = nullptr;
 
 	agentSet.clear();
 	unitSet.clear();
+	CoalitionHelper::removeCoalition(this);
 }
 
 int Coalition::getAge() const
@@ -131,7 +133,7 @@ void Coalition::removeAgent(Agent* agent)
 
 	if (active)
 	{
-		AgentHelper::unbind(agent);
+		agent->unbind();
 		//if all agents die while coalition is activated, the task is a failure
 		if(agentSet.size() == 0)
 			task->fail();

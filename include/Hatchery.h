@@ -8,5 +8,7 @@ public:
 	Hatchery(BWAPI::Unit unit);
 
 	//-	
-	void act();	
+	void act();
+	bool upgrade(BWAPI::UpgradeType upgradeType);
+	
 };

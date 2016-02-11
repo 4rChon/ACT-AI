@@ -14,7 +14,7 @@ protected:
 	Workerset workers;
 	int mineralMiners;
 	int gasMiners;
-	bool expandDesire;
+	double expandDesire;
 public:
 	//constructors and destructors
 	ResourceDepot();
@@ -30,6 +30,8 @@ public:
 
 	//-
 	virtual void act();
+
+	void updateExpandDesire();
 
 	//helpers
 	bool isMineralSaturated();

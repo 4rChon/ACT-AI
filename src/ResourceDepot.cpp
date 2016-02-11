@@ -10,7 +10,7 @@ ResourceDepot::ResourceDepot()
 	workers.clear();
 	mineralMiners = 0;
 	gasMiners = 0;
-	expandDesire = 0.0;
+	expandDesire = 1.0;
 }
 
 ResourceDepot::ResourceDepot(BWAPI::Unit unit)
@@ -57,18 +57,25 @@ int ResourceDepot::getGasMiners()
 }
 
 void ResourceDepot::act()
-{	
+{		
+	updateExpandDesire();
+
+	//temp contents
 	if (unit->isIdle())
-		train((*unit->getType().buildsWhat().begin()));
-	
+		train((*unit->getType().buildsWhat().begin()));	
+	/*if (!train(unit->getPlayer()->getRace().getWorker()))
+		unit->train(unit->getPlayer()->getRace().getSupplyProvider());*/
+}
+
+void ResourceDepot::updateExpandDesire()
+{	
+	//temp contents
 	if (isMineralSaturated() && expandDesire == 1.0)
-	{
+	{		
 		Task* expand = new Expand();
 		TaskHelper::addTask(expand, true);
 		expandDesire = 0.0;
 	}
-	/*if (!train(unit->getPlayer()->getRace().getWorker()))
-		unit->train(unit->getPlayer()->getRace().getSupplyProvider());*/
 }
 
 bool ResourceDepot::isMineralSaturated()

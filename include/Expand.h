@@ -5,9 +5,12 @@
 
 class Expand : public Task
 {
+private:
+	Agent* builder;
 public:
 	//constructors and destructors
 	Expand();
+	~Expand();
 
 	//-
 	void assign();

@@ -44,9 +44,9 @@ public:
 	virtual void update() = 0;
 	void cleanSubTasks();
 	void addSubTask(Task* task);
-	std::string toString() const;
 
 	virtual void succeed();
 	virtual void fail();
+	void updateTaskTree();
 
 };
