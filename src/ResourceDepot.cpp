@@ -1,5 +1,8 @@
 #include "..\include\ResourceDepot.h"
 #include "..\include\EconHelper.h"
+#include "..\include\TaskHelper.h"
+#include "..\include\Task.h"
+#include "..\include\Expand.h"
 
 ResourceDepot::ResourceDepot()
 {	
@@ -7,6 +10,7 @@ ResourceDepot::ResourceDepot()
 	workers.clear();
 	mineralMiners = 0;
 	gasMiners = 0;
+	expandDesire = 0.0;
 }
 
 ResourceDepot::ResourceDepot(BWAPI::Unit unit)
@@ -16,7 +20,8 @@ ResourceDepot::ResourceDepot(BWAPI::Unit unit)
 	baseLocation = BWTA::getNearestBaseLocation(unit->getPosition());
 	workers.clear();
 	mineralMiners = 0;
-	gasMiners = 0;	
+	gasMiners = 0;
+	expandDesire = 1.0;
 }
 
 ResourceDepot::~ResourceDepot()
@@ -53,7 +58,15 @@ int ResourceDepot::getGasMiners()
 
 void ResourceDepot::act()
 {	
-	train((*unit->getType().buildsWhat().begin()));
+	if (unit->isIdle())
+		train((*unit->getType().buildsWhat().begin()));
+	
+	if (isMineralSaturated() && expandDesire == 1.0)
+	{
+		Task* expand = new Expand();
+		TaskHelper::addTask(expand, true);
+		expandDesire = 0.0;
+	}
 	/*if (!train(unit->getPlayer()->getRace().getWorker()))
 		unit->train(unit->getPlayer()->getRace().getSupplyProvider());*/
 }

@@ -38,12 +38,14 @@ public:
 	double getCost();
 	double getProfit() const;
 	bool isActive() const;
+	Composition getCurrentComp() const;
+	Composition getTargetComp() const;
 	
 	//-
-	void addUnit(BWAPI::Unit unit);
-	void addAgent(Agent* agent);
-	void removeUnit(BWAPI::Unit unit);
+	bool addAgent(Agent* agent);
+	void addUnit(BWAPI::Unit unit);	
 	void removeAgent(Agent* agent);
+	void removeUnit(BWAPI::Unit unit);	
 
 	////getters
 	BWAPI::Unitset getUnitSet() const;

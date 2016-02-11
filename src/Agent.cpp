@@ -1,5 +1,6 @@
 #include "..\include\Agent.h"
 #include "..\include\EconHelper.h"
+#include "..\include\CoalitionHelper.h"
 #include "..\include\Coalition.h"
 #include "..\include\Task.h"
 
@@ -11,6 +12,7 @@ Agent::Agent()
 	taskID = -1;
 
 	free = true;
+	movingToBuild = false;
 
 	task = nullptr;
 	coalition = nullptr;
@@ -36,8 +38,7 @@ Agent::Agent(BWAPI::Unit unit)
 Agent::~Agent()
 {
 	std::cout << "~Agent\n";
-	delete task;	
-	delete coalition;
+	unbind();
 }
 
 void Agent::initialiseCommandMap()
@@ -48,14 +49,16 @@ void Agent::initialiseCommandMap()
 	}
 }
 
-void Agent::setCoalitionID(int id)
+void Agent::setCoalition(Coalition* coalition)
 {
-	coalitionID = id;	
+	coalitionID = coalition->getID();	
+	this->coalition = coalition;
 }
 
-void Agent::setTaskID(int id)
+void Agent::setTask(Task* task)
 {
-	taskID = id;
+	taskID = task->getID();
+	this->task = task;
 }
 
 void Agent::setUnit(BWAPI::Unit unit)
@@ -63,15 +66,17 @@ void Agent::setUnit(BWAPI::Unit unit)
 	this->unit = unit;
 }
 
-void Agent::bindCheck()
+void Agent::bind()
 {
-	if (coalitionID != -1)
-		if (coalition->isActive())
-			free = false;
+	std::cout << "Binding agent " << unitID << "\n";
+	free = false;
 }
 
 void Agent::unbind()
 {
+	if (coalitionID != -1)
+		coalition->removeAgent(this);
+
 	coalitionID = -1;
 	coalition = nullptr;
 	taskID = -1;
@@ -104,6 +109,11 @@ double Agent::getPrice() const
 	return unit->getType().mineralPrice() + (unit->getType().gasPrice() * 1.5);
 }
 
+bool Agent::isMovingToBuild() const
+{
+	return movingToBuild;
+}
+
 bool Agent::isFree() const
 {
 	return free;
@@ -112,6 +122,15 @@ bool Agent::isFree() const
 void Agent::act()
 {
 	//do stuff
+}
+
+bool Agent::pollCoalitions()
+{
+	for (auto &coalition : CoalitionHelper::getCoalitionset())
+		if (!coalition->isActive())
+			if (coalition->addAgent(this))
+				return true;
+	return false;
 }
 
 bool Agent::move(BWAPI::Position target)
@@ -125,6 +144,11 @@ bool Agent::attack(BWAPI::PositionOrUnit target)
 {
 	if (unit->canAttack(target))
 		return unit->attack(target);
+	return false;
+}
+
+bool Agent::expand()
+{
 	return false;
 }
 

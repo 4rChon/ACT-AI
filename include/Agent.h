@@ -21,6 +21,7 @@ protected:
 	int taskID;
 
 	bool free;
+	bool movingToBuild;
 
 	CommandMap commandMap;
 
@@ -33,8 +34,8 @@ public:
 	virtual ~Agent();	
 
 	//setters	
-	void setCoalitionID(int id);
-	void setTaskID(int id);
+	void setCoalition(Coalition* coalition);
+	void setTask(Task* task);
 	void setUnit(BWAPI::Unit unit);
 
 	//getters
@@ -43,14 +44,17 @@ public:
 	int getTaskID() const;
 	BWAPI::Unit getUnit() const;
 	double getPrice() const;
+	bool isMovingToBuild() const;
 	bool isFree() const;
 
 	//-
 	virtual void act();
+	virtual bool pollCoalitions();
 
 	//commands
 	virtual bool move(BWAPI::Position target);
 	virtual bool attack(BWAPI::PositionOrUnit target);
+	virtual bool expand();
 	virtual bool gather(BWAPI::Unit target);
 	virtual bool buildAddon(BWAPI::UnitType addon);
 	virtual bool train(BWAPI::UnitType unitType);
@@ -59,7 +63,7 @@ public:
 	virtual bool useAbility(BWAPI::TechType ability, BWAPI::PositionOrUnit target = nullptr);
 
 	//helpers
-	void bindCheck();
+	void bind();
 	void unbind();
 	virtual void debugInfo() const;
 };

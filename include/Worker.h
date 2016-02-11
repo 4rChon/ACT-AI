@@ -18,7 +18,7 @@ public:
 
 	//setters
 	void setMiningBase(ResourceDepot* miningBase, bool gas);
-	void unsetMiningBase();
+	void unsetMiningBase();	
 
 	//getters
 	bool isMiningGas() const;

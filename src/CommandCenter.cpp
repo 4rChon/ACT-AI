@@ -11,5 +11,6 @@ CommandCenter::CommandCenter(BWAPI::Unit unit)
 void CommandCenter::act()
 {
 	buildAddon(BWAPI::UnitTypes::Terran_Comsat_Station);
-	train(unit->getPlayer()->getRace().getWorker());
+	if (unit->isIdle())
+		train(unit->getPlayer()->getRace().getWorker());
 }

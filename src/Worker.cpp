@@ -4,12 +4,14 @@
 #include "..\include\EconHelper.h"
 #include "..\include\DesireHelper.h"
 #include "..\include\UtilHelper.h"
+#include "..\include\Task.h"
 #include "BWAPI.h"
 
 Worker::Worker()
 {
-	miningBase = nullptr;
 	gasMiner = false;
+	movingToBuild = false;
+	miningBase = nullptr;
 }
 
 Worker::Worker(BWAPI::Unit unit)
@@ -17,6 +19,7 @@ Worker::Worker(BWAPI::Unit unit)
 	this->unit = unit;
 	unitID = unit->getID();
 	miningBase = nullptr;
+	movingToBuild = false;
 	gasMiner = false;
 }
 
@@ -59,26 +62,26 @@ ResourceDepot* Worker::getMiningBase() const
 
 void Worker::act()
 {
-	if (BWAPI::Broodwar->self()->getRace() != BWAPI::Races::Zerg && BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed() <= 2 && BWAPI::Broodwar->self()->minerals() >= 100 && BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::Broodwar->self()->getRace().getSupplyProvider()) < 1)
+	if (unit->isIdle())
 	{
-		build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr);
-		return;
-	}
-
-	bool mining = false;
-	auto resourceDepots = AgentHelper::getResourceDepots();
-	for (auto &base : resourceDepots)
-	{
-		if (!base->isMineralSaturated())
+		if (BWAPI::Broodwar->self()->getRace() != BWAPI::Races::Zerg && BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed() <= 2 && BWAPI::Broodwar->self()->minerals() >= 100 && BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::Broodwar->self()->getRace().getSupplyProvider()) < 1)
 		{
-			setMiningBase(base, false);
-			mining = true;
+			build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr);
 			return;
 		}
+
+		bool mining = false;
+		auto resourceDepots = AgentHelper::getResourceDepots();
+		for (auto &base : resourceDepots)
+		{
+			if (!base->isMineralSaturated())
+			{
+				setMiningBase(base, false);
+				mining = true;
+				return;
+			}
+		}		
 	}
-	
-	if (!mining)
-		expand();
 }
 
 bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPosition)
@@ -104,6 +107,7 @@ bool Worker::expand()
 {	
 	if (EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getCenter()))
 	{
+		movingToBuild = true;
 		BWTA::BaseLocation* bestLocation = (*DesireHelper::getExpansionDesireMap().begin()).first;
 		double bestScore = (*DesireHelper::getExpansionDesireMap().begin()).second;
 		for (auto &expansion : DesireHelper::getExpansionDesireMap())
@@ -119,10 +123,11 @@ bool Worker::expand()
 			if (unit->build(unit->getPlayer()->getRace().getCenter(), bestLocation->getTilePosition()))
 			{
 				DesireHelper::setExpansionDesire(bestLocation, 0.0);
-				//MapHelper::getCandidateBases().erase(bestLocation);
 				return true;
 			}
 		}
+		else
+			return false;
 	}
 	return false;
 }

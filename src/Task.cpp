@@ -14,7 +14,7 @@ Task::Task()
 	creationFrame = BWAPI::Broodwar->getFrameCount();
 	cost = 0.0;
 	profit = 0.0;
-	TaskHelper::addTask(this);
+	TaskHelper::addTask(this, false);
 }
 
 Task::~Task()
@@ -32,31 +32,6 @@ void Task::setCoalition(Coalition* coalition)
 	coalitionID = coalition->getID();
 }
 
-void Task::setAssigned(bool assigned)
-{
-	this->assigned = assigned;
-}
-
-void Task::setActing(bool acting)
-{
-	this->acting = acting;
-}
-
-void Task::setComplete(bool complete)
-{
-	this->complete = complete;
-}
-
-bool Task::isAssigned() const
-{
-	return assigned;
-}
-
-bool Task::isActing() const
-{
-	return acting;
-}
-
 bool Task::isComplete() const
 {
 	return complete;
@@ -65,6 +40,11 @@ bool Task::isComplete() const
 int Task::getID() const
 {
 	return taskID;
+}
+
+std::string Task::getName() const
+{
+	return this->taskName;
 }
 
 Taskset Task::getSubTasks() const
@@ -114,5 +94,23 @@ void Task::addSubTask(Task* task)
 std::string Task::toString() const
 {
 	std::cout << "Task: Getting Name\n";
-	return this->taskName;
+	return taskName;
+}
+
+void Task::succeed()
+{
+	complete = true;
+	profit = 1.0;
+	std::cout << taskID << " : " << taskName << " : Success!\n";
+
+	cleanSubTasks();
+}
+
+void Task::fail()
+{	
+	complete = true;
+	profit = 0.0;
+	std::cout << taskID << " : " << taskName << " : Failure!\n";
+
+	cleanSubTasks();
 }

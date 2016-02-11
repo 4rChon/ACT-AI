@@ -29,19 +29,15 @@ Coalition::Coalition(Composition targetComp, Task* task)
 
 Coalition::~Coalition()
 {
-	this->active = false;
+	std::cout << "~Coalition : " << coalitionID << "\n";
+	active = false;
 	for (auto agent : agentSet)
 		AgentHelper::unbind(agent);
 
-	task = nullptr;//TODO: do i want to delete task? review later
+	task = nullptr;
 
-	this->agentSet.clear();
-	this->unitSet.clear();
-}
-
-void Coalition::setActive(bool active)
-{
-	this->active = active;
+	agentSet.clear();
+	unitSet.clear();
 }
 
 int Coalition::getAge() const
@@ -79,12 +75,22 @@ double Coalition::getProfit() const
 	return this->profit;
 }
 
+Composition Coalition::getCurrentComp() const
+{
+	return this->currentComp;
+}
+
+Composition Coalition::getTargetComp() const
+{
+	return this->targetComp;
+}
+
 bool Coalition::isActive() const
 {
 	return this->active;
 }
 
-void Coalition::addAgent(Agent* agent)
+bool Coalition::addAgent(Agent* agent)
 {
 	if (!agentSet.count(agent))
 	{
@@ -95,10 +101,13 @@ void Coalition::addAgent(Agent* agent)
 				std::cout << agent->getUnit()->getType().c_str() << " is joining a coalition\n";
 				this->agentSet.insert(this->agentSet.begin(), agent);
 				this->addUnit(agent->getUnit());
-				return;
+				agent->setCoalition(this);
+				agent->setTask(task);				
+				return true;
 			}
 		}
 	}
+	return false;
 }
 
 void Coalition::addUnit(BWAPI::Unit unit)
@@ -110,6 +119,8 @@ void Coalition::addUnit(BWAPI::Unit unit)
 	{
 		std::cout << "A coalition has been activated!\n";
 		active = true;
+		for (auto &agent : agentSet)
+			agent->bind();
 	}
 }
 
@@ -119,7 +130,12 @@ void Coalition::removeAgent(Agent* agent)
 	removeUnit(agent->getUnit());
 
 	if (active)
+	{
 		AgentHelper::unbind(agent);
+		//if all agents die while coalition is activated, the task is a failure
+		if(agentSet.size() == 0)
+			task->fail();
+	}
 }
 
 void Coalition::removeUnit(BWAPI::Unit unit)
@@ -128,17 +144,3 @@ void Coalition::removeUnit(BWAPI::Unit unit)
 	this->currentComp -= unit->getType();
 	std::cout << "A " << unit->getType() << " has left a coalition\n";
 }
-//
-//
-//Composition Coalition::getCurrentComp() const
-//{
-//	return this->currentComp;
-//}
-//
-//Composition Coalition::getTargetComp() const
-//{
-//	return this->targetComp;
-//}
-//
-//
-//bind agentside instead of coalitionside?

@@ -9,7 +9,7 @@ SCV::SCV(BWAPI::Unit unit)
 }
 
 void SCV::act()
-{
+{	
 	if (repair())
 		return;
 
@@ -17,20 +17,20 @@ void SCV::act()
 		if(build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr))
 			return;
 
-	bool mining = false;
-	auto resourceDepots = AgentHelper::getResourceDepots();
-	for (auto &base : resourceDepots)
+	if (unit->isIdle())
 	{
-		if (!base->isMineralSaturated())
+		bool mining = false;
+		auto resourceDepots = AgentHelper::getResourceDepots();
+		for (auto &base : resourceDepots)
 		{
-			setMiningBase(base, false);
-			mining = true;
-			return;
+			if (!base->isMineralSaturated())
+			{
+				setMiningBase(base, false);
+				mining = true;
+				return;
+			}
 		}
 	}
-
-	if (!mining)
-		expand();
 }
 
 bool SCV::repair(BWAPI::Unit damagedUnit)

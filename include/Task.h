@@ -27,17 +27,13 @@ public:
 	virtual ~Task();
 
 	//setters
-	virtual void setCoalition(Coalition* coalition);
-	virtual void setAssigned(bool assigned);
-	virtual void setActing(bool acting);
-	virtual void setComplete(bool complete);
+	void setCoalition(Coalition* coalition);
 
 	//getters
-	virtual bool isAssigned() const;
-	virtual bool isActing() const;
-	virtual bool isComplete() const;
-	virtual int getID() const;
-	virtual Taskset getSubTasks() const;
+	virtual bool Task::isComplete() const;
+	int getID() const;
+	std::string getName() const;
+	Taskset getSubTasks() const;
 	virtual Coalition* getCoalition() const;
 	virtual double getCost();
 	virtual double getProfit();
@@ -46,8 +42,11 @@ public:
 	virtual void assign() = 0;
 	virtual void act() = 0;
 	virtual void update() = 0;
-	virtual void cleanSubTasks();
-	virtual void addSubTask(Task* task);
-	virtual std::string toString() const;
+	void cleanSubTasks();
+	void addSubTask(Task* task);
+	std::string toString() const;
+
+	virtual void succeed();
+	virtual void fail();
 
 };

@@ -16,6 +16,6 @@ namespace CoalitionHelper
 	int getNextID();
 
 	//helpers
-	void addCoalition(Composition composition, Task* task);	
+	Coalition* addCoalition(Composition composition, Task* task);	
 	void removeCoalition(Coalition* coalition);
 };

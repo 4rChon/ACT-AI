@@ -32,10 +32,11 @@ namespace CoalitionHelper
 		return ++nextID;
 	}
 	
-	void addCoalition(Composition composition, Task * task)
+	Coalition* addCoalition(Composition composition, Task* task)
 	{
 		Coalition* coalition = new Coalition(composition, task);
 		coalitionSet.insert(coalition);
+		return coalition;
 	}
 
 	void removeCoalition(Coalition* coalition)

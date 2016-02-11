@@ -10,8 +10,9 @@ Hatchery::Hatchery(BWAPI::Unit unit)
 
 void Hatchery::act()
 {	
-	if(!train(BWAPI::UnitTypes::Zerg_Drone))
-		unit->train(BWAPI::UnitTypes::Zerg_Overlord);
+	if (unit->isIdle())
+		if (!train(BWAPI::UnitTypes::Zerg_Drone))
+			unit->train(BWAPI::UnitTypes::Zerg_Overlord);
 	if(unit->getType() != BWAPI::UnitTypes::Zerg_Hive)
 		morph(*unit->getType().buildsWhat().begin());
 	upgrade(*unit->getType().upgradesWhat().begin());

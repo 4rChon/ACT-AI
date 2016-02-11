@@ -5,6 +5,8 @@
 
 typedef BWAPI::SetContainer < Worker*, std::hash<void*>> Workerset;
 
+class Expand;
+
 class ResourceDepot : public Producer
 {
 protected:
@@ -12,6 +14,7 @@ protected:
 	Workerset workers;
 	int mineralMiners;
 	int gasMiners;
+	bool expandDesire;
 public:
 	//constructors and destructors
 	ResourceDepot();
