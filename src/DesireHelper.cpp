@@ -10,7 +10,8 @@ namespace DesireHelper
 		std::unordered_map<BWAPI::TechType, double> techDesireMap;
 		std::unordered_map<BWTA::BaseLocation*, double, std::hash<void*>> expansionDesireMap;
 		std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> attackDesireMap;
-		std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> defendDesireMap;		
+		std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> defendDesireMap;
+		double supplyDesire;
 	}
 
 	void initialiseHelper()
@@ -30,7 +31,7 @@ namespace DesireHelper
 		for (auto &expansion : BWTA::getBaseLocations())
 		{
 			double desire = 0.0;
-			if(!expansion->isStartLocation())
+			if(!expansion->isStartLocation() && !expansion->isIsland())
 				desire = 10 + std::log(1.0 / expansion->getGroundDistance(BWTA::getStartLocation(BWAPI::Broodwar->self())));
 			expansionDesireMap.insert(std::pair<BWTA::BaseLocation*, double>(expansion, desire));
 		}
@@ -40,6 +41,8 @@ namespace DesireHelper
 			attackDesireMap.insert(std::pair<MapHelper::Zone*, double>(MapHelper::getZone(region), 0.0));
 			defendDesireMap.insert(std::pair<MapHelper::Zone*, double>(MapHelper::getZone(region), 0.0));
 		}
+
+		supplyDesire = 0.0;
 	}
 
 	void updateUnitDesireMap()
@@ -84,6 +87,11 @@ namespace DesireHelper
 	const std::unordered_map<BWTA::BaseLocation*, double, std::hash<void*>>& getExpansionDesireMap()
 	{
 		return expansionDesireMap;
+	}
+
+	double getSupplyDesire()
+	{
+		return supplyDesire;
 	}
 
 	void setExpansionDesire(BWTA::BaseLocation* baseLocation, double desire)

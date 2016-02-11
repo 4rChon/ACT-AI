@@ -8,6 +8,7 @@
 
 typedef BWAPI::SetContainer < Agent*, std::hash<void*>> Agentset;
 typedef BWAPI::SetContainer < ResourceDepot*, std::hash<void*>> Baseset;
+typedef std::map<BWAPI::UnitType, int> TypeCountMap;
 
 namespace AgentHelper
 {
@@ -20,6 +21,7 @@ namespace AgentHelper
 	Agent* getAgent(int id);
 	const Agentset& getAgentset();
 	const Baseset& getResourceDepots();
+	TypeCountMap& getTypeCountMap();
 	Agentset::iterator getLastServiced();
 
 	//-

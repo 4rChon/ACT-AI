@@ -11,4 +11,8 @@ namespace EconHelper
 	int haveSupply(BWAPI::UnitType unitType);
 	void addDebt(int minerals, int gas);
 	void subtractDebt(int minerals, int gas);
+	int getMinerals();
+	int getGas();	
+	double getMineralIncome();
+	double getGasIncome();
 }

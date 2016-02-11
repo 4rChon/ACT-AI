@@ -43,7 +43,6 @@ public:
 	virtual void act() = 0;
 	virtual void update() = 0;
 	void cleanSubTasks();
-	void addSubTask(Task* task);
 
 	virtual void succeed();
 	virtual void fail();

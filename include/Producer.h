@@ -15,7 +15,7 @@ public:
 	virtual void act();
 
 	//commands
-	virtual bool train(BWAPI::UnitType unitType);
+	/*virtual bool train(BWAPI::UnitType unitType);*/
 
 	//helpers
 };

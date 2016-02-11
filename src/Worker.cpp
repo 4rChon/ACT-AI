@@ -10,7 +10,6 @@
 Worker::Worker()
 {
 	gasMiner = false;
-	movingToBuild = false;
 	miningBase = nullptr;
 }
 

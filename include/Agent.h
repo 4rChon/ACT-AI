@@ -56,6 +56,7 @@ public:
 	virtual bool attack(BWAPI::PositionOrUnit target);
 	virtual bool expand();
 	virtual bool gather(BWAPI::Unit target);
+	virtual bool build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPosition);
 	virtual bool buildAddon(BWAPI::UnitType addon);
 	virtual bool train(BWAPI::UnitType unitType);
 	virtual bool morph(BWAPI::UnitType unitType);

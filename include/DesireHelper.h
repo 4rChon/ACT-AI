@@ -7,6 +7,7 @@
 namespace DesireHelper
 {
 	void initialiseHelper();
+	
 	void updateUnitDesireMap();
 	void updateUpgradeDesireMap();
 	void updateTechDesireMap();
@@ -17,8 +18,10 @@ namespace DesireHelper
 	const std::unordered_map<BWAPI::UpgradeType, double>& getUpgradeDesireMap();
 	const std::unordered_map<BWAPI::TechType, double>& getTechDesireMap();
 	const std::unordered_map<BWTA::BaseLocation*, double, std::hash<void*>>& getExpansionDesireMap();
-	void setExpansionDesire(BWTA::BaseLocation* baseLocation, double desire);
+	double getSupplyDesire();	
 	double getExpansionDesire(BWTA::BaseLocation* baseLocation);
 	const std::unordered_map<MapHelper::Zone*, double, std::hash<void*>>& getAttackDesireMap();
 	const std::unordered_map<MapHelper::Zone*, double, std::hash<void*>>& getDefendDesireMap();
+
+	void setExpansionDesire(BWTA::BaseLocation* baseLocation, double desire);
 }

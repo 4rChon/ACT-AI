@@ -8,14 +8,14 @@ namespace AgentHelper
 	namespace
 	{
 		static Agentset agentSet;
-		static Baseset resourceDepots;
-		
+		static Baseset resourceDepots;		
 		static Agentset::iterator lastServiced;
+		static TypeCountMap typeCountMap;
 	}
 
 	void initialiseHelper()
 	{		
-		lastServiced = agentSet.begin();		
+		lastServiced = agentSet.begin();
 	}
 
 	Agent* getAgent(int id)
@@ -34,6 +34,11 @@ namespace AgentHelper
 	const Baseset& getResourceDepots()
 	{
 		return resourceDepots;
+	}
+
+	TypeCountMap& getTypeCountMap()
+	{
+		return typeCountMap;
 	}
 
 	Agentset::iterator getLastServiced()
@@ -123,12 +128,14 @@ namespace AgentHelper
 			}
 		}
 		agentSet.insert(agent);
+		typeCountMap[agent->getUnit()->getType()]++;
 	}
 
 	void removeAgent(Agent* agent)
 	{
 		agent->unbind();
 		agentSet.erase(agent);
+		typeCountMap[agent->getUnit()->getType()]--;
 	}
 
 	void removeAgent(int id)

@@ -19,15 +19,15 @@ CreateCoalition::~CreateCoalition()
 // add coalition to open coalitions
 void CreateCoalition::assign()
 {
-	std::cout << "CreateCoalition: Assign\n";
+	//std::cout << taskName.c_str() << " : " << taskID << " : Assign\n";
 	assigned = true;
-	std::cout << "CreateCoalition: Assign End\n";
+	//std::cout << taskName.c_str() << " : " << taskID << " : Assign End\n";
 }
 
 // attempt to activate coalition
 void CreateCoalition::act()
 {
-	std::cout << "CreateCoalition: Acting\n";
+	//std::cout << taskName.c_str() << " : " << taskID << " : Acting\n";
 	Composition differenceComposition = taskCoalition->getTargetComp() - taskCoalition->getCurrentComp();
 	for (auto unitType : differenceComposition.getTypes())
 	{
@@ -35,32 +35,30 @@ void CreateCoalition::act()
 		{
 			std::cout << "I need " << differenceComposition[unitType] << " more " << unitType.c_str() << "\n";
 			CreateUnit *createUnit = new CreateUnit(unitType, differenceComposition[unitType]);
-			addSubTask(createUnit);
+			subTasks.insert(createUnit);
 		}
 	}
 	acting = true;
-	std::cout << "CreateCoalition: Acting End\n";
+	//std::cout << taskName.c_str() << " : " << taskID << " : Acting End\n";
 }
 
 void CreateCoalition::update()
 {
-	//if (complete)
-	//{
-	//	std::cout << "CreateCoalition Complete\n";
-	//	TaskHelper::removeTask(this);
-	//	return;
-	//}
+	//std::cout << taskName.c_str() << " : " << taskID << " : Update\n";
 	if (!assigned)
 		assign();
+
 	if (taskCoalition->isActive())
 	{
 		succeed();
 		return;
 	}
+
 	if (assigned && !acting)
 		act();
 	//if(age > x) fail();
 	//TODO: fail when taking too long
+	//std::cout << taskName.c_str() << " : " << taskID << " : Update End\n";
 }
 
 double CreateCoalition::getCost()

@@ -18,35 +18,33 @@ Expand::~Expand()
 
 void Expand::assign()
 {
-	std::cout << "Expand: Assign\n";
+	//std::cout << taskName.c_str() << " : " << taskID << " : Assign\n";
 	Composition c;
-	c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 1);
+	c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 1);	
 	CreateCoalition *createCoalition = new CreateCoalition(c, this);
-	addSubTask(createCoalition);
+	subTasks.insert(createCoalition);
 	assigned = true;
-	std::cout << "Expand: Assign End\n";
+	//std::cout << taskName.c_str() << " : " << taskID << " : Assign End\n";
 }
 
 void Expand::act()
 {
-	std::cout << "Expand: Act\n";
+	//std::cout << taskName.c_str() << " : " << taskID << " : Acting\n";
 	acting = true;
-	complete = builder->expand() && !builder->isMovingToBuild();
-	std::cout << "Expand: Act End\n";
+	complete = builder->expand();
+	//std::cout << taskName.c_str() << " : " << taskID << " : Acting End\n";
 }
 
 void Expand::update()
 {
+	//std::cout << taskName.c_str() << " : " << taskID << " : Update\n";
 	if (!assigned)
 		assign();
+
 	if (coalition->isActive() && !builder)
-	{
-		std::cout << "Assigning Builder\n";
 		builder = (*coalition->getAgentSet().begin());		
-	}
+
 	if (builder && !complete)
-	{
-		std::cout << "Acting\n";
 		act();
-	}
+	//std::cout << taskName.c_str() << " : " << taskID << " : Update End\n";
 }

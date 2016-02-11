@@ -156,6 +156,11 @@ bool Agent::gather(BWAPI::Unit target)
 	return false;	
 }
 
+bool Agent::build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPosition)
+{
+	return false;
+}
+
 bool Agent::buildAddon(BWAPI::UnitType addon)
 {
 	if (unit->canBuildAddon(addon) && EconHelper::haveMoney(addon))
@@ -165,7 +170,7 @@ bool Agent::buildAddon(BWAPI::UnitType addon)
 
 bool Agent::train(BWAPI::UnitType unitType)
 {
-	if (unit->canTrain(unitType) && EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType))
+	if (unit->canTrain(unitType) && EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType) && unit->getTrainingQueue().size() < 1)
 		return this->unit->train(unitType);
 	return false;
 }

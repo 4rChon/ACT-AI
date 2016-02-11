@@ -6,12 +6,27 @@ namespace EconHelper
 	{
 		static int mineralDebt;
 		static int gasDebt;
+
+		static double mineralIncome;
+		static double gasIncome;
+
+		static int lastCheckMineralsFrame;
+		static int lastCheckGasFrame;
+		static int lastCheckMinerals;
+		static int lastCheckGas;
+		//measure current resource difference between two time frames and get income data from that
 	}
 
 	void initialiseHelper()
-	{
-		gasDebt = 0;
+	{	
+		lastCheckMineralsFrame = 0;
+		lastCheckGasFrame = 0;
+		lastCheckMinerals = 0;
+		lastCheckGas = 0;
 		mineralDebt = 0;
+		gasDebt = 0;
+		mineralIncome = 0.0;
+		gasIncome = 0.0;
 	}
 
 	int haveMoney(BWAPI::UnitType unitType)
@@ -34,6 +49,16 @@ namespace EconHelper
 		return BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed() >= unitType.supplyRequired();
 	}
 
+	int getMinerals()
+	{
+		return BWAPI::Broodwar->self()->minerals();
+	}
+
+	int getGas()
+	{
+		return BWAPI::Broodwar->self()->gas();
+	}
+
 	void addDebt(int minerals, int gas)
 	{
 		mineralDebt += minerals;
@@ -44,5 +69,28 @@ namespace EconHelper
 	{
 		mineralDebt -= minerals;
 		gasDebt -= gas;
+	}
+	double getMineralIncome()
+	{
+		int framesSinceLastCheck = BWAPI::Broodwar->getFrameCount() - lastCheckMineralsFrame;
+		if (framesSinceLastCheck > 24 * 5 || lastCheckMineralsFrame == 0)
+		{
+			mineralIncome = ((BWAPI::Broodwar->self()->gatheredMinerals() - 50) - lastCheckMinerals) * 12;
+			lastCheckMinerals = (BWAPI::Broodwar->self()->gatheredMinerals() - 50);
+			lastCheckMineralsFrame = BWAPI::Broodwar->getFrameCount();
+		}
+		return mineralIncome;
+	}
+
+	double getGasIncome()
+	{
+		int framesSinceLastCheck = BWAPI::Broodwar->getFrameCount() - lastCheckGasFrame;
+		if (framesSinceLastCheck > 24 * 5 || lastCheckGasFrame == 0)
+		{
+			gasIncome = (BWAPI::Broodwar->self()->gatheredGas() - lastCheckGas) * 12;
+			lastCheckGas = BWAPI::Broodwar->self()->gatheredGas();
+			lastCheckGasFrame = BWAPI::Broodwar->getFrameCount();
+		}
+		return gasIncome;
 	}
 }

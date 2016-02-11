@@ -6,7 +6,7 @@ class CreateUnit : public Task
 private:
 	BWAPI::UnitType unitType;
 	int unitCount;
-	bool satisfied;
+	bool satisfyAttempt;
 	bool building;
 	bool reserved;
 public:

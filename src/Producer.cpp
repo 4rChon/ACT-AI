@@ -19,14 +19,14 @@ Producer::~Producer()
 void Producer::act()
 {	
 	//temp contents
-	train(*unit->getType().buildsWhat().begin());
+	//train(*unit->getType().buildsWhat().begin());
 	/*if (!train(unit->getPlayer()->getRace().getWorker()))
 	unit->train(unit->getPlayer()->getRace().getSupplyProvider());*/
 }
 
-bool Producer::train(BWAPI::UnitType unitType)
-{
-	if (EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType))
-		return this->unit->train(unitType);
-	return false;
-}
+//bool Producer::train(BWAPI::UnitType unitType)
+//{
+//	if (EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType))
+//		return this->unit->train(unitType);
+//	return false;
+//}

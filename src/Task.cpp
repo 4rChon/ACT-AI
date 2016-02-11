@@ -81,11 +81,6 @@ void Task::cleanSubTasks()
 	subTasks.clear();
 }
 
-void Task::addSubTask(Task* task)
-{
-	subTasks.insert(task);
-}
-
 void Task::succeed()
 {
 	complete = true;
@@ -106,21 +101,26 @@ void Task::fail()
 
 void Task::updateTaskTree()
 {
+	//std::cout << taskName.c_str() << " : " << taskID << " : UpdateTaskTree\n";
 	if (subTasks.size() > 0)
 	{
+		//std::cout << subTasks.size() << "\n";
 		for (auto it = subTasks.begin(); it != subTasks.end();)
 		{
+			//std::cout << (*it)->getName().c_str() << " : " << (*it)->getID() << "\n";
 			if ((*it)->isComplete())
 			{
 				auto tempIt = subTasks.erase(it);
 				delete (*it);
-				it = tempIt; //BRB GETTING SOME TEA
+				it = tempIt;
 			}
 			else
 			{
 				(*it)->updateTaskTree();
+				++it;
 			}
 		}
 	}
 	update();
+	//std::cout << taskName.c_str() << " : " << taskID << " : UpdateTaskTree End\n";
 }

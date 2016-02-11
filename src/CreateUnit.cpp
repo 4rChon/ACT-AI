@@ -1,14 +1,14 @@
 #include "..\include\CreateUnit.h"
 #include "..\include\CreateCoalition.h"
 #include "..\include\EconHelper.h"
-//#include "..\include\SatisfyRequirement.h"
+#include "..\include\SatisfyRequirement.h"
 
 CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 {
-	taskName = "CreateUnit(unitType)";
+	taskName = "CreateUnit(" + unitType.getName() + ")";
 	this->unitType = unitType;
 	this->unitCount = unitCount;
-	satisfied = false;
+	satisfyAttempt = false;
 	building = false;
 	reserved = false;
 }
@@ -16,136 +16,81 @@ CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 // assign a producer coalition
 void CreateUnit::assign()
 {
+	//std::cout << taskName.c_str() << " : " << taskID << " : Assign\n";
 	std::cout << "CreateUnit: Assign - " << unitType.whatBuilds().first.c_str() << "\n";
 	Composition producer;
 	producer.addType(unitType.whatBuilds().first, unitType.whatBuilds().second);
 	CreateCoalition* createCoalition = new CreateCoalition(producer, this);
-	addSubTask(createCoalition);
+	subTasks.insert(createCoalition);
 	assigned = true;
+	//std::cout << taskName.c_str() << " : " << taskID << " : Assign End\n";
 }
 
 // produce a unit
 void CreateUnit::act()
 {
-	while (unitCount > 0)
+	//std::cout << taskName.c_str() << " : " << taskID << " : Acting\n";
+	if (unitCount > 0)
 	{
 		if (BWAPI::Broodwar->self()->isUnitAvailable(unitType))
 		{
-			if (satisfied)
-				return;
-
-			//std::cout << unitType.c_str() << " is locked\n";
-			/*SatisfyRequirement* satisfyRequirement = new SatisfyRequirement(unitType);
-			this->addSubTask(satisfyRequirement);*/
-			satisfied = true;
-			return;
-		}
-		
-			
-		if (!EconHelper::haveMoney(unitType))
-		{
-			std::cout << "Not Enough Minerals\n";
-			return;
-		}
-
-		if (!EconHelper::haveSupply(unitType))
-		{
-			std::cout << "You must construct additional pylons\n";
-			return;
-		}
-
-		if (unitType.isAddon())
-		{
-			if (!coalition->getUnitSet().buildAddon(unitType))
-				return;
-			unitCount--;
-		}
-
-		if (unitType.isBuilding() && unitType.whatBuilds().first == BWAPI::Broodwar->self()->getRace().getWorker())
-		{
-			if (building)
-				return;
-
-			if (!reserved)
+			if (unitType == BWAPI::UnitTypes::Protoss_Archon)
 			{
-				std::cout << "I have enough resources to build a " << unitType.c_str() << "\n";
-				std::cout << "Reserving " << unitType.mineralPrice() << " Minerals and " << unitType.gasPrice() << " Gas to build a " << unitType.c_str() << "\n";
-				EconHelper::addDebt(unitType.mineralPrice(), unitType.gasPrice());
-				reserved = true;
+				if (coalition->getUnitSet().train(unitType))
+					unitCount--;
 			}
 
-			for (auto builder : coalition->getUnitSet())
+			if (unitType.isAddon())
 			{
-				//std::cout << "Selecting Builder\n";
-				BWAPI::TilePosition targetBuildLocation = BWAPI::Broodwar->getBuildLocation(unitType, builder->getTilePosition());
-
-				if (targetBuildLocation)
+				for (auto &agent : coalition->getAgentSet())
 				{
-					//std::cout << "I found a suitable location to build a " << this->unitType.c_str() << "\n";
-
-					if (!builder->move(BWAPI::Position(targetBuildLocation.x * BWAPI::TILEPOSITION_SCALE, targetBuildLocation.y * BWAPI::TILEPOSITION_SCALE)))
-						return;
-
-					if (BWAPI::Broodwar->self()->getRace() == BWAPI::Races::Zerg)
-					{
-						if (!builder->morph(true)) return;
+					if (agent->buildAddon(unitType))
 						unitCount--;
-					}
-					else
-					{
-						building = builder->build(unitType, targetBuildLocation);
-
-						if (!building)
-							return;
-
-						//std::cout << "Moving to build a " << this->unitType.c_str() << "\n";							
-						int min = unitType.mineralPrice();
-						int gas = unitType.gasPrice();
-						auto uType = unitType;
-
-						BWAPI::Broodwar->registerEvent([builder, min, gas, uType](BWAPI::Game*)
-						{
-							//std::cout << "Releasing " << min << " Minerals and " << gas << " Gas after placing a " << uType.c_str() << "\n";
-							EconHelper::subtractDebt(min, gas);
-						},
-							[builder](BWAPI::Game*) {return builder->getOrder() == BWAPI::Orders::ConstructingBuilding; },
-							1);
-
-						unitCount--;
-					}
 				}
 			}
-		}
-		else
-		{
-			if (coalition->getUnitSet().size() == 0)
-				return;
 
-			for (auto producer : coalition->getUnitSet())
+			if (unitType.isBuilding())
 			{
-				if (producer->getTrainingQueue().size() < 1)
+				for (auto &agent : coalition->getAgentSet())
 				{
-					if (coalition->getUnitSet().train(unitType))
+					if (agent->build(unitType, nullptr))
 						unitCount--;
-					else
-						return;
 				}
-				else
-					return;
 			}
+			else
+			{
+				for (auto &agent : coalition->getAgentSet())
+				{
+					if (agent->train(unitType))
+						unitCount--;
+				}
+			}
+
+		}
+		else if (!satisfyAttempt)
+		{
+			std::cout << "Attempting to Satisfy Requirement\n";
+			SatisfyRequirement* satisfyRequirement = new SatisfyRequirement(unitType);
+			subTasks.insert(satisfyRequirement);
+			satisfyAttempt = true;
+			//satisfy requirements
 		}
 	}
-	acting = true;
+	else
+		succeed();
+	//std::cout << taskName.c_str() << " : " << taskID << " : Acting End\n";
 }
 
 void CreateUnit::update()
 {
+	//std::cout << taskName.c_str() << " : " << taskID << " : Update\n";
 	if (complete)
 		return;
+
 	if (!assigned)
 		assign();
-	if (coalition->isActive() && !acting)
-		act();	
-	if (acting)
-		succeed();
+
+	if (coalition->isActive())
+		act();
+	//std::cout << taskName.c_str() << " : " << taskID << " : Update End\n";
 }
