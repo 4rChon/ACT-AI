@@ -31,8 +31,8 @@ void CreateUnit::act()
 {
 	//std::cout << taskName.c_str() << " : " << taskID << " : Acting\n";
 	if (unitCount > 0)
-	{
-		if (BWAPI::Broodwar->self()->isUnitAvailable(unitType))
+	{		
+		if (satisfyAttempt)
 		{
 			if (unitType == BWAPI::UnitTypes::Protoss_Archon)
 			{
@@ -69,11 +69,17 @@ void CreateUnit::act()
 		}
 		else if (!satisfyAttempt)
 		{
-			std::cout << "Attempting to Satisfy Requirement\n";
-			SatisfyRequirement* satisfyRequirement = new SatisfyRequirement(unitType);
-			subTasks.insert(satisfyRequirement);
+			for (auto &required : unitType.requiredUnits())
+			{
+				if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(required.first))
+				{
+					std::cout << "Attempting to Satisfy Requirement\n";
+					SatisfyRequirement* satisfyRequirement = new SatisfyRequirement(unitType);
+					subTasks.insert(satisfyRequirement);
+					break;
+				}
+			}
 			satisfyAttempt = true;
-			//satisfy requirements
 		}
 	}
 	else

@@ -84,26 +84,26 @@ namespace AgentHelper
 				if (unit->getType() == BWAPI::UnitTypes::Terran_Command_Center)
 				{
 					agent = new CommandCenter(unit);
-					std::cout << "Added new Command Center : " << unit->getID() << "\n";
+					//std::cout << "Added new Command Center : " << unit->getID() << "\n";
 					resourceDepots.insert((CommandCenter*)agent);
 				}
 				else if (unit->getPlayer()->getRace() == BWAPI::Races::Zerg)
 				{
 					agent = new Hatchery(unit);
-					std::cout << "Added new Hatchery : " << unit->getID() << "\n";
+					//std::cout << "Added new Hatchery : " << unit->getID() << "\n";
 					resourceDepots.insert((Hatchery*)agent);
 				}
 				else
 				{
 					agent = new ResourceDepot(unit);
-					std::cout << "Added new Resource Depot : " << unit->getID() << "\n";
+					//std::cout << "Added new Resource Depot : " << unit->getID() << "\n";
 					resourceDepots.insert((ResourceDepot*)agent);
 				}
 			}
 			else
 			{
 				agent = new Producer(unit);
-				std::cout << "Added new Producer : " << unit->getType() << " : " << unit->getID() << "\n";
+				//std::cout << "Added new Producer : " << unit->getType() << " : " << unit->getID() << "\n";
 			}
 		}
 		else
@@ -113,18 +113,18 @@ namespace AgentHelper
 				if (unit->getType() == BWAPI::UnitTypes::Terran_SCV)
 				{
 					agent = new SCV(unit);
-					std::cout << "Added new SCV : " << unit->getType() << " : " << unit->getID() << "\n";
+					//std::cout << "Added new SCV : " << unit->getType() << " : " << unit->getID() << "\n";
 				}
 				else
 				{
 					agent = new Worker(unit);
-					std::cout << "Added new Worker : " << unit->getType() << " : " << unit->getID() << "\n";
+					//std::cout << "Added new Worker : " << unit->getType() << " : " << unit->getID() << "\n";
 				}
 			}
 			else
 			{
 				agent = new Agent(unit);
-				std::cout << "Added new Unit : " << unit->getType() << " : " << unit->getID() << "\n";
+				//std::cout << "Added new Unit : " << unit->getType() << " : " << unit->getID() << "\n";
 			}
 		}
 		agentSet.insert(agent);

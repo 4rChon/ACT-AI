@@ -17,7 +17,7 @@ void SatisfyRequirement::assign()
 void SatisfyRequirement::act()
 {
 	//create units to satisfy requirements
-	//std::cout << taskName.c_str() << " : " << taskID << " : Acting\n";
+	std::cout << taskName.c_str() << " : " << taskID << " : Acting\n";
 	for (auto &requirement : unitType.requiredUnits())
 	{
 		std::cout << "required unit: " << requirement.first.c_str() << "\n";
@@ -37,13 +37,12 @@ void SatisfyRequirement::act()
 void SatisfyRequirement::update()
 {
 	//std::cout << taskName.c_str() << " : " << taskID << " : Update\n";
-	if (!assigned)
-		assign();
 	if (complete)
-	{
-		succeed();
 		return;
-	}
+
+	if (!assigned)
+		assign();				
+
 	if(!acting)
 		act();
 
@@ -52,8 +51,7 @@ void SatisfyRequirement::update()
 		for (auto &task : subTasks)
 			if (!task->isComplete())
 				return;
-		complete = true;
-		std::cout << "SatisfyRequirement: Complete\n";
+		succeed();
 	}
 	//std::cout << taskName.c_str() << " : " << taskID << " : Update End\n";
 }

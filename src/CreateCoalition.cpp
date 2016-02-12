@@ -45,6 +45,9 @@ void CreateCoalition::act()
 void CreateCoalition::update()
 {
 	//std::cout << taskName.c_str() << " : " << taskID << " : Update\n";
+	if (complete)
+		return;
+
 	if (!assigned)
 		assign();
 
