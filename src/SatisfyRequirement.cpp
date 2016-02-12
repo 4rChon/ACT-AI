@@ -3,8 +3,8 @@
 
 SatisfyRequirement::SatisfyRequirement(BWAPI::UnitType unitType)
 {
-	std::cout << taskName.c_str() << " : " << taskID << " : Construct\n";
-	this->unitType = unitType;
+	taskName = "SatisfyRequirement(" + unitType.getName() + ")";
+	this->unitType = unitType;	
 }
 
 void SatisfyRequirement::assign()

@@ -6,7 +6,7 @@
 
 Agent::Agent()
 {
-	this->unit = nullptr;
+	unit = nullptr;
 	unitID = -1;
 	coalitionID = -1;
 	taskID = -1;

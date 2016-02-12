@@ -101,13 +101,10 @@ void Task::fail()
 
 void Task::updateTaskTree()
 {
-	//std::cout << taskName.c_str() << " : " << taskID << " : UpdateTaskTree\n";
 	if (subTasks.size() > 0)
 	{
-		//std::cout << subTasks.size() << "\n";
 		for (auto it = subTasks.begin(); it != subTasks.end();)
 		{
-			//std::cout << (*it)->getName().c_str() << " : " << (*it)->getID() << "\n";
 			if ((*it)->isComplete())
 			{
 				auto tempIt = subTasks.erase(it);
@@ -122,5 +119,4 @@ void Task::updateTaskTree()
 		}
 	}
 	update();
-	//std::cout << taskName.c_str() << " : " << taskID << " : UpdateTaskTree End\n";
 }

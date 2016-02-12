@@ -36,14 +36,23 @@ void CreateUnit::act()
 		{
 			if (unitType == BWAPI::UnitTypes::Protoss_Archon)
 			{
-				if (coalition->getUnitSet().train(unitType))
+				auto unit = (*++coalition->getUnitSet().begin());
+				if((*coalition->getAgentSet().begin())->useAbility(BWAPI::TechTypes::Archon_Warp, unit))
 					unitCount--;
+			}
+
+			if (unitType == BWAPI::UnitTypes::Protoss_Dark_Archon)
+			{
+				auto unit = (*++coalition->getUnitSet().begin());
+				if ((*coalition->getAgentSet().begin())->useAbility(BWAPI::TechTypes::Dark_Archon_Meld, unit))
+					unitCount--;
+
 			}
 
 			if (unitType.isAddon())
 			{
 				for (auto &agent : coalition->getAgentSet())
-				{
+				{					
 					if (agent->buildAddon(unitType))
 						unitCount--;
 				}
