@@ -68,12 +68,13 @@ void Agent::setUnit(BWAPI::Unit unit)
 
 void Agent::bind()
 {
-	std::cout << "Binding agent " << unitID << "\n";
+	std::cout << unitID << " : Binding agent\n";
 	free = false;
 }
 
 void Agent::unbind()
 {
+	std::cout << unitID << " : Unbinding Agent\n";
 	coalitionID = -1;
 	coalition = nullptr;
 	taskID = -1;
@@ -186,6 +187,13 @@ bool Agent::upgrade(BWAPI::UpgradeType upgradeType)
 {
 	if (unit->canUpgrade(upgradeType) && EconHelper::haveMoney(upgradeType))
 		return unit->upgrade(upgradeType);
+	return false;
+}
+
+bool Agent::research(BWAPI::TechType techType)
+{
+	if (unit->canResearch(techType))
+		return unit->research(techType);
 	return false;
 }
 

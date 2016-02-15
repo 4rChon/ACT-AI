@@ -16,7 +16,7 @@ void CommandCenter::act()
 	updateExpandDesire();
 
 	//temp contents
-	buildAddon(BWAPI::UnitTypes::Terran_Comsat_Station);
+	//buildAddon(BWAPI::UnitTypes::Terran_Comsat_Station);
 	if (unit->isIdle())
 		train(unit->getPlayer()->getRace().getWorker());
 }

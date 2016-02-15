@@ -9,6 +9,7 @@ Expand::Expand()
 {
 	builder = nullptr;
 	taskName = "Expand()";
+	TaskHelper::addTask(this, false);
 }
 
 Expand::~Expand()

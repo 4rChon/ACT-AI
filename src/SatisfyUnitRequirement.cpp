@@ -1,23 +1,24 @@
-#include "..\include\SatisfyRequirement.h"
+#include "..\include\SatisfyUnitRequirement.h"
 #include "..\include\CreateUnit.h"
+#include "..\include\ResearchTech.h"
+#include "..\include\TaskHelper.h"
 
-SatisfyRequirement::SatisfyRequirement(BWAPI::UnitType unitType)
+SatisfyUnitRequirement::SatisfyUnitRequirement(BWAPI::UnitType unitType)
 {
-	taskName = "SatisfyRequirement(" + unitType.getName() + ")";
-	this->unitType = unitType;	
+	taskName = "SatisfyUnitRequirement(" + unitType.getName() + ")";
+	this->unitType = unitType;
+	TaskHelper::addTask(this, false);
 }
 
-void SatisfyRequirement::assign()
+void SatisfyUnitRequirement::assign()
 {
-	//std::cout << taskName.c_str() << " : " << taskID << " : Assign\n";
 	assigned = true;
-	//std::cout << taskName.c_str() << " : " << taskID << " : Assign End\n";
 }
 
-void SatisfyRequirement::act()
+void SatisfyUnitRequirement::act()
 {
 	//create units to satisfy requirements
-	std::cout << taskName.c_str() << " : " << taskID << " : Acting\n";
+	printDebugInfo("Acting");
 	for (auto &requirement : unitType.requiredUnits())
 	{
 		std::cout << "required unit: " << requirement.first.c_str() << "\n";
@@ -30,13 +31,20 @@ void SatisfyRequirement::act()
 			subTasks.insert(createUnit);
 		}
 	}
+
+	if(unitType.requiredTech() != BWAPI::TechTypes::None)
+	{
+		ResearchTech* researchTech = new ResearchTech(unitType.requiredTech());
+		subTasks.insert(researchTech);
+	}
+
 	acting = true;
-	//std::cout << taskName.c_str() << " : " << taskID << " : Acting End\n";
+	printDebugInfo("Acting End");
 }
 
-void SatisfyRequirement::update()
+void SatisfyUnitRequirement::update()
 {
-	//std::cout << taskName.c_str() << " : " << taskID << " : Update\n";
+	printDebugInfo("Update");
 	if (complete)
 		return;
 
@@ -53,6 +61,6 @@ void SatisfyRequirement::update()
 				return;
 		succeed();
 	}
-	//std::cout << taskName.c_str() << " : " << taskID << " : Update End\n";
+	printDebugInfo("Update End");
 }
 

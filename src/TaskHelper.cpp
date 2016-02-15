@@ -1,4 +1,5 @@
 #include "..\include\TaskHelper.h"
+#include <string>
 
 namespace TaskHelper
 {
@@ -29,11 +30,26 @@ namespace TaskHelper
 		return fullTaskSet;
 	}
 
-	void addTask(Task* task, bool root)
+	bool addTask(Task* newTask, bool root)
 	{
+		//check whether similar task has been added
 		if (root)
-			rootTaskSet.insert(task);
-		fullTaskSet.insert(task);
+			rootTaskSet.insert(newTask);
+		else
+		{
+			for (auto &task : fullTaskSet)
+			{
+				std::cout << "Task : " << task->getName() << "\nNewTask : " << newTask->getName() << "\n";
+				std::cout << task->getName().compare(newTask->getName()) << "\n";
+				if(newTask->getName().compare("Coalition(Composition, Task*)") != 0
+					&& task->getName().compare(newTask->getName()) == 0)
+					return true;
+			}
+			std::cout << "----\n";
+		}
+
+		fullTaskSet.insert(newTask);
+		return true;
 	}
 
 	void removeTask(Task* task)

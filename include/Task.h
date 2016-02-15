@@ -15,10 +15,13 @@ protected:
 	bool assigned;
 	bool complete;
 	bool acting;
+	bool debug;
 	int creationFrame;
 	int taskID;
 	double cost;
 	double profit;
+	bool techSatisfied;
+	bool unitSatisfied;
 	Coalition* coalition;
 	int coalitionID;
 public:
@@ -28,8 +31,13 @@ public:
 
 	//setters
 	void setCoalition(Coalition* coalition);
+	void setUnitSatisfied(bool unitSatisfied);
+	void setTechSatisfied(bool techSatisfied);
+	
 
 	//getters
+	bool isUnitSatisfied() const;
+	bool isTechSatisfied() const;
 	virtual bool Task::isComplete() const;
 	int getID() const;
 	std::string getName() const;
@@ -47,5 +55,7 @@ public:
 	virtual void succeed();
 	virtual void fail();
 	void updateTaskTree();
+
+	void printDebugInfo(std::string info);
 
 };

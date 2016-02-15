@@ -1,6 +1,7 @@
 #include "..\include\Task.h"
 #include "..\include\CoalitionHelper.h"
 #include "..\include\TaskHelper.h"
+#include <string>
 
 Task::Task()
 {
@@ -14,12 +15,13 @@ Task::Task()
 	creationFrame = BWAPI::Broodwar->getFrameCount();
 	cost = 0.0;
 	profit = 0.0;
-	TaskHelper::addTask(this, false);
+	debug = false;
+	//TaskHelper::addTask(this, false);
 }
 
 Task::~Task()
 {
-	std::cout << "~" << taskName.c_str() << "\n";
+	printDebugInfo("DELETE");
 	cleanSubTasks();	
 	delete coalition;
 	coalition = nullptr;
@@ -30,6 +32,26 @@ void Task::setCoalition(Coalition* coalition)
 {
 	this->coalition = coalition;
 	coalitionID = coalition->getID();
+}
+
+void Task::setUnitSatisfied(bool unitSatisfied)
+{
+	this->unitSatisfied = unitSatisfied;
+}
+
+void Task::setTechSatisfied(bool techSatisfied)
+{
+	this->techSatisfied = techSatisfied;
+}
+
+bool Task::isUnitSatisfied() const
+{
+	return unitSatisfied;
+}
+
+bool Task::isTechSatisfied() const
+{
+	return techSatisfied;
 }
 
 bool Task::isComplete() const
@@ -119,4 +141,10 @@ void Task::updateTaskTree()
 		}
 	}
 	update();
+}
+
+void Task::printDebugInfo(std::string info)
+{
+	if(debug)
+		std::cout << getName().c_str() << " : " << taskID << " : " << info << "\n";
 }

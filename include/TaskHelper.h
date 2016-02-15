@@ -5,7 +5,7 @@ namespace TaskHelper
 {
 	void initialiseHelper();
 	int getNextID();
-	void addTask(Task* task, bool root = false);
+	bool addTask(Task* task, bool root = false);
 	void removeTask(Task* task);
 	void updateRootTasks();
 	Taskset getRootTasks();

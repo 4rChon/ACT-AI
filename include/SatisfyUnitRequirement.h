@@ -2,13 +2,15 @@
 #include <BWAPI.h>
 
 #include "Task.h"
+#include "CreateUnit.h"
 
-class SatisfyRequirement : public Task
+class SatisfyUnitRequirement : public Task
 {
 private:
 	BWAPI::UnitType unitType;
+	CreateUnit* superTask;
 public:
-	SatisfyRequirement(BWAPI::UnitType unitType);
+	SatisfyUnitRequirement(BWAPI::UnitType unitType);
 	void assign();
 	void act();
 	void update();

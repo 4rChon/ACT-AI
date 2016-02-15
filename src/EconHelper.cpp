@@ -31,17 +31,22 @@ namespace EconHelper
 
 	int haveMoney(BWAPI::UnitType unitType)
 	{
-		return (BWAPI::Broodwar->self()->minerals() - mineralDebt) >= unitType.mineralPrice() && (BWAPI::Broodwar->self()->gas() - gasDebt) >= unitType.gasPrice();
+		return haveMoney(unitType.mineralPrice(), unitType.gasPrice());
 	}
 
 	int haveMoney(BWAPI::UpgradeType upgradeType)
 	{
-		return (BWAPI::Broodwar->self()->minerals() - mineralDebt) >= upgradeType.mineralPrice() && (BWAPI::Broodwar->self()->gas() - gasDebt) >= upgradeType.gasPrice();
+		return haveMoney(upgradeType.mineralPrice(), upgradeType.gasPrice());
+	}
+
+	int haveMoney(BWAPI::TechType techType)
+	{
+		return haveMoney(techType.mineralPrice(), techType.gasPrice());
 	}
 
 	int haveMoney(int minerals, int gas)
 	{
-		return BWAPI::Broodwar->self()->minerals() >= minerals && BWAPI::Broodwar->self()->gas() >= gas;
+		return getMinerals() - mineralDebt >= minerals && getGas() - gasDebt >= gas;
 	}
 
 	int haveSupply(BWAPI::UnitType unitType)
