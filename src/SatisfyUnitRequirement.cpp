@@ -6,8 +6,8 @@
 SatisfyUnitRequirement::SatisfyUnitRequirement(BWAPI::UnitType unitType)
 {
 	taskName = "SatisfyUnitRequirement(" + unitType.getName() + ")";
+	
 	this->unitType = unitType;
-	TaskHelper::addTask(this, false);
 }
 
 void SatisfyUnitRequirement::assign()
@@ -28,14 +28,14 @@ void SatisfyUnitRequirement::act()
 				continue;
 			CreateUnit* createUnit = new CreateUnit(requirement.first, requirement.second - AgentHelper::getTypeCountMap()[requirement.first]);
 			std::cout << "Creating Requirement: " << requirement.first.c_str() << " : " << requirement.second << "\n";
-			subTasks.insert(createUnit);
+			addSubTask(createUnit);
 		}
 	}
 
 	if(unitType.requiredTech() != BWAPI::TechTypes::None)
 	{
 		ResearchTech* researchTech = new ResearchTech(unitType.requiredTech());
-		subTasks.insert(researchTech);
+		addSubTask(researchTech);
 	}
 
 	acting = true;

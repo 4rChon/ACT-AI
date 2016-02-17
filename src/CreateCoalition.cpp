@@ -6,10 +6,8 @@
 CreateCoalition::CreateCoalition(Composition composition, Task* task)
 {
 	taskName = "CreateCoalition(Composition, Task*)";
-	taskCoalition = CoalitionHelper::addCoalition(composition, task);
-	task->setCoalition(taskCoalition);
-	cost = composition.getCost();
-	TaskHelper::addTask(this, false);
+	taskCoalition = CoalitionHelper::addCoalition(composition, task);	
+	cost = composition.getCost();	
 }
 
 CreateCoalition::~CreateCoalition()
@@ -20,6 +18,7 @@ CreateCoalition::~CreateCoalition()
 // add coalition to open coalitions
 void CreateCoalition::assign()
 {
+	task->setCoalition(taskCoalition);
 	assigned = true;
 }
 
@@ -34,7 +33,7 @@ void CreateCoalition::act()
 		{
 			std::cout << "I need " << differenceComposition[unitType] << " more " << unitType.c_str() << "\n";
 			CreateUnit *createUnit = new CreateUnit(unitType, differenceComposition[unitType]);
-			subTasks.insert(createUnit);
+			addSubTask(createUnit);
 		}
 	}
 	acting = true;

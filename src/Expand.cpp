@@ -1,5 +1,4 @@
 #include "..\include\Composition.h"
-//#include "..\include\CreateCoalition.h"
 #include "..\include\Expand.h"
 #include "..\include\EconHelper.h"
 #include "..\include\TaskHelper.h"
@@ -7,9 +6,9 @@
 
 Expand::Expand()
 {
-	builder = nullptr;
 	taskName = "Expand()";
-	TaskHelper::addTask(this, false);
+	
+	builder = nullptr;
 }
 
 Expand::~Expand()
@@ -23,7 +22,7 @@ void Expand::assign()
 	Composition c;
 	c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 1);	
 	CreateCoalition *createCoalition = new CreateCoalition(c, this);
-	subTasks.insert(createCoalition);
+	addSubTask(createCoalition);
 	assigned = true;
 	//std::cout << taskName.c_str() << " : " << taskID << " : Assign End\n";
 }

@@ -7,33 +7,32 @@
 CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 {
 	taskName = "CreateUnit(" + unitType.getName() + ")"; //
+	
 	this->unitType = unitType;
 	this->unitCount = unitCount;
-	satisfyingUnit = false;
-	satisfyingTech = false;
+	satisfying = false;
 	satisfied = true;
 	debug = false;
 	building = false;
-	reserved = false;
-	TaskHelper::addTask(this, false);
+	reserved = false;	
 }
 
 void CreateUnit::satisfyUnitRequirements()
 {
-	for (auto &required : unitType.requiredUnits())
+	if (!satisfying)
 	{
-		if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(required.first))
-			satisfied = false;
-	}	
+		for (auto &required : unitType.requiredUnits())
+		{
+			if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(required.first))
+				satisfied = false;
+		}	
 
-	if (!satisfyingUnit)
-	{
 		for (auto &required : unitType.requiredUnits())
 		{
 			printDebugInfo("Attempting to Satisfy Unit - Unit Requirement");
 			SatisfyUnitRequirement* satisfyUnitRequirement = new SatisfyUnitRequirement(unitType);
-			subTasks.insert(satisfyUnitRequirement);
-			satisfyingUnit = true;
+			addSubTask(satisfyUnitRequirement);
+			satisfying = true;
 			return;
 		}
 	}
@@ -44,15 +43,14 @@ void CreateUnit::satisfyTechRequirements()
 	if (unitType.requiredTech() != BWAPI::TechTypes::None && !BWAPI::Broodwar->self()->hasResearched(unitType.requiredTech()))
 	{
 		satisfied = false;
-		if (!satisfyingTech)
+		if (!satisfying)
 		{
 			printDebugInfo("Attempting to Satisfy Unit - Tech Requirement"); //unit tech requirements
 			SatisfyUnitRequirement* satisfyUnitRequirement = new SatisfyUnitRequirement(unitType);
-			subTasks.insert(satisfyUnitRequirement);
-			satisfyingTech = true;
+			addSubTask(satisfyUnitRequirement);
+			satisfying = true;
 		}
-	}
-		
+	}		
 }
 
 // assign a producer coalition
@@ -61,8 +59,7 @@ void CreateUnit::assign()
 	//printDebugInfo("Assign");
 	satisfied = true;	
 	satisfyUnitRequirements();
-	if(satisfied)
-		satisfyTechRequirements();
+	satisfyTechRequirements();
 		
 	if (satisfied)// && EconHelper::haveMoney(unitType))
 	{

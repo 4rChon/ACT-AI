@@ -30,7 +30,7 @@ namespace TaskHelper
 		return fullTaskSet;
 	}
 
-	bool addTask(Task* newTask, bool root)
+	Task* addTask(Task* newTask, bool root)
 	{
 		//check whether similar task has been added
 		if (root)
@@ -43,13 +43,13 @@ namespace TaskHelper
 				std::cout << task->getName().compare(newTask->getName()) << "\n";
 				if(newTask->getName().compare("Coalition(Composition, Task*)") != 0
 					&& task->getName().compare(newTask->getName()) == 0)
-					return true;
+					return task;
 			}
 			std::cout << "----\n";
 		}
 
 		fullTaskSet.insert(newTask);
-		return true;
+		return newTask;
 	}
 
 	void removeTask(Task* task)

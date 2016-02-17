@@ -5,9 +5,9 @@
 SatisfyTechRequirement::SatisfyTechRequirement(BWAPI::TechType techType)
 {
 	taskName = "SatisfyTechRequirement(" + techType.getName() + ")";
+	
 	this->techType = techType;
 	debug = true;
-	TaskHelper::addTask(this, false);
 }
 
 void SatisfyTechRequirement::assign()
@@ -24,7 +24,7 @@ void SatisfyTechRequirement::act()
 	{
 		printDebugInfo(techType.c_str());
 		CreateUnit* createUnit = new CreateUnit(techType.requiredUnit());
-		subTasks.insert(createUnit);
+		addSubTask(createUnit);
 	}
 	acting = true;
 	printDebugInfo("Acting End");

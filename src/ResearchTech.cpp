@@ -7,9 +7,9 @@
 ResearchTech::ResearchTech(BWAPI::TechType techType)
 {
 	taskName = "ResearchTech(" + techType.getName() + ")";
+	
 	this->techType = techType;	
 	debug = true;
-	TaskHelper::addTask(this, false);
 }
 
 void ResearchTech::createCoalition()
@@ -20,7 +20,7 @@ void ResearchTech::createCoalition()
 
 	producer.addType(techType.whatResearches(), 1);
 	CreateCoalition* createCoalition = new CreateCoalition(producer, this);
-	subTasks.insert(createCoalition);
+	addSubTask(createCoalition);
 }
 
 void ResearchTech::satisfyRequirements()
@@ -32,7 +32,7 @@ void ResearchTech::satisfyRequirements()
 		{
 			printDebugInfo("Satisfying Tech Requirement");
 			SatisfyTechRequirement* satisfyTechRequirement = new SatisfyTechRequirement(techType);
-			subTasks.insert(satisfyTechRequirement);
+			addSubTask(satisfyTechRequirement);
 			satisfying = true;
 			return;
 		}

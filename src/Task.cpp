@@ -96,6 +96,11 @@ double Task::getProfit()
 	return profit;
 }
 
+void Task::addSubTask(Task* task)
+{
+	subTasks.insert(TaskHelper::addTask(task));
+}
+
 void Task::cleanSubTasks()
 {
 	for(auto &task : subTasks)
