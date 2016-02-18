@@ -13,6 +13,7 @@ namespace DesireHelper
 	void updateTechDesireMap();
 	void updateExpansionDesireMap();
 	void updateDesireMaps();
+	void updateSupplyDesire(BWAPI::UnitType unitType, bool justDied = false);
 
 	const std::unordered_map<BWAPI::UnitType, double>& getUnitDesireMap();
 	const std::unordered_map<BWAPI::UpgradeType, double>& getUpgradeDesireMap();

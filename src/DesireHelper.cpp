@@ -5,13 +5,13 @@ namespace DesireHelper
 {
 	namespace
 	{
-		std::unordered_map<BWAPI::UnitType, double> unitDesireMap;
-		std::unordered_map<BWAPI::UpgradeType, double> upgradeDesireMap;
-		std::unordered_map<BWAPI::TechType, double> techDesireMap;
-		std::unordered_map<BWTA::BaseLocation*, double, std::hash<void*>> expansionDesireMap;
-		std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> attackDesireMap;
-		std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> defendDesireMap;
-		double supplyDesire;
+		static std::unordered_map<BWAPI::UnitType, double> unitDesireMap;
+		static std::unordered_map<BWAPI::UpgradeType, double> upgradeDesireMap;
+		static std::unordered_map<BWAPI::TechType, double> techDesireMap;
+		static std::unordered_map<BWTA::BaseLocation*, double, std::hash<void*>> expansionDesireMap;
+		static std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> attackDesireMap;
+		static std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> defendDesireMap;
+		static double supplyDesire;
 	}
 
 	void initialiseHelper()
@@ -42,7 +42,7 @@ namespace DesireHelper
 			defendDesireMap.insert(std::pair<MapHelper::Zone*, double>(MapHelper::getZone(region), 0.0));
 		}
 
-		supplyDesire = 0.0;
+		supplyDesire = 1.00;
 	}
 
 	void updateUnitDesireMap()
@@ -67,6 +67,23 @@ namespace DesireHelper
 		updateUpgradeDesireMap();
 		updateTechDesireMap();
 		updateExpansionDesireMap();
+	}
+
+	void updateSupplyDesire(BWAPI::UnitType unitType, bool justDied)
+	{
+		if (BWAPI::Broodwar->self()->supplyTotal() >= 200)
+		{
+			std::cout << "Full supply!\n";
+			supplyDesire = 0.0;
+			return;
+		}
+		
+		int unitSupply = unitType.supplyProvided() - unitType.supplyRequired();
+		if (justDied)
+			unitSupply *= -1;
+		supplyDesire -= (double)unitSupply / BWAPI::Broodwar->self()->getRace().getCenter().supplyProvided();
+		std::cout << "Supply Desire: " << supplyDesire << "\n";
+		std::cout << "Unit Supply: " << unitSupply << "\n";		
 	}
 
 	const std::unordered_map<BWAPI::UnitType, double>& getUnitDesireMap()

@@ -1,6 +1,7 @@
 #include "..\include\SCV.h"
 #include "..\include\AgentHelper.h"
 #include "..\include\EconHelper.h"
+#include "..\include\DesireHelper.h"
 
 SCV::SCV(BWAPI::Unit unit)
 {
@@ -14,12 +15,15 @@ void SCV::act()
 	if (repair())
 		return;
 
-	if (BWAPI::Broodwar->self()->supplyTotal() != 200 
-		&& BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed() <= 2
-		&& EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getSupplyProvider())
-		&& BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::Broodwar->self()->getRace().getSupplyProvider()) < 1)
-		if(build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr))
+	if (DesireHelper::getSupplyDesire() > 0.6
+		&& EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getSupplyProvider()))
+	{
+		if (build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr))
+		{
+			DesireHelper::updateSupplyDesire(BWAPI::Broodwar->self()->getRace().getSupplyProvider());
 			return;
+		}
+	}
 
 	if (unit->isIdle())
 	{

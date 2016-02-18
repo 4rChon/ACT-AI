@@ -65,12 +65,14 @@ void Worker::act()
 	if (unit->isIdle())
 	{
 		if (BWAPI::Broodwar->self()->getRace() != BWAPI::Races::Zerg 
-			&& BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed() <= 2 
-			&& EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getSupplyProvider())
-			&& BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::Broodwar->self()->getRace().getSupplyProvider()) < 1)
+			&& DesireHelper::getSupplyDesire() > 0.6
+			&& EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getSupplyProvider()))
 		{
-			if(build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr))
+			if (build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr))
+			{
+				DesireHelper::updateSupplyDesire(BWAPI::Broodwar->self()->getRace().getSupplyProvider());
 				return;
+			}
 		}
 
 		bool mining = false;
