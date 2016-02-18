@@ -48,7 +48,6 @@ void SatisfyUnitRequirement::update()
 	printDebugInfo("Update");
 	if (complete)
 	{
-		/*CoalitionHelper::removeCoalition(coalition);*/
 		cleanSubTasks();
 		return;
 	}

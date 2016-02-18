@@ -136,7 +136,6 @@ void CreateUnit::update() //x2 redundant in res tech
 	printDebugInfo("Update");
 	if (complete)
 	{
-		/*CoalitionHelper::removeCoalition(coalition);*/
 		cleanSubTasks();
 		return;
 	}

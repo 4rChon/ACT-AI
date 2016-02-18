@@ -77,7 +77,6 @@ void ResearchTech::update() //x2 redundant in create unit
 	//printDebugInfo("Update");
 	if (complete)
 	{
-		/*CoalitionHelper::removeCoalition(coalition);*/
 		cleanSubTasks();
 		return;
 	}

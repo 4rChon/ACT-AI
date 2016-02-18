@@ -19,7 +19,7 @@ namespace MapHelper
 		{
 			this->region = region;
 			this->id = id;
-			lastVisited = 0;
+			lastVisited = -99999;
 			enemyScore = 0;
 			friendScore = 0;
 			resourceScore = 0;

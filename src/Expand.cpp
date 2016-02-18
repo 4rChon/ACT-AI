@@ -8,7 +8,6 @@
 Expand::Expand()
 {
 	taskName = "Expand()";
-	
 	builder = nullptr;
 }
 
@@ -19,29 +18,28 @@ Expand::~Expand()
 
 void Expand::assign()
 {
-	//std::cout << taskName.c_str() << " : " << taskID << " : Assign\n";
+	printDebugInfo("Assign");
 	Composition c;
 	c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 1);	
 	CreateCoalition *createCoalition = new CreateCoalition(c, this);
 	addSubTask(createCoalition);
 	assigned = true;
-	//std::cout << taskName.c_str() << " : " << taskID << " : Assign End\n";
+	printDebugInfo("Assign End");
 }
 
 void Expand::act()
 {
-	//std::cout << taskName.c_str() << " : " << taskID << " : Acting\n";
+	printDebugInfo("Acting");
 	acting = true;
 	complete = builder->expand();
-	//std::cout << taskName.c_str() << " : " << taskID << " : Acting End\n";
+	printDebugInfo("Acting End");
 }
 
 void Expand::update()
 {
-	//std::cout << taskName.c_str() << " : " << taskID << " : Update\n";
+	printDebugInfo("Update");
 	if (complete)
 	{
-		/*CoalitionHelper::removeCoalition(coalition);*/
 		cleanSubTasks();
 		return;
 	}
@@ -54,5 +52,5 @@ void Expand::update()
 
 	if (builder && !complete)
 		act();
-	//std::cout << taskName.c_str() << " : " << taskID << " : Update End\n";
+	printDebugInfo("Update End");
 }

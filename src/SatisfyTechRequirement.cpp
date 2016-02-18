@@ -36,7 +36,6 @@ void SatisfyTechRequirement::update()
 	printDebugInfo("Update");
 	if (complete)
 	{
-		/*CoalitionHelper::removeCoalition(coalition);*/
 		cleanSubTasks();
 		return;
 	}
