@@ -3,6 +3,7 @@
 #include "..\include\EconHelper.h"
 #include "..\include\TaskHelper.h"
 #include "..\include\CreateCoalition.h"
+#include "..\include\CoalitionHelper.h"
 
 Expand::Expand()
 {
@@ -39,7 +40,11 @@ void Expand::update()
 {
 	//std::cout << taskName.c_str() << " : " << taskID << " : Update\n";
 	if (complete)
+	{
+		/*CoalitionHelper::removeCoalition(coalition);*/
+		cleanSubTasks();
 		return;
+	}
 
 	if (!assigned)
 		assign();

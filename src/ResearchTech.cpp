@@ -3,13 +3,16 @@
 #include "..\include\EconHelper.h"
 #include "..\include\CreateCoalition.h"
 #include "..\include\TaskHelper.h"
+#include "..\include\CoalitionHelper.h"
 
 ResearchTech::ResearchTech(BWAPI::TechType techType)
 {
 	taskName = "ResearchTech(" + techType.getName() + ")";
-	
+	satisfying = false;
+	satisfied = true;
+
 	this->techType = techType;	
-	debug = true;
+	debug = false;
 }
 
 void ResearchTech::createCoalition()
@@ -28,21 +31,21 @@ void ResearchTech::satisfyRequirements()
 	if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(techType.requiredUnit())
 		&& !BWAPI::Broodwar->self()->hasUnitTypeRequirement(techType.whatResearches()))
 	{					
+		satisfied = false;
 		if (!satisfying)
 		{
 			printDebugInfo("Satisfying Tech Requirement");
 			SatisfyTechRequirement* satisfyTechRequirement = new SatisfyTechRequirement(techType);
 			addSubTask(satisfyTechRequirement);
 			satisfying = true;
-			return;
 		}
 	}
-	else
-		satisfied = true;
 }
 
 void ResearchTech::assign()
 {
+	printDebugInfo("Assign");
+	satisfied = true;
 	satisfyRequirements();
 
 	if (satisfied && EconHelper::haveMoney(techType))
@@ -51,6 +54,7 @@ void ResearchTech::assign()
 		assigned = true;
 		printDebugInfo("Assigned!");
 	}
+	printDebugInfo("Assign End");
 }
 
 void ResearchTech::act()
@@ -70,9 +74,13 @@ void ResearchTech::act()
 
 void ResearchTech::update() //x2 redundant in create unit
 {
-	printDebugInfo("Update");
+	//printDebugInfo("Update");
 	if (complete)
+	{
+		/*CoalitionHelper::removeCoalition(coalition);*/
+		cleanSubTasks();
 		return;
+	}
 
 	if (!assigned)
 	{
@@ -82,5 +90,5 @@ void ResearchTech::update() //x2 redundant in create unit
 
 	if (coalition->isActive())
 		act();
-	printDebugInfo("Update End");
+	//printDebugInfo("Update End");
 }

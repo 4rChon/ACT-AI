@@ -1,13 +1,13 @@
 #pragma once
 #include "BWTA.h"
-#include "Producer.h"
+#include "Agent.h"
 #include "Worker.h"
 
 typedef BWAPI::SetContainer < Worker*, std::hash<void*>> Workerset;
 
 class Expand;
 
-class ResourceDepot : public Producer
+class ResourceDepot : public Agent
 {
 protected:
 	BWTA::BaseLocation* baseLocation;

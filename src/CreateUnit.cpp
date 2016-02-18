@@ -3,6 +3,7 @@
 #include "..\include\EconHelper.h"
 #include "..\include\SatisfyUnitRequirement.h"
 #include "..\include\TaskHelper.h"
+#include "..\include\CoalitionHelper.h"
 
 CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 {
@@ -11,63 +12,29 @@ CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 	this->unitType = unitType;
 	this->unitCount = unitCount;
 	satisfying = false;
-	satisfied = true;
-	debug = false;
-	building = false;
-	reserved = false;	
-}
-
-void CreateUnit::satisfyUnitRequirements()
-{
-	if (!satisfying)
-	{
-		for (auto &required : unitType.requiredUnits())
-		{
-			if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(required.first))
-				satisfied = false;
-		}	
-
-		for (auto &required : unitType.requiredUnits())
-		{
-			printDebugInfo("Attempting to Satisfy Unit - Unit Requirement");
-			SatisfyUnitRequirement* satisfyUnitRequirement = new SatisfyUnitRequirement(unitType);
-			addSubTask(satisfyUnitRequirement);
-			satisfying = true;
-			return;
-		}
-	}
-}
-
-void CreateUnit::satisfyTechRequirements()
-{		
-	if (unitType.requiredTech() != BWAPI::TechTypes::None && !BWAPI::Broodwar->self()->hasResearched(unitType.requiredTech()))
-	{
-		satisfied = false;
-		if (!satisfying)
-		{
-			printDebugInfo("Attempting to Satisfy Unit - Tech Requirement"); //unit tech requirements
-			SatisfyUnitRequirement* satisfyUnitRequirement = new SatisfyUnitRequirement(unitType);
-			addSubTask(satisfyUnitRequirement);
-			satisfying = true;
-		}
-	}		
-}
-
-// assign a producer coalition
-void CreateUnit::assign()
-{
-	//printDebugInfo("Assign");
 	satisfied = true;	
-	satisfyUnitRequirements();
-	satisfyTechRequirements();
-		
-	if (satisfied)// && EconHelper::haveMoney(unitType))
+	building = false;
+	reserved = false;
+
+	debug = false;
+}
+
+void CreateUnit::satisfyRequirements()
+{
+	for (auto &required : unitType.requiredUnits())
+		if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(required.first))
+			satisfied = false;
+
+	if (unitType.requiredTech() != BWAPI::TechTypes::None && !BWAPI::Broodwar->self()->hasResearched(unitType.requiredTech()))
+		satisfied = false;
+
+	if (!satisfying && !satisfied)
 	{
-		createCoalition();
-		assigned = true;
-		//printDebugInfo("Assigned!");
+		printDebugInfo("Attempting to Satisfy Unit - Unit Requirement");
+		SatisfyUnitRequirement* satisfyUnitRequirement = new SatisfyUnitRequirement(unitType);
+		addSubTask(satisfyUnitRequirement);
+		satisfying = true;
 	}
-	//printDebugInfo("Assign End");
 }
 
 void CreateUnit::createCoalition()
@@ -75,7 +42,8 @@ void CreateUnit::createCoalition()
 	printDebugInfo("Unit requirements satisfied");
 	Composition producer;
 	auto whatBuilds = unitType.whatBuilds().first;
-	if(whatBuilds == BWAPI::UnitTypes::Zerg_Larva)
+
+	if (whatBuilds == BWAPI::UnitTypes::Zerg_Larva)
 		producer.addType(BWAPI::UnitTypes::Zerg_Hatchery, 1);
 	else
 		producer.addType(unitType.whatBuilds().first, unitType.whatBuilds().second);
@@ -83,14 +51,29 @@ void CreateUnit::createCoalition()
 	subTasks.insert(createCoalition);
 }
 
-// produce a unit
+// assign a producer coalition
+void CreateUnit::assign()
+{
+	printDebugInfo("Assign");
+	satisfied = true;	
+	satisfyRequirements();
+		
+	if (satisfied && EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType))
+	{
+		createCoalition();
+		assigned = true;
+		printDebugInfo("Assigned!");
+	}
+	printDebugInfo("Assign End");
+}
 
+// produce a unit
 void CreateUnit::act()
 {
 	printDebugInfo("Acting");
 	if (unitCount > 0)
 	{
-		if (unitType == BWAPI::UnitTypes::Zerg_Lurker)
+		if (unitType == BWAPI::UnitTypes::Zerg_Lurker || unitType == BWAPI::UnitTypes::Zerg_Guardian)
 		{
 			if((*coalition->getAgentSet().begin())->morph(unitType))
 				unitCount--;
@@ -123,9 +106,10 @@ void CreateUnit::act()
 			
 			for (auto &agent : coalition->getAgentSet())
 			{
-				if (unitType.getRace() == BWAPI::Races::Zerg && unitType.isResourceDepot() && unitType != BWAPI::UnitTypes::Zerg_Hatchery)
+				if (unitType.getRace() == BWAPI::Races::Zerg 
+					&& (unitType.isResourceDepot() && unitType != BWAPI::UnitTypes::Zerg_Hatchery) 
+					|| unitType == BWAPI::UnitTypes::Zerg_Greater_Spire)
 				{
-					std::cout << "MORPH ME WITH YOUR SPECIAL MORPH\n";
 					if (agent->morph(unitType))
 						unitCount--;
 				}
@@ -151,7 +135,11 @@ void CreateUnit::update() //x2 redundant in res tech
 {
 	printDebugInfo("Update");
 	if (complete)
+	{
+		/*CoalitionHelper::removeCoalition(coalition);*/
+		cleanSubTasks();
 		return;
+	}
 
 	if (!assigned)
 	{

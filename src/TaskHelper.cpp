@@ -1,4 +1,5 @@
 #include "..\include\TaskHelper.h"
+#include "..\include\CoalitionHelper.h"
 #include <string>
 
 namespace TaskHelper
@@ -20,12 +21,12 @@ namespace TaskHelper
 		return ++nextID;
 	}
 
-	Taskset getRootTasks()
+	Taskset& getRootTasks()
 	{
 		return rootTaskSet;
 	}
 
-	Taskset getAllTasks()
+	Taskset& getAllTasks()
 	{
 		return fullTaskSet;
 	}
@@ -39,13 +40,19 @@ namespace TaskHelper
 		{
 			for (auto &task : fullTaskSet)
 			{
-				std::cout << "Task : " << task->getName() << "\nNewTask : " << newTask->getName() << "\n";
-				std::cout << task->getName().compare(newTask->getName()) << "\n";
-				if(newTask->getName().compare("Coalition(Composition, Task*)") != 0
+				/*std::cout << "Task : " << task->getName() << "\nNewTask : " << newTask->getName() << "\n";
+				std::cout << task->getName().compare(newTask->getName()) << "\n";*/
+
+				if (rootTaskSet.count(task) == 0 
+					&& newTask->getName().compare("CreateCoalition(Composition, Task*)") != 0
+					/*&& newTask->getName().compare("CreateUnit") > 0*/
 					&& task->getName().compare(newTask->getName()) == 0)
+				{
+					removeTask(newTask);
 					return task;
+				}
 			}
-			std::cout << "----\n";
+			/*std::cout << "----\n";*/
 		}
 
 		fullTaskSet.insert(newTask);
@@ -53,21 +60,26 @@ namespace TaskHelper
 	}
 
 	void removeTask(Task* task)
-	{		
-		std::cout << "Removing " << task->getName().c_str() << " from root taskset\n";
+	{
+		std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from root taskset\n";
 		rootTaskSet.erase(task);
-		std::cout << "Removing " << task->getName().c_str() << " from full taskset\n";
-		fullTaskSet.erase(task);		
+		std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from full taskset\n";
+		fullTaskSet.erase(task);
+		//CoalitionHelper::removeCoalition(task->getCoalition());
+		delete task;
 		/*std::cout << "Deleting " << task->getName().c_str() << "\n";
 		delete task;*/
 	}
 
 	void updateRootTasks()
-	{
-		for (auto &task : rootTaskSet)
-			if (task->isComplete())
-				delete task;
-			else
-				task->updateTaskTree();
+	{		
+		if (rootTaskSet.size() > 0)
+		{
+			for (auto it = rootTaskSet.begin(); it != rootTaskSet.end(); ++it)
+				if ((*it)->isComplete())
+					removeTask(*it);
+				else
+					(*it)->updateTaskTree();
+		}
 	}
 }

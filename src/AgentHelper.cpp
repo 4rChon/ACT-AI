@@ -1,6 +1,4 @@
 #include "..\include\AgentHelper.h"
-#include "..\include\CommandCenter.h"
-#include "..\include\Hatchery.h"
 #include "..\include\SCV.h"
 
 namespace AgentHelper
@@ -16,6 +14,7 @@ namespace AgentHelper
 	void initialiseHelper()
 	{		
 		lastServiced = agentSet.begin();
+		typeCountMap.clear();
 	}
 
 	Agent* getAgent(int id)
@@ -36,9 +35,9 @@ namespace AgentHelper
 		return resourceDepots;
 	}
 
-	TypeCountMap& getTypeCountMap()
+	int getTypeCount(BWAPI::UnitType unitType)
 	{
-		return typeCountMap;
+		return typeCountMap[unitType];
 	}
 
 	Agentset::iterator getLastServiced()
@@ -77,34 +76,11 @@ namespace AgentHelper
 			return;
 		}
 
-		if (unit->getType().isBuilding() && unit->getType().canProduce())
+		if (unit->getType().isResourceDepot())
 		{
-			if (unit->getType().isResourceDepot())
-			{
-				if (unit->getType() == BWAPI::UnitTypes::Terran_Command_Center)
-				{
-					agent = new CommandCenter(unit);
-					//std::cout << "Added new Command Center : " << unit->getID() << "\n";
-					resourceDepots.insert((CommandCenter*)agent);
-				}
-				else if (unit->getPlayer()->getRace() == BWAPI::Races::Zerg)
-				{
-					agent = new Hatchery(unit);
-					//std::cout << "Added new Hatchery : " << unit->getID() << "\n";
-					resourceDepots.insert((Hatchery*)agent);
-				}
-				else
-				{
-					agent = new ResourceDepot(unit);
-					//std::cout << "Added new Resource Depot : " << unit->getID() << "\n";
-					resourceDepots.insert((ResourceDepot*)agent);
-				}
-			}
-			else
-			{
-				agent = new Producer(unit);
-				//std::cout << "Added new Producer : " << unit->getType() << " : " << unit->getID() << "\n";
-			}
+			agent = new ResourceDepot(unit);
+			//std::cout << "Added new Resource Depot : " << unit->getID() << "\n";
+			resourceDepots.insert((ResourceDepot*)agent);
 		}
 		else
 		{
@@ -124,7 +100,7 @@ namespace AgentHelper
 			else
 			{
 				agent = new Agent(unit);
-				//std::cout << "Added new Unit : " << unit->getType() << " : " << unit->getID() << "\n";
+				std::cout << "Added new Unit : " << unit->getType() << " : " << unit->getID() << "\n";
 			}
 		}
 		agentSet.insert(agent);

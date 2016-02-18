@@ -16,16 +16,15 @@ Task::Task()
 	cost = 0.0;
 	profit = 0.0;
 	debug = false;
-	//TaskHelper::addTask(this, false);
 }
 
 Task::~Task()
 {
-	printDebugInfo("DELETE");
-	cleanSubTasks();	
-	delete coalition;
+	printDebugInfo("DELETE", true);
+	cleanSubTasks();
 	coalition = nullptr;
-	TaskHelper::removeTask(this);
+	//TaskHelper::getAllTasks().erase(this);
+	//TaskHelper::removeTask(this);
 }
 
 void Task::setCoalition(Coalition* coalition)
@@ -69,7 +68,7 @@ std::string Task::getName() const
 	return taskName;
 }
 
-Taskset Task::getSubTasks() const
+Taskset& Task::getSubTasks()
 {
 	return subTasks;
 }
@@ -103,9 +102,21 @@ void Task::addSubTask(Task* task)
 
 void Task::cleanSubTasks()
 {
-	for(auto &task : subTasks)
-		TaskHelper::removeTask(task);
+	if (subTasks.size() > 0)
+		for (auto it = subTasks.begin(); it != subTasks.end(); ++it)
+			if((*it)->getName().compare("") != 0)
+				TaskHelper::removeTask(*it);
+
 	subTasks.clear();
+}
+
+void Task::updateTaskTree()
+{
+	if (subTasks.size() > 0)
+		for (auto it = subTasks.begin(); it != subTasks.end(); ++it)
+			if (!(*it)->isComplete())
+				(*it)->updateTaskTree();				
+	update();
 }
 
 void Task::succeed()
@@ -113,8 +124,9 @@ void Task::succeed()
 	complete = true;
 	profit = 1.0;
 	std::cout << taskID << " : " << taskName << " : Success!\n";
-
-	cleanSubTasks();
+	
+	if(taskName.compare("CreateCoalition(Composition, Task*)") != 0)
+		CoalitionHelper::removeCoalition(coalition);
 }
 
 void Task::fail()
@@ -123,33 +135,12 @@ void Task::fail()
 	profit = 0.0;
 	std::cout << taskID << " : " << taskName << " : Failure!\n";
 
-	cleanSubTasks();
+	if (taskName.compare("CreateCoalition(Composition, Task*)") != 0)
+		CoalitionHelper::removeCoalition(coalition);
 }
 
-void Task::updateTaskTree()
+void Task::printDebugInfo(std::string info, bool forceShow)
 {
-	if (subTasks.size() > 0)
-	{
-		for (auto it = subTasks.begin(); it != subTasks.end();)
-		{
-			if ((*it)->isComplete())
-			{
-				auto tempIt = subTasks.erase(it);
-				delete (*it);
-				it = tempIt;
-			}
-			else
-			{
-				(*it)->updateTaskTree();
-				++it;
-			}
-		}
-	}
-	update();
-}
-
-void Task::printDebugInfo(std::string info)
-{
-	if(debug)
-		std::cout << getName().c_str() << " : " << taskID << " : " << info << "\n";
+	if(debug || forceShow)
+		std::cout << taskName << " : " << taskID << " : " << info << "\n";
 }

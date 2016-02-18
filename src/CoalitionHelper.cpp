@@ -42,6 +42,7 @@ namespace CoalitionHelper
 	void removeCoalition(Coalition* coalition)
 	{
 		coalitionSet.erase(coalition);
+		delete coalition;
 	}
 	//Coalitionset::iterator removeCoalition(Coalitionset::iterator coalition);
 	//void activateCoalition(Coalition* coalition);

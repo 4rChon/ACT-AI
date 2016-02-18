@@ -1,13 +1,14 @@
 #include "..\include\SatisfyTechRequirement.h"
 #include "..\include\CreateUnit.h"
 #include "..\include\TaskHelper.h"
+#include "..\include\CoalitionHelper.h"
 
 SatisfyTechRequirement::SatisfyTechRequirement(BWAPI::TechType techType)
 {
 	taskName = "SatisfyTechRequirement(" + techType.getName() + ")";
 	
 	this->techType = techType;
-	debug = true;
+	debug = false;
 }
 
 void SatisfyTechRequirement::assign()
@@ -19,8 +20,8 @@ void SatisfyTechRequirement::act()
 {
 	//create units to satisfy requirements
 	printDebugInfo("Acting");
-	if (AgentHelper::getTypeCountMap()[techType.requiredUnit()] == 0
-		&& BWAPI::Broodwar->self()->incompleteUnitCount(techType.requiredUnit() == 0))
+	if (AgentHelper::getTypeCount(techType.requiredUnit()) < 1
+		&& BWAPI::Broodwar->self()->incompleteUnitCount(techType.requiredUnit()) < 1)
 	{
 		printDebugInfo(techType.c_str());
 		CreateUnit* createUnit = new CreateUnit(techType.requiredUnit());
@@ -34,7 +35,11 @@ void SatisfyTechRequirement::update()
 {
 	printDebugInfo("Update");
 	if (complete)
+	{
+		/*CoalitionHelper::removeCoalition(coalition);*/
+		cleanSubTasks();
 		return;
+	}
 
 	if (!assigned)
 		assign();

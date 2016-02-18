@@ -2,12 +2,14 @@
 #include "..\include\CreateUnit.h"
 #include "..\include\ResearchTech.h"
 #include "..\include\TaskHelper.h"
+#include "..\include\CoalitionHelper.h"
 
 SatisfyUnitRequirement::SatisfyUnitRequirement(BWAPI::UnitType unitType)
 {
 	taskName = "SatisfyUnitRequirement(" + unitType.getName() + ")";
 	
 	this->unitType = unitType;
+	debug = false;
 }
 
 void SatisfyUnitRequirement::assign()
@@ -21,12 +23,11 @@ void SatisfyUnitRequirement::act()
 	printDebugInfo("Acting");
 	for (auto &requirement : unitType.requiredUnits())
 	{
-		std::cout << "required unit: " << requirement.first.c_str() << "\n";
-		if (AgentHelper::getTypeCountMap()[requirement.first] < requirement.second)
+		std::cout << "Required unit: " << requirement.first.c_str() << "\n";
+		if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(requirement.first, requirement.second)
+			&& BWAPI::Broodwar->self()->incompleteUnitCount(requirement.first) < requirement.second)
 		{
-			if (BWAPI::Broodwar->self()->incompleteUnitCount(requirement.first) >= requirement.second)
-				continue;
-			CreateUnit* createUnit = new CreateUnit(requirement.first, requirement.second - AgentHelper::getTypeCountMap()[requirement.first]);
+			CreateUnit* createUnit = new CreateUnit(requirement.first, requirement.second - AgentHelper::getTypeCount(requirement.first));
 			std::cout << "Creating Requirement: " << requirement.first.c_str() << " : " << requirement.second << "\n";
 			addSubTask(createUnit);
 		}
@@ -46,7 +47,11 @@ void SatisfyUnitRequirement::update()
 {
 	printDebugInfo("Update");
 	if (complete)
+	{
+		/*CoalitionHelper::removeCoalition(coalition);*/
+		cleanSubTasks();
 		return;
+	}
 
 	if (!assigned)
 		assign();				

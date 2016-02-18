@@ -39,7 +39,7 @@ Coalition::~Coalition()
 
 	agentSet.clear();
 	unitSet.clear();
-	CoalitionHelper::removeCoalition(this);
+	/*CoalitionHelper::removeCoalition(this);*/
 }
 
 int Coalition::getAge() const

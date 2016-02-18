@@ -21,7 +21,7 @@ namespace AgentHelper
 	Agent* getAgent(int id);
 	const Agentset& getAgentset();
 	const Baseset& getResourceDepots();
-	TypeCountMap& getTypeCountMap();
+	int getTypeCount(BWAPI::UnitType unitType);
 	Agentset::iterator getLastServiced();
 
 	//-

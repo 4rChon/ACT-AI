@@ -6,8 +6,7 @@ class CreateUnit : public Task
 private:
 	BWAPI::UnitType unitType;
 	int unitCount;
-	bool satisfyingTech;
-	bool satisfyingUnit;
+	bool satisfying;
 	bool satisfied;
 	bool building;
 	bool reserved;
@@ -16,9 +15,8 @@ public:
 	CreateUnit(BWAPI::UnitType unitType, int unitCount = 1);	
 
 	//-
-	void assign();	
-	void satisfyUnitRequirements();
-	void satisfyTechRequirements();
+	void assign();
+	void satisfyRequirements();
 	void createCoalition();
 	void act();
 	void update();

@@ -41,21 +41,21 @@ public:
 	virtual bool Task::isComplete() const;
 	int getID() const;
 	std::string getName() const;
-	Taskset getSubTasks() const;
+	Taskset& getSubTasks();
 	virtual Coalition* getCoalition() const;
 	virtual double getCost();
 	virtual double getProfit();
+	void addSubTask(Task* task);
 
 	//-
 	virtual void assign() = 0;
 	virtual void act() = 0;
 	virtual void update() = 0;
 	void cleanSubTasks();
+	void updateTaskTree();
 
 	virtual void succeed();
 	virtual void fail();
-	void updateTaskTree();
 
-	void printDebugInfo(std::string info);
-
+	void printDebugInfo(std::string info, bool forceShow = false);
 };
