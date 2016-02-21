@@ -65,7 +65,7 @@ void Worker::act()
 	if (unit->isIdle())
 	{
 		if (BWAPI::Broodwar->self()->getRace() != BWAPI::Races::Zerg 
-			&& DesireHelper::getSupplyDesire() > 0.6
+			&& DesireHelper::getSupplyDesire() > 0.4
 			&& EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getSupplyProvider()))
 		{
 			if (build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr))
@@ -79,6 +79,13 @@ void Worker::act()
 		auto resourceDepots = AgentHelper::getResourceDepots();
 		for (auto &base : resourceDepots)
 		{
+			if (!base->isGasSaturated())
+			{
+				setMiningBase(base, true);
+				mining = true;
+				return;
+			}
+
 			if (!base->isMineralSaturated())
 			{
 				setMiningBase(base, false);
@@ -93,6 +100,7 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 {	
 	if (EconHelper::haveMoney(building))
 	{
+		EconHelper::addDebt(building.mineralPrice(), building.gasPrice());
 		unsetMiningBase();
 		if (!desiredPosition)
 		{
@@ -103,6 +111,18 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 		}
 
 		auto buildLocation = BWAPI::Broodwar->getBuildLocation(building, *desiredPosition);
+		BWAPI::Broodwar->registerEvent(
+		[this, building](BWAPI::Game*)
+		{
+			EconHelper::subtractDebt(building.mineralPrice(), building.gasPrice());
+		},
+
+		[this](BWAPI::Game*) 
+		{
+			return this->getUnit()->getOrder() == BWAPI::Orders::ConstructingBuilding; 
+		},
+
+		1);
 		return unit->build(building, buildLocation);
 	}
 	return false;

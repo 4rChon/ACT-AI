@@ -10,6 +10,7 @@ private:
 	bool satisfied;
 	bool building;
 	bool reserved;
+	bool requiresGas;
 public:
 	//constructors
 	CreateUnit(BWAPI::UnitType unitType, int unitCount = 1);	

@@ -12,18 +12,23 @@ CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 	
 	this->unitType = unitType;
 	this->unitCount = unitCount;
-	satisfying = false;
-	satisfied = true;	
+	satisfying = false;	
+	satisfied = true;
 	building = false;
 	reserved = false;
+	requiresGas = false;
 
 	debug = false;
 }
 
 void CreateUnit::satisfyRequirements()
 {
-	/*if(unitType.gasPrice() > 0 && EconHelper::getGasIncome() == 0)
-		CreateUnit* createGas = new */
+	if (unitType.gasPrice() > 0 && EconHelper::getGasIncome() == 0)
+	{
+		requiresGas = true;
+		satisfied = false;		
+	}
+
 	for (auto &required : unitType.requiredUnits())
 		if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(required.first))
 			satisfied = false;
@@ -36,6 +41,11 @@ void CreateUnit::satisfyRequirements()
 		printDebugInfo("Attempting to Satisfy Unit - Unit Requirement");
 		SatisfyUnitRequirement* satisfyUnitRequirement = new SatisfyUnitRequirement(unitType);
 		addSubTask(satisfyUnitRequirement);
+		if (requiresGas)
+		{
+			CreateUnit* createGas = new CreateUnit(BWAPI::Broodwar->self()->getRace().getRefinery());
+			addSubTask(createGas);
+		}
 		satisfying = true;
 	}
 }
@@ -76,6 +86,15 @@ void CreateUnit::act()
 	printDebugInfo("Acting");
 	if (unitCount > 0)
 	{
+		if (unitType == BWAPI::Broodwar->self()->getRace().getRefinery())
+			for each (auto &resourceDepot in AgentHelper::getResourceDepots())
+			{
+				if (resourceDepot->addGeyser(*coalition->getAgentSet().begin()))
+				{
+					unitCount--;
+					break;
+				}
+			}
 		if (unitType == BWAPI::UnitTypes::Zerg_Lurker || unitType == BWAPI::UnitTypes::Zerg_Guardian)
 		{
 			if((*coalition->getAgentSet().begin())->morph(unitType))

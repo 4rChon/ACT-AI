@@ -3,15 +3,6 @@
 #include "..\include\TaskHelper.h"
 #include "..\include\CreateUnit.h"
 
-//BWAPI::Broodwar->registerEvent([builder, min, gas, uType](BWAPI::Game*)
-//{
-//	//std::cout << "Releasing " << min << " Minerals and " << gas << " Gas after placing a " << uType.c_str() << "\n";
-//	g_MinReserve -= min;
-//	g_GasReserve -= gas;
-//},
-//[builder](BWAPI::Game*) {return builder->getOrder() == BWAPI::Orders::ConstructingBuilding; },
-//1);
-
 CreateCoalition::CreateCoalition(Composition composition, Task* task)
 {
 	taskName = "CreateCoalition(Composition, Task*)";

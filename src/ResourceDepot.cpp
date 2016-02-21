@@ -11,7 +11,7 @@ ResourceDepot::ResourceDepot()
 	mineralMiners = 0;
 	gasMiners = 0;
 	expandDesire = 1.0;
-	geyserCount = 0;
+	refineries = 0;
 }
 
 ResourceDepot::ResourceDepot(BWAPI::Unit unit)
@@ -23,7 +23,7 @@ ResourceDepot::ResourceDepot(BWAPI::Unit unit)
 	mineralMiners = 0;
 	gasMiners = 0;
 	expandDesire = 1.0;
-	/*baseLocation->getGeysers()*/
+	refineries = 0;
 }
 
 ResourceDepot::~ResourceDepot()
@@ -58,6 +58,11 @@ int ResourceDepot::getGasMiners()
 	return gasMiners;
 }
 
+int ResourceDepot::getRefineries()
+{
+	return refineries;
+}
+
 void ResourceDepot::act()
 {		
 	updateExpandDesire();
@@ -86,8 +91,8 @@ bool ResourceDepot::isMineralSaturated()
 }
 
 bool ResourceDepot::isGasSaturated()
-{
-	return gasMiners >= 3.0 * baseLocation->getGeysers().size();
+{	
+	return gasMiners >= 3.0 * refineries;
 }
 
 void ResourceDepot::addMineralWorker(Worker* worker)
@@ -114,10 +119,16 @@ void ResourceDepot::removeWorker(Worker* worker)
 			mineralMiners--;
 		workers.erase(worker);
 	}
-	
 }
 
-//void ResourceDepot::addGeyser()
-//{
-//	baseLocation()
-//}
+bool ResourceDepot::addGeyser(Agent* worker)
+{
+	for each (auto &geyser in baseLocation->getGeysers())
+		if (!geyser->getType().isRefinery())
+			if (worker->build(BWAPI::Broodwar->self()->getRace().getRefinery(), &geyser->getTilePosition()))
+			{
+				refineries++;
+				return true;
+			}
+	return false;
+}
