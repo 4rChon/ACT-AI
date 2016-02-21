@@ -1,16 +1,29 @@
 #include "..\include\Attack.h"
 #include "..\include\Scout.h"
 #include "..\include\CreateCoalition.h"
+#include "..\include\EconHelper.h"
+#include <string>
 
 Attack::Attack(MapHelper::Zone* target)
 {
-	taskName = "Attack(Zone*)";
+	taskName = "Attack(" + std::to_string(target->getID()) + ")";
 	this->target = target;
+	debug = false;
 	scouting = false;
+	scoutingFinished = false;
 }
 
-// assign an attacking coalition
-void Attack::assign()
+void Attack::createCoalition()
+{
+	Composition c;
+	c.addType(BWAPI::UnitTypes::Protoss_Dragoon, 5);
+	c.addType(BWAPI::UnitTypes::Protoss_Zealot, 5);
+	c.addType(BWAPI::UnitTypes::Protoss_Observer, 1);
+	CreateCoalition *createCoalition = new CreateCoalition(c, this);
+	addSubTask(createCoalition);
+}
+
+void Attack::scout()
 {
 	if (BWAPI::Broodwar->getFrameCount() - target->getLastVisited() > 5)
 	{
@@ -20,39 +33,58 @@ void Attack::assign()
 			addSubTask(scout);
 			scouting = true;
 		}
-		return;
 	}
+	else
+		scoutingFinished = true;
+}
 
-	std::cout << "Attack: Assign\n";
-	Composition c;
-	c.addType(BWAPI::UnitTypes::Terran_Marine, 5);
-	CreateCoalition *createCoalition = new CreateCoalition(c, this);
-	addSubTask(createCoalition);
+// assign an attacking coalition
+void Attack::assign()
+{
+	printDebugInfo("Assign");	
+	createCoalition();
 	assigned = true;
+	printDebugInfo("Assign End");
 }
 
 // attack with coalition
 void Attack::act()
-{
-	std::cout << "Attack: Act\n";
+{	
+	printDebugInfo("Acting");	
+	scout();
+	if (!scoutingFinished)
+		return;
+
+	if (!coalition->isActive())
+		return;
 	coalition->getUnitSet().attack(target->getRegion()->getCenter());
 	acting = true;
+	printDebugInfo("Acting End");
 }
 
 void Attack::update()
-{
+{	
+	printDebugInfo("Update");
+	if (acting && coalition->getAgentSet().size() == 0)
+	{
+		printDebugInfo("Coalition is dead", true);
+		fail();
+	}
+
 	if (complete)
 	{
 		cleanSubTasks();
 		return;
-	}
+	}	
 
 	if (!assigned)
 		assign();
 
-	if (assigned && coalition->isActive())
+	if (!acting && assigned)
 		act();
 
 	if (BWAPI::Broodwar->getFrameCount() - target->getLastVisited() < 5 && target->getEnemyScore() == 0)
 		succeed();
+
+	printDebugInfo("Update End");
 }

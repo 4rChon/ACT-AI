@@ -28,7 +28,9 @@ CreateCoalition::~CreateCoalition()
 // add coalition to open coalitions
 void CreateCoalition::assign()
 {	
+	printDebugInfo("Assign");
 	assigned = true;
+	printDebugInfo("Assign End");
 }
 
 // attempt to activate coalition
@@ -42,7 +44,7 @@ void CreateCoalition::act()
 			continue;
 		if (differenceComposition[unitType] > 0)
 		{
-			std::cout << "I need " << differenceComposition[unitType] << " more " << unitType.c_str() << "\n";
+			//std::cout << "I need " << differenceComposition[unitType] << " more " << unitType.c_str() << "\n";
 			CreateUnit *createUnit = new CreateUnit(unitType, differenceComposition[unitType]);
 			addSubTask(createUnit);
 		}
@@ -53,6 +55,7 @@ void CreateCoalition::act()
 
 void CreateCoalition::update()
 {
+	printDebugInfo("Update");
 	if (complete)
 	{
 		cleanSubTasks();
@@ -72,7 +75,7 @@ void CreateCoalition::update()
 		act();
 	//if(age > x) fail();
 	//TODO: fail when taking too long
-	//std::cout << taskName.c_str() << " : " << taskID << " : Update End\n";
+	printDebugInfo("Update End");
 }
 
 double CreateCoalition::getCost()

@@ -22,6 +22,7 @@ Task::~Task()
 {
 	printDebugInfo("DELETE", true);
 	cleanSubTasks();
+	if(coalition)
 	coalition = nullptr;
 	//TaskHelper::getAllTasks().erase(this);
 	//TaskHelper::removeTask(this);
@@ -112,6 +113,7 @@ void Task::cleanSubTasks()
 
 void Task::updateTaskTree()
 {
+	//printDebugInfo("updating Task tree", true);
 	if (subTasks.size() > 0)
 		for (auto it = subTasks.begin(); it != subTasks.end(); ++it)
 			if (!(*it)->isComplete())
@@ -123,7 +125,7 @@ void Task::succeed()
 {
 	complete = true;
 	profit = 1.0;
-	std::cout << taskID << " : " << taskName << " : Success!\n";
+	printDebugInfo("Success!", true);
 	
 	if(taskName.compare("CreateCoalition(Composition, Task*)") != 0)
 		CoalitionHelper::removeCoalition(coalition);
@@ -133,7 +135,7 @@ void Task::fail()
 {	
 	complete = true;
 	profit = 0.0;
-	std::cout << taskID << " : " << taskName << " : Failure!\n";
+	printDebugInfo("Failure!", true);
 
 	if (taskName.compare("CreateCoalition(Composition, Task*)") != 0)
 		CoalitionHelper::removeCoalition(coalition);

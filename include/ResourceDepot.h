@@ -15,6 +15,7 @@ protected:
 	int mineralMiners;
 	int gasMiners;
 	double expandDesire;
+	int geyserCount;
 public:
 	//constructors and destructors
 	ResourceDepot();

@@ -11,6 +11,7 @@ ResourceDepot::ResourceDepot()
 	mineralMiners = 0;
 	gasMiners = 0;
 	expandDesire = 1.0;
+	geyserCount = 0;
 }
 
 ResourceDepot::ResourceDepot(BWAPI::Unit unit)
@@ -22,6 +23,7 @@ ResourceDepot::ResourceDepot(BWAPI::Unit unit)
 	mineralMiners = 0;
 	gasMiners = 0;
 	expandDesire = 1.0;
+	/*baseLocation->getGeysers()*/
 }
 
 ResourceDepot::~ResourceDepot()
@@ -114,3 +116,8 @@ void ResourceDepot::removeWorker(Worker* worker)
 	}
 	
 }
+
+//void ResourceDepot::addGeyser()
+//{
+//	baseLocation()
+//}

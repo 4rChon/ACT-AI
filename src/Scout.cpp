@@ -1,20 +1,27 @@
 #include "..\include\Scout.h"
 #include "..\include\CreateCoalition.h"
+#include <string>
 
 Scout::Scout(MapHelper::Zone* target)
 {
-	taskName = "Scout()";
+	taskName = "Scout(" + std::to_string(target->getID()) + ")";
 	this->target = target;
 	debug = false;
+}
+
+void Scout::createCoalition()
+{
+	Composition c;
+	c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 1);
+	//c.addType(BWAPI::UnitTypes::Protoss_Probe, 1);
+	CreateCoalition *createCoalition = new CreateCoalition(c, this);
+	addSubTask(createCoalition);
 }
 
 void Scout::assign()
 {
 	printDebugInfo("Assign");
-	Composition c;
-	c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 1);
-	CreateCoalition *createCoalition = new CreateCoalition(c, this);
-	addSubTask(createCoalition);
+	createCoalition();
 	assigned = true;
 	printDebugInfo("Assign End");
 }

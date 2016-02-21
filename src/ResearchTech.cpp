@@ -74,7 +74,7 @@ void ResearchTech::act()
 
 void ResearchTech::update() //x2 redundant in create unit
 {
-	//printDebugInfo("Update");
+	printDebugInfo("Update");
 	if (complete)
 	{
 		cleanSubTasks();
@@ -89,5 +89,5 @@ void ResearchTech::update() //x2 redundant in create unit
 
 	if (coalition->isActive())
 		act();
-	//printDebugInfo("Update End");
+	printDebugInfo("Update End");
 }

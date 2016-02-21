@@ -23,12 +23,12 @@ void SatisfyUnitRequirement::act()
 	printDebugInfo("Acting");
 	for (auto &requirement : unitType.requiredUnits())
 	{
-		std::cout << "Required unit: " << requirement.first.c_str() << "\n";
+		printDebugInfo("Require : " + requirement.first.getName());
 		if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(requirement.first, requirement.second)
 			&& BWAPI::Broodwar->self()->incompleteUnitCount(requirement.first) < requirement.second)
 		{
 			CreateUnit* createUnit = new CreateUnit(requirement.first, requirement.second - AgentHelper::getTypeCount(requirement.first));
-			std::cout << "Creating Requirement: " << requirement.first.c_str() << " : " << requirement.second << "\n";
+			printDebugInfo(" Creating : " + requirement.first.getName() + " : " + std::to_string(requirement.second));
 			addSubTask(createUnit);
 		}
 	}

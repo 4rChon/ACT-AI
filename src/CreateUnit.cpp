@@ -4,10 +4,11 @@
 #include "..\include\SatisfyUnitRequirement.h"
 #include "..\include\TaskHelper.h"
 #include "..\include\CoalitionHelper.h"
+#include <string>
 
 CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 {
-	taskName = "CreateUnit(" + unitType.getName() + ")"; //
+	taskName = "CreateUnit(" + unitType.getName() + " : " + std::to_string(unitCount) + ")";
 	
 	this->unitType = unitType;
 	this->unitCount = unitCount;
@@ -21,6 +22,8 @@ CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 
 void CreateUnit::satisfyRequirements()
 {
+	/*if(unitType.gasPrice() > 0 && EconHelper::getGasIncome() == 0)
+		CreateUnit* createGas = new */
 	for (auto &required : unitType.requiredUnits())
 		if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(required.first))
 			satisfied = false;

@@ -8,6 +8,7 @@ private:
 	MapHelper::Zone* target;
 public:
 	Scout(MapHelper::Zone* target);
+	void createCoalition();
 	void assign();
 	void act();
 	void update();

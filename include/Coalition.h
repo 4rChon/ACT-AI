@@ -22,6 +22,18 @@ private:
 	int coalitionID;
 	double cost;
 	double profit;
+	struct Attributes
+	{
+		double groundDPS;
+		double airDPS;
+		int totalHealth;
+		double avgGroundRange;
+		double avgAirRange;
+		double maxGroundRange;
+		double maxAirRange;
+		double avgSpeed;
+		bool detection;
+	} attributes;
 public:
 	//constructors and destructors;
 	Coalition();	
@@ -29,10 +41,7 @@ public:
 	
 	~Coalition();
 
-	//setters
-	void setActive(bool active);
-
-	//getters
+	//getters	
 	int getAge() const;
 	int getID() const;
 	double getCost();
@@ -40,16 +49,15 @@ public:
 	bool isActive() const;
 	Composition getCurrentComp() const;
 	Composition getTargetComp() const;
+	BWAPI::Unitset getUnitSet() const;
+	Agentset getAgentSet() const;
+	Attributes &getAttributes();
 	
 	//-
+	void initAttributes();
+	void outAttributes();
 	bool addAgent(Agent* agent);
 	void addUnit(BWAPI::Unit unit);	
 	void removeAgent(Agent* agent);
-	void removeUnit(BWAPI::Unit unit);	
-
-	////getters
-	BWAPI::Unitset getUnitSet() const;
-	Agentset getAgentSet() const;
-	//Composition getCurrentComp() const;
-	//Composition getTargetComp() const;
+	void removeUnit(BWAPI::Unit unit);		
 };

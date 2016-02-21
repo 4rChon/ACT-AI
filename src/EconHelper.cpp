@@ -14,6 +14,8 @@ namespace EconHelper
 		static int lastCheckGasFrame;
 		static int lastCheckMinerals;
 		static int lastCheckGas;
+
+		static double unitMultiplier;
 		//measure current resource difference between two time frames and get income data from that
 	}
 
@@ -27,6 +29,7 @@ namespace EconHelper
 		gasDebt = 0;
 		mineralIncome = 0.0;
 		gasIncome = 0.0;
+		unitMultiplier = 0.0;
 	}
 
 	int haveMoney(BWAPI::UnitType unitType)
@@ -97,5 +100,10 @@ namespace EconHelper
 			lastCheckGasFrame = BWAPI::Broodwar->getFrameCount();
 		}
 		return gasIncome;
+	}
+
+	double getUnitMultiplier()
+	{
+		return unitMultiplier;
 	}
 }

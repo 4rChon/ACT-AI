@@ -16,13 +16,18 @@ Expand::~Expand()
 	builder = nullptr;
 }
 
+void Expand::createCoalition()
+{
+	Composition c;
+	c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 1);
+	CreateCoalition *createCoalition = new CreateCoalition(c, this);
+	addSubTask(createCoalition);
+}
+
 void Expand::assign()
 {
 	printDebugInfo("Assign");
-	Composition c;
-	c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 1);	
-	CreateCoalition *createCoalition = new CreateCoalition(c, this);
-	addSubTask(createCoalition);
+	createCoalition();
 	assigned = true;
 	printDebugInfo("Assign End");
 }

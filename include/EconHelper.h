@@ -16,4 +16,5 @@ namespace EconHelper
 	int getGas();	
 	double getMineralIncome();
 	double getGasIncome();
+	double getUnitMultiplier();
 }
