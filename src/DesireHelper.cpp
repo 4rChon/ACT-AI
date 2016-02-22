@@ -73,7 +73,6 @@ namespace DesireHelper
 	{
 		if (BWAPI::Broodwar->self()->supplyTotal() >= 200)
 		{
-			std::cout << "Full supply!\n";
 			supplyDesire = 0.0;
 			return;
 		}
@@ -81,9 +80,7 @@ namespace DesireHelper
 		int unitSupply = unitType.supplyProvided() - unitType.supplyRequired();
 		if (justDied)
 			unitSupply *= -1;
-		supplyDesire -= (double)unitSupply / BWAPI::Broodwar->self()->getRace().getCenter().supplyProvided();
-		std::cout << "Supply Desire: " << supplyDesire << "\n";
-		std::cout << "Unit Supply: " << unitSupply << "\n";		
+		supplyDesire -= (double)unitSupply / BWAPI::Broodwar->self()->getRace().getCenter().supplyProvided();		
 	}
 
 	const std::unordered_map<BWAPI::UnitType, double>& getUnitDesireMap()

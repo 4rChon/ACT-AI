@@ -107,13 +107,11 @@ void Task::cleanSubTasks()
 		for (auto it = subTasks.begin(); it != subTasks.end(); ++it)
 			if((*it)->getName().compare("") != 0)
 				TaskHelper::removeTask(*it);
-
 	subTasks.clear();
 }
 
 void Task::updateTaskTree()
-{
-	//printDebugInfo("updating Task tree", true);
+{	
 	if (subTasks.size() > 0)
 		for (auto it = subTasks.begin(); it != subTasks.end(); ++it)
 			if (!(*it)->isComplete())

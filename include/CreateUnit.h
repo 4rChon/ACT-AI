@@ -11,6 +11,7 @@ private:
 	bool building;
 	bool reserved;
 	bool requiresGas;
+	int successfulOrders;
 public:
 	//constructors
 	CreateUnit(BWAPI::UnitType unitType, int unitCount = 1);	
@@ -19,6 +20,7 @@ public:
 	void assign();
 	void satisfyRequirements();
 	void createCoalition();
+	void decrementUnitCount();
 	void act();
 	void update();
 };

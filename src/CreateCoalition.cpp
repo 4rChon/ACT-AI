@@ -5,7 +5,7 @@
 
 CreateCoalition::CreateCoalition(Composition composition, Task* task)
 {
-	taskName = "CreateCoalition(Composition, Task*)";
+	taskName = "CreateCoalition(Composition, " + task->getName() + ")";
 	taskCoalition = CoalitionHelper::addCoalition(composition, task);	
 	task->setCoalition(taskCoalition);
 	cost = composition.getCost();

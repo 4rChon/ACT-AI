@@ -25,10 +25,10 @@ public:
 	ResourceDepot* getMiningBase() const;
 
 	//-
-	virtual void act();
+	virtual void act();	
 
 	//commands
-	bool build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPosition);
+	bool build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPosition = nullptr);
 	bool expand();
 	
 	//helpers

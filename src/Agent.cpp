@@ -3,6 +3,7 @@
 #include "..\include\CoalitionHelper.h"
 #include "..\include\Coalition.h"
 #include "..\include\Task.h"
+#include "..\include\CreateUnit.h"
 
 Agent::Agent()
 {
@@ -37,8 +38,8 @@ Agent::Agent(BWAPI::Unit unit)
 
 Agent::~Agent()
 {
-	std::cout << "~Agent\n";
-	AgentHelper::removeAgent(this);	
+	//std::cout << "~Agent\n";
+	/*AgentHelper::removeAgent(this);*/	
 }
 
 void Agent::initialiseCommandMap()
@@ -92,9 +93,19 @@ int Agent::getCoalitionID() const
 	return coalitionID;
 }
 
+Coalition* Agent::getCoalition() const
+{
+	return coalition;
+}
+
 int Agent::getTaskID() const
 {
 	return taskID;
+}
+
+Task* Agent::getTask() const
+{
+	return task;
 }
 
 BWAPI::Unit Agent::getUnit() const
@@ -119,6 +130,8 @@ bool Agent::isFree() const
 
 void Agent::act()
 {
+	if (unit->getType().canProduce())
+		train(*unit->getType().buildsWhat().begin());
 	//temp contents
 }
 
@@ -159,6 +172,7 @@ bool Agent::gather(BWAPI::Unit target)
 
 bool Agent::build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPosition)
 {
+	std::cout << "Agent Build\n";
 	return false;
 }
 

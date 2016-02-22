@@ -64,6 +64,11 @@ void CreateUnit::createCoalition()
 	subTasks.insert(createCoalition);
 }
 
+void CreateUnit::decrementUnitCount()
+{
+	unitCount--;
+}
+
 // assign a producer coalition
 void CreateUnit::assign()
 {
@@ -87,65 +92,81 @@ void CreateUnit::act()
 	if (unitCount > 0)
 	{
 		if (unitType == BWAPI::Broodwar->self()->getRace().getRefinery())
-			for each (auto &resourceDepot in AgentHelper::getResourceDepots())
+		{
+			for each (auto &agent in coalition->getAgentSet())
 			{
-				if (resourceDepot->addGeyser(*coalition->getAgentSet().begin()))
-				{
-					unitCount--;
-					break;
-				}
+				for each (auto &resourceDepot in AgentHelper::getResourceDepots())
+					if (resourceDepot->addGeyser((Worker*)agent))
+						return;
 			}
+		}
 		if (unitType == BWAPI::UnitTypes::Zerg_Lurker || unitType == BWAPI::UnitTypes::Zerg_Guardian)
 		{
-			if((*coalition->getAgentSet().begin())->morph(unitType))
-				unitCount--;
+			for each (auto &agent in coalition->getAgentSet())
+				if (agent->morph(unitType))
+					unitCount--;
+			return;
 		}
 		if (unitType == BWAPI::UnitTypes::Protoss_Archon)
 		{
-			auto unit = (*++coalition->getUnitSet().begin());
-			if((*coalition->getAgentSet().begin())->useAbility(BWAPI::TechTypes::Archon_Warp, unit))
-				unitCount--;
+			if(coalition->getAgentSet().size()%2 == 0)
+				for (auto agent = coalition->getAgentSet().begin(); agent != coalition->getAgentSet().end(); ++agent)
+				{
+					if ((*agent)->useAbility(BWAPI::TechTypes::Archon_Warp, (*++agent)->getUnit()))
+						unitCount--;
+				}
+			return;
 		}
 
 		if (unitType == BWAPI::UnitTypes::Protoss_Dark_Archon)
 		{
-			auto unit = (*++coalition->getUnitSet().begin());
-			if ((*coalition->getAgentSet().begin())->useAbility(BWAPI::TechTypes::Dark_Archon_Meld, unit))
-				unitCount--;
+			if (coalition->getAgentSet().size() % 2 == 0)
+				for (auto &agent = coalition->getAgentSet().begin(); agent != coalition->getAgentSet().end(); ++agent)
+				{
+					if ((*agent)->useAbility(BWAPI::TechTypes::Dark_Archon_Meld, (*++agent)->getUnit()))
+						unitCount--;
+				}
+			return;
 		}
 
 		if (unitType.isAddon())
 		{
-			for (auto &agent : coalition->getAgentSet())
-			{					
-				if (agent->buildAddon(unitType))
+			for each (auto &agent in coalition->getAgentSet())
+			{
+				if(agent->buildAddon(unitType))
 					unitCount--;
 			}
+			return;
 		}
 
 		if (unitType.isBuilding())
 		{
-			
-			for (auto &agent : coalition->getAgentSet())
+			for each (auto &agent in coalition->getAgentSet())
 			{
-				if (unitType.getRace() == BWAPI::Races::Zerg 
-					&& (unitType.isResourceDepot() && unitType != BWAPI::UnitTypes::Zerg_Hatchery) 
-					|| unitType == BWAPI::UnitTypes::Zerg_Greater_Spire)
+				if (!agent->getUnit()->isConstructing())
 				{
-					if (agent->morph(unitType))
-						unitCount--;
+					if (unitType.getRace() == BWAPI::Races::Zerg
+						&& (unitType.isResourceDepot() && unitType != BWAPI::UnitTypes::Zerg_Hatchery)
+						|| unitType == BWAPI::UnitTypes::Zerg_Greater_Spire)
+					{
+						if (agent->morph(unitType))
+							unitCount--;
+					}
+					else
+					{
+						if(agent->build(unitType))
+							std::cout << "UnitCount for " << unitType << " : " << unitCount;
+					}
 				}
-				else if (agent->build(unitType, nullptr))
-					unitCount--;
 			}
+			return;
 		}
 		else
 		{
-			for (auto &agent : coalition->getAgentSet())
-			{
+			for each (auto &agent in coalition->getAgentSet())
 				if (agent->train(unitType))
 					unitCount--;
-			}
+			return;
 		}
 	}
 	else

@@ -15,7 +15,7 @@ protected:
 	int mineralMiners;
 	int gasMiners;
 	double expandDesire;
-	int refineries;
+	int refineryCount;
 public:
 	//constructors and destructors
 	ResourceDepot();
@@ -29,7 +29,8 @@ public:
 	int getMineralMiners();
 	int getGasMiners();
 
-	int getRefineries();
+	int getRefineryCount();
+	void updateRefineryCount();
 
 	//-
 	virtual void act();
@@ -42,5 +43,5 @@ public:
 	void addMineralWorker(Worker* worker);
 	void addGasWorker(Worker* worker);
 	void removeWorker(Worker* worker);
-	bool addGeyser(Agent* worker);
+	bool addGeyser(Worker * worker);
 };

@@ -36,7 +36,7 @@ void Expand::act()
 {
 	printDebugInfo("Acting");
 	acting = true;
-	complete = builder->expand();
+	builder->expand();
 	printDebugInfo("Acting End");
 }
 

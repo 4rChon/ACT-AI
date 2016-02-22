@@ -3,6 +3,7 @@
 #include "..\include\TaskHelper.h"
 #include "..\include\Task.h"
 #include "..\include\Expand.h"
+#include "..\include\CreateUnit.h"
 
 ResourceDepot::ResourceDepot()
 {	
@@ -11,7 +12,7 @@ ResourceDepot::ResourceDepot()
 	mineralMiners = 0;
 	gasMiners = 0;
 	expandDesire = 1.0;
-	refineries = 0;
+	refineryCount = 0;
 }
 
 ResourceDepot::ResourceDepot(BWAPI::Unit unit)
@@ -23,7 +24,7 @@ ResourceDepot::ResourceDepot(BWAPI::Unit unit)
 	mineralMiners = 0;
 	gasMiners = 0;
 	expandDesire = 1.0;
-	refineries = 0;
+	refineryCount = 0;
 }
 
 ResourceDepot::~ResourceDepot()
@@ -58,9 +59,19 @@ int ResourceDepot::getGasMiners()
 	return gasMiners;
 }
 
-int ResourceDepot::getRefineries()
+int ResourceDepot::getRefineryCount()
 {
-	return refineries;
+	return refineryCount;
+}
+
+void ResourceDepot::updateRefineryCount()
+{
+	refineryCount = 0;
+	for each (auto &geyser in baseLocation->getGeysers())
+	{
+		if (geyser->getType().isRefinery())
+			refineryCount++;
+	}
 }
 
 void ResourceDepot::act()
@@ -92,7 +103,7 @@ bool ResourceDepot::isMineralSaturated()
 
 bool ResourceDepot::isGasSaturated()
 {	
-	return gasMiners >= 3.0 * refineries;
+	return gasMiners >= 3.0 * refineryCount;
 }
 
 void ResourceDepot::addMineralWorker(Worker* worker)
@@ -121,14 +132,38 @@ void ResourceDepot::removeWorker(Worker* worker)
 	}
 }
 
-bool ResourceDepot::addGeyser(Agent* worker)
+bool ResourceDepot::addGeyser(Worker* worker)
 {
 	for each (auto &geyser in baseLocation->getGeysers())
+	{
 		if (!geyser->getType().isRefinery())
+		{
 			if (worker->build(BWAPI::Broodwar->self()->getRace().getRefinery(), &geyser->getTilePosition()))
 			{
-				refineries++;
+				BWAPI::Broodwar->registerEvent(
+					[this, worker](BWAPI::Game*)
+				{
+					if (BWAPI::Broodwar->getLastError() != BWAPI::Errors::Insufficient_Gas
+						&& BWAPI::Broodwar->getLastError() != BWAPI::Errors::Insufficient_Minerals
+						&& BWAPI::Broodwar->getLastError() != BWAPI::Errors::Unbuildable_Location
+						&& this->getUnit()->exists()
+						&& worker->getUnit()->exists())
+					{
+						this->updateRefineryCount();
+					}
+					else
+					{
+						BWAPI::Broodwar->setLastError();
+					}
+				},
+					[worker](BWAPI::Game*)
+				{
+					return !worker->getUnit()->exists() || worker->getUnit()->getOrder() == BWAPI::Orders::PlayerGuard;
+				},
+					1);
 				return true;
 			}
+		}
+	}
 	return false;
 }

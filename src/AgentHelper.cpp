@@ -1,5 +1,6 @@
 #include "..\include\AgentHelper.h"
 #include "..\include\SCV.h"
+#include "..\include\Coalition.h"
 
 namespace AgentHelper
 {
@@ -122,10 +123,14 @@ namespace AgentHelper
 			std::cout << "\tAgent not found\n";
 		else
 		{
-			agent->unbind();
+			if (agent->getCoalitionID() != -1)
+				agent->getCoalition()->removeAgent(agent);
+			else
+				agent->unbind();
 			agentSet.erase(agent);
 			if (resourceDepots.count((ResourceDepot*)agent))
 				resourceDepots.erase((ResourceDepot*)agent);
+			delete agent;
 		}
 		resetLastServiced();
 	}

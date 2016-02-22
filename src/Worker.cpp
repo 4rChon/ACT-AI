@@ -5,6 +5,7 @@
 #include "..\include\DesireHelper.h"
 #include "..\include\UtilHelper.h"
 #include "..\include\Task.h"
+#include "..\include\CreateUnit.h"
 #include "BWAPI.h"
 
 Worker::Worker()
@@ -24,7 +25,7 @@ Worker::Worker(BWAPI::Unit unit)
 
 Worker::~Worker()
 {
-	std::cout << "\t~Worker\n";
+	/*std::cout << "\t~Worker\n";*/
 	unsetMiningBase();
 }
 
@@ -65,11 +66,13 @@ void Worker::act()
 	if (unit->isIdle())
 	{
 		if (BWAPI::Broodwar->self()->getRace() != BWAPI::Races::Zerg 
-			&& DesireHelper::getSupplyDesire() > 0.4
+			&& DesireHelper::getSupplyDesire() >= 0.6
 			&& EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getSupplyProvider()))
 		{
-			if (build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr))
+			//int amount = DesireHelper::getSupplyDesire() / 0.6;
+			if (build(BWAPI::Broodwar->self()->getRace().getSupplyProvider()))
 			{
+				//for (int i = 0; i < amount; i++)
 				DesireHelper::updateSupplyDesire(BWAPI::Broodwar->self()->getRace().getSupplyProvider());
 				return;
 			}
@@ -100,7 +103,7 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 {	
 	if (EconHelper::haveMoney(building))
 	{
-		EconHelper::addDebt(building.mineralPrice(), building.gasPrice());
+		std::cout << "Building : " << building.getName().c_str() << "\n";		
 		unsetMiningBase();
 		if (!desiredPosition)
 		{
@@ -109,21 +112,36 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 			else
 				desiredPosition = &unit->getTilePosition();
 		}
-
+		
 		auto buildLocation = BWAPI::Broodwar->getBuildLocation(building, *desiredPosition);
+		if(!unit->build(building, buildLocation))
+			return false;
+		EconHelper::addDebt(building.mineralPrice(), building.gasPrice());
 		BWAPI::Broodwar->registerEvent(
 		[this, building](BWAPI::Game*)
 		{
 			EconHelper::subtractDebt(building.mineralPrice(), building.gasPrice());
+			if (BWAPI::Broodwar->getLastError() == BWAPI::Errors::Insufficient_Gas
+				|| BWAPI::Broodwar->getLastError() == BWAPI::Errors::Insufficient_Minerals
+				|| BWAPI::Broodwar->getLastError() == BWAPI::Errors::Unbuildable_Location
+				|| !this->getUnit()->exists())
+			{
+				BWAPI::Broodwar->setLastError();
+				if (building == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
+					DesireHelper::updateSupplyDesire(building, true);
+			}				
+			else if (task)
+			{
+				std::cout << task->getName() << " Complete : decrementing unitCount\n";				
+				((CreateUnit*)task)->decrementUnitCount();
+			}
 		},
-
-		[this](BWAPI::Game*) 
+		[this, building, desiredPosition](BWAPI::Game*)
 		{
-			return this->getUnit()->getOrder() == BWAPI::Orders::ConstructingBuilding; 
+			return !this->getUnit()->exists() || !this->getUnit()->isConstructing();
 		},
-
 		1);
-		return unit->build(building, buildLocation);
+		return unit->isConstructing();
 	}
 	return false;
 }

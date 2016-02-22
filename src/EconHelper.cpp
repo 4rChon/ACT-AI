@@ -49,7 +49,7 @@ namespace EconHelper
 
 	int haveMoney(int minerals, int gas)
 	{
-		return getMinerals() - mineralDebt >= minerals && getGas() - gasDebt >= gas;
+		return getMinerals() >= minerals && getGas() >= gas;
 	}
 
 	int haveSupply(BWAPI::UnitType unitType)
@@ -59,12 +59,12 @@ namespace EconHelper
 
 	int getMinerals()
 	{
-		return BWAPI::Broodwar->self()->minerals();
+		return BWAPI::Broodwar->self()->minerals() - mineralDebt;
 	}
 
 	int getGas()
 	{
-		return BWAPI::Broodwar->self()->gas();
+		return BWAPI::Broodwar->self()->gas() - gasDebt;
 	}
 
 	void addDebt(int minerals, int gas)

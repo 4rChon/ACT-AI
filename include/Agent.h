@@ -4,6 +4,7 @@
 #include <unordered_map>
 
 class Task;
+class CreateUnit;
 class Coalition;
 
 typedef std::unordered_map<BWAPI::UnitCommandType, double> CommandMap;
@@ -41,7 +42,9 @@ public:
 	//getters
 	int getID() const;
 	int getCoalitionID() const;
+	Coalition* getCoalition() const;
 	int getTaskID() const;
+	Task * getTask() const;
 	BWAPI::Unit getUnit() const;
 	double getPrice() const;
 	bool isMovingToBuild() const;
@@ -56,7 +59,7 @@ public:
 	virtual bool attack(BWAPI::PositionOrUnit target);
 	virtual bool expand();
 	virtual bool gather(BWAPI::Unit target);
-	virtual bool build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPosition);
+	virtual bool build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPosition = nullptr);
 	virtual bool buildAddon(BWAPI::UnitType addon);
 	virtual bool train(BWAPI::UnitType unitType);
 	virtual bool morph(BWAPI::UnitType unitType);

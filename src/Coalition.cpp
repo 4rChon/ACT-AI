@@ -71,10 +71,7 @@ Agentset Coalition::getAgentSet() const
 double Coalition::getCost()
 {
 	if (!active)
-	//{
 		cost += (BWAPI::Broodwar->getFrameCount() - creationFrame);
-		//creationFrame = BWAPI::Broodwar->getFrameCount();
-	//}
 	return 1 - (1 / ((this->cost + 500) / 500)); //convert to sigma function instead : 1/(1 + e^-x)
 }
 
