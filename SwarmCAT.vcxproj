@@ -1,0 +1,174 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="14.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Source\include\Agent.h" />
+    <ClInclude Include="Source\include\AgentHelper.h" />
+    <ClInclude Include="Source\include\Attack.h" />
+    <ClInclude Include="Source\include\Coalition.h" />
+    <ClInclude Include="Source\include\CoalitionHelper.h" />
+    <ClInclude Include="Source\include\Composition.h" />
+    <ClInclude Include="Source\include\CreateCoalition.h" />
+    <ClInclude Include="Source\include\CreateUnit.h" />
+    <ClInclude Include="Source\include\DesireHelper.h" />
+    <ClInclude Include="Source\include\EconHelper.h" />
+    <ClInclude Include="Source\include\Expand.h" />
+    <ClInclude Include="Source\include\MapHelper.h" />
+    <ClInclude Include="Source\include\ResearchTech.h" />
+    <ClInclude Include="Source\include\ResourceDepot.h" />
+    <ClInclude Include="Source\include\SatisfyTechRequirement.h" />
+    <ClInclude Include="Source\include\SatisfyUnitRequirement.h" />
+    <ClInclude Include="Source\include\Scout.h" />
+    <ClInclude Include="Source\include\SCV.h" />
+    <ClInclude Include="Source\include\SwarmCAT.h" />
+    <ClInclude Include="Source\include\Task.h" />
+    <ClInclude Include="Source\include\TaskHelper.h" />
+    <ClInclude Include="Source\include\UtilHelper.h" />
+    <ClInclude Include="Source\include\Worker.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\src\Agent.cpp" />
+    <ClCompile Include="Source\src\AgentHelper.cpp" />
+    <ClCompile Include="Source\src\Attack.cpp" />
+    <ClCompile Include="Source\src\Coalition.cpp" />
+    <ClCompile Include="Source\src\CoalitionHelper.cpp" />
+    <ClCompile Include="Source\src\Composition.cpp" />
+    <ClCompile Include="Source\src\CreateCoalition.cpp" />
+    <ClCompile Include="Source\src\CreateUnit.cpp" />
+    <ClCompile Include="Source\src\DesireHelper.cpp" />
+    <ClCompile Include="Source\src\Dll.cpp" />
+    <ClCompile Include="Source\src\EconHelper.cpp" />
+    <ClCompile Include="Source\src\Expand.cpp" />
+    <ClCompile Include="Source\src\MapHelper.cpp" />
+    <ClCompile Include="Source\src\ResearchTech.cpp" />
+    <ClCompile Include="Source\src\ResourceDepot.cpp" />
+    <ClCompile Include="Source\src\SatisfyTechRequirement.cpp" />
+    <ClCompile Include="Source\src\SatisfyUnitRequirement.cpp" />
+    <ClCompile Include="Source\src\Scout.cpp" />
+    <ClCompile Include="Source\src\SCV.cpp" />
+    <ClCompile Include="Source\src\SwarmCAT.cpp" />
+    <ClCompile Include="Source\src\Task.cpp" />
+    <ClCompile Include="Source\src\TaskHelper.cpp" />
+    <ClCompile Include="Source\src\Worker.cpp" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{936DE1D4-76CC-40F5-9586-B39F835B1E0B}</ProjectGuid>
+    <RootNamespace>SwarmCAT</RootNamespace>
+    <WindowsTargetPlatformVersion>8.1</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v120</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v140</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>MultiByte</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>D:\Games\StarCraft\BWAPI\SwarmCAT\Source\include;D:\Games\StarCraft\BWAPI\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>D:\Games\StarCraft\BWAPI\SwarmCAT\Source\include;D:\Games\StarCraft\BWAPI\include;$(IncludePath)</IncludePath>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <AdditionalDependencies>../lib/BWAPI.lib;../lib/BWTA.lib;../lib/libboost_filesystem-vc120-mt-1_56.lib;../lib/libboost_system-vc120-mt-1_56.lib;../lib/libboost_thread-vc120-mt-1_56.lib;../lib/libCGAL-vc120-mt-4.4.lib;../lib/libgmp-10.lib;../lib/libmpfr-4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>Disabled</Optimization>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalDependencies>../lib/BWAPI.lib;../lib/BWTA.lib;../lib/libboost_filesystem-vc120-mt-1_56.lib;../lib/libboost_system-vc120-mt-1_56.lib;../lib/libboost_thread-vc120-mt-1_56.lib;../lib/libCGAL-vc120-mt-4.4.lib;../lib/libgmp-10.lib;../lib/libmpfr-4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <Optimization>MaxSpeed</Optimization>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+    </ClCompile>
+    <Link>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

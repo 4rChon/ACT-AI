@@ -1,6 +1,6 @@
 #include "BWTA.h"
 #include "BWAPI.h"
-#include "..\include\MapHelper.h"
+#include "MapHelper.h"
 
 namespace MapHelper
 {	

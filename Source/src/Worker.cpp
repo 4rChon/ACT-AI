@@ -1,12 +1,12 @@
-#include "..\include\Worker.h"
-#include "..\include\ResourceDepot.h"
-#include "..\include\AgentHelper.h"
-#include "..\include\EconHelper.h"
-#include "..\include\DesireHelper.h"
-#include "..\include\UtilHelper.h"
-#include "..\include\Task.h"
-#include "..\include\CreateUnit.h"
-#include "BWAPI.h"
+#include "Worker.h"
+#include "ResourceDepot.h"
+#include "AgentHelper.h"
+#include "EconHelper.h"
+#include "DesireHelper.h"
+#include "UtilHelper.h"
+#include "Task.h"
+#include "CreateUnit.h"
+#include <BWAPI.h>
 
 Worker::Worker()
 {

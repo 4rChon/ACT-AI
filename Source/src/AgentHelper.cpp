@@ -1,6 +1,6 @@
-#include "..\include\AgentHelper.h"
-#include "..\include\SCV.h"
-#include "..\include\Coalition.h"
+#include "AgentHelper.h"
+#include "SCV.h"
+#include "Coalition.h"
 
 namespace AgentHelper
 {
@@ -138,6 +138,6 @@ namespace AgentHelper
 	Agentset::iterator removeAgent(Agentset::iterator agent)
 	{
 		(*agent)->unbind();
-		auto nextAgent = agentSet.erase(agent);
+		return agentSet.erase(agent);
 	}
 }

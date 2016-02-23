@@ -1,0 +1,28 @@
+﻿  Agent.cpp
+  AgentHelper.cpp
+  Attack.cpp
+  Coalition.cpp
+  CoalitionHelper.cpp
+  Composition.cpp
+  CreateCoalition.cpp
+  CreateUnit.cpp
+  DesireHelper.cpp
+  Dll.cpp
+  EconHelper.cpp
+  Expand.cpp
+  MapHelper.cpp
+  ResearchTech.cpp
+  ResourceDepot.cpp
+  SatisfyTechRequirement.cpp
+  SatisfyUnitRequirement.cpp
+  Scout.cpp
+  SCV.cpp
+  SwarmCAT.cpp
+  Compiling...
+  Task.cpp
+  TaskHelper.cpp
+  Worker.cpp
+     Creating library D:\Games\StarCraft\BWAPI\SwarmCAT\Release\SwarmCAT.lib and object D:\Games\StarCraft\BWAPI\SwarmCAT\Release\SwarmCAT.exp
+  Generating code
+  Finished generating code
+  SwarmCAT.vcxproj -> D:\Games\StarCraft\BWAPI\SwarmCAT\Release\SwarmCAT.dll

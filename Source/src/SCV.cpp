@@ -1,7 +1,7 @@
-#include "..\include\SCV.h"
-#include "..\include\AgentHelper.h"
-#include "..\include\EconHelper.h"
-#include "..\include\DesireHelper.h"
+#include "SCV.h"
+#include "AgentHelper.h"
+#include "EconHelper.h"
+#include "DesireHelper.h"
 
 SCV::SCV(BWAPI::Unit unit)
 {

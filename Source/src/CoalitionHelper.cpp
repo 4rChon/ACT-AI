@@ -1,5 +1,5 @@
 #pragma once
-#include "..\include\CoalitionHelper.h"
+#include "CoalitionHelper.h"
 
 namespace CoalitionHelper
 {

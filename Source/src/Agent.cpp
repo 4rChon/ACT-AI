@@ -1,9 +1,9 @@
-#include "..\include\Agent.h"
-#include "..\include\EconHelper.h"
-#include "..\include\CoalitionHelper.h"
-#include "..\include\Coalition.h"
-#include "..\include\Task.h"
-#include "..\include\CreateUnit.h"
+#include "Agent.h"
+#include "EconHelper.h"
+#include "CoalitionHelper.h"
+#include "Coalition.h"
+#include "Task.h"
+#include "CreateUnit.h"
 
 Agent::Agent()
 {

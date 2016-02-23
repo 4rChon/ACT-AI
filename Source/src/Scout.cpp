@@ -1,5 +1,5 @@
-#include "..\include\Scout.h"
-#include "..\include\CreateCoalition.h"
+#include "Scout.h"
+#include "CreateCoalition.h"
 #include <string>
 
 Scout::Scout(MapHelper::Zone* target)

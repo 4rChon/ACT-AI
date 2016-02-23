@@ -64,4 +64,7 @@
 *.suo
 *.ncb
 *.suo
+*.opendb
+*.tlog
+Debug
 packages

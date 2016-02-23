@@ -1,9 +1,9 @@
-#include "..\include\CreateUnit.h"
-#include "..\include\CreateCoalition.h"
-#include "..\include\EconHelper.h"
-#include "..\include\SatisfyUnitRequirement.h"
-#include "..\include\TaskHelper.h"
-#include "..\include\CoalitionHelper.h"
+#include "CreateUnit.h"
+#include "CreateCoalition.h"
+#include "EconHelper.h"
+#include "SatisfyUnitRequirement.h"
+#include "TaskHelper.h"
+#include "CoalitionHelper.h"
 #include <string>
 
 CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)

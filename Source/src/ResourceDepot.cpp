@@ -1,9 +1,9 @@
-#include "..\include\ResourceDepot.h"
-#include "..\include\EconHelper.h"
-#include "..\include\TaskHelper.h"
-#include "..\include\Task.h"
-#include "..\include\Expand.h"
-#include "..\include\CreateUnit.h"
+#include "ResourceDepot.h"
+#include "EconHelper.h"
+#include "TaskHelper.h"
+#include "Task.h"
+#include "Expand.h"
+#include "CreateUnit.h"
 
 ResourceDepot::ResourceDepot()
 {	

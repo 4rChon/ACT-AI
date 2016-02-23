@@ -1,9 +1,9 @@
-#include "..\include\ResearchTech.h"
-#include "..\include\SatisfyTechRequirement.h"
-#include "..\include\EconHelper.h"
-#include "..\include\CreateCoalition.h"
-#include "..\include\TaskHelper.h"
-#include "..\include\CoalitionHelper.h"
+#include "ResearchTech.h"
+#include "SatisfyTechRequirement.h"
+#include "EconHelper.h"
+#include "CreateCoalition.h"
+#include "TaskHelper.h"
+#include "CoalitionHelper.h"
 
 ResearchTech::ResearchTech(BWAPI::TechType techType)
 {

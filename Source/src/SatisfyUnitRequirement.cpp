@@ -1,8 +1,8 @@
-#include "..\include\SatisfyUnitRequirement.h"
-#include "..\include\CreateUnit.h"
-#include "..\include\ResearchTech.h"
-#include "..\include\TaskHelper.h"
-#include "..\include\CoalitionHelper.h"
+#include "SatisfyUnitRequirement.h"
+#include "CreateUnit.h"
+#include "ResearchTech.h"
+#include "TaskHelper.h"
+#include "CoalitionHelper.h"
 
 SatisfyUnitRequirement::SatisfyUnitRequirement(BWAPI::UnitType unitType)
 {

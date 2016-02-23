@@ -1,7 +1,7 @@
-#include "..\include\CreateCoalition.h"
-#include "..\include\CoalitionHelper.h"
-#include "..\include\TaskHelper.h"
-#include "..\include\CreateUnit.h"
+#include "CreateCoalition.h"
+#include "CoalitionHelper.h"
+#include "TaskHelper.h"
+#include "CreateUnit.h"
 
 CreateCoalition::CreateCoalition(Composition composition, Task* task)
 {

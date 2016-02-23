@@ -1,9 +1,9 @@
-#include "..\include\Composition.h"
-#include "..\include\Expand.h"
-#include "..\include\EconHelper.h"
-#include "..\include\TaskHelper.h"
-#include "..\include\CreateCoalition.h"
-#include "..\include\CoalitionHelper.h"
+#include "Composition.h"
+#include "Expand.h"
+#include "EconHelper.h"
+#include "TaskHelper.h"
+#include "CreateCoalition.h"
+#include "CoalitionHelper.h"
 
 Expand::Expand()
 {

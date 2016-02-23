@@ -1,6 +1,6 @@
-#include "..\include\Task.h"
-#include "..\include\CoalitionHelper.h"
-#include "..\include\TaskHelper.h"
+#include "Task.h"
+#include "CoalitionHelper.h"
+#include "TaskHelper.h"
 #include <string>
 
 Task::Task()

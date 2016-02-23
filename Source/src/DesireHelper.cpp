@@ -1,5 +1,5 @@
-#include "..\include\DesireHelper.h"
-#include "..\include\UtilHelper.h"
+#include "DesireHelper.h"
+#include "UtilHelper.h"
 
 namespace DesireHelper
 {

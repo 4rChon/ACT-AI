@@ -1,5 +1,5 @@
-#include "..\include\TaskHelper.h"
-#include "..\include\CoalitionHelper.h"
+#include "TaskHelper.h"
+#include "CoalitionHelper.h"
 #include <string>
 
 namespace TaskHelper

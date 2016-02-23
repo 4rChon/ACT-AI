@@ -1,7 +1,7 @@
-#include "..\include\Attack.h"
-#include "..\include\Scout.h"
-#include "..\include\CreateCoalition.h"
-#include "..\include\EconHelper.h"
+#include "Attack.h"
+#include "Scout.h"
+#include "CreateCoalition.h"
+#include "EconHelper.h"
 #include <string>
 
 Attack::Attack(MapHelper::Zone* target)

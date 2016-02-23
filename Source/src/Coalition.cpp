@@ -1,7 +1,7 @@
-#include "..\include\Coalition.h"
-#include "..\include\AgentHelper.h"
-#include "..\include\CoalitionHelper.h"
-#include "..\include\Task.h"
+#include "Coalition.h"
+#include "AgentHelper.h"
+#include "CoalitionHelper.h"
+#include "Task.h"
 
 Coalition::Coalition()
 {

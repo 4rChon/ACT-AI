@@ -1,7 +1,7 @@
-#include "..\include\SatisfyTechRequirement.h"
-#include "..\include\CreateUnit.h"
-#include "..\include\TaskHelper.h"
-#include "..\include\CoalitionHelper.h"
+#include "SatisfyTechRequirement.h"
+#include "CreateUnit.h"
+#include "TaskHelper.h"
+#include "CoalitionHelper.h"
 
 SatisfyTechRequirement::SatisfyTechRequirement(BWAPI::TechType techType)
 {

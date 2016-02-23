@@ -1,4 +1,4 @@
-#include "..\include\EconHelper.h"
+#include "EconHelper.h"
 
 namespace EconHelper
 {
