@@ -16,9 +16,6 @@
 
 *.dylib
 
-*.dll
-!Release/AIUR.dll
-
 
 
 # Compiled Static libraries
@@ -66,5 +63,7 @@
 *.suo
 *.opendb
 *.tlog
+.gitattribtues
+.gitignore
 Debug
 packages
