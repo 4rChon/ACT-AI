@@ -9,6 +9,7 @@ SatisfyUnitRequirement::SatisfyUnitRequirement(BWAPI::UnitType unitType)
 	taskName = "SatisfyUnitRequirement(" + unitType.getName() + ")";
 	
 	this->unitType = unitType;
+	taskType = SUR;
 	debug = false;
 }
 

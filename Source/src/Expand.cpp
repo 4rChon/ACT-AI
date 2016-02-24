@@ -9,6 +9,7 @@ Expand::Expand()
 {
 	taskName = "Expand()";
 	builder = nullptr;
+	taskType = EXP;
 }
 
 Expand::~Expand()

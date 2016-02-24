@@ -9,6 +9,7 @@ CreateCoalition::CreateCoalition(Composition composition, Task* task)
 	taskCoalition = CoalitionHelper::addCoalition(composition, task);	
 	task->setCoalition(taskCoalition);
 	cost = composition.getCost();
+	taskType = CRC;
 }
 
 CreateCoalition::~CreateCoalition()

@@ -60,9 +60,9 @@ namespace TaskHelper
 
 	void removeTask(Task* task)
 	{
-		std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from root taskset\n";
+		/*std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from root taskset\n";*/
 		rootTaskSet.erase(task);
-		std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from full taskset\n";
+		/*std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from full taskset\n";*/
 		fullTaskSet.erase(task);
 		delete task;
 	}

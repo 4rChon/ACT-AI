@@ -72,18 +72,18 @@ void SwarmCAT::onStart()
 	//CreateUnit* createDarkTemplar = new CreateUnit(BWAPI::UnitTypes::Protoss_Dark_Templar, 5);
 	//CreateUnit* createCarrier = new CreateUnit(BWAPI::UnitTypes::Protoss_Carrier, 4);
 	//CreateUnit* createDragoon = new CreateUnit(BWAPI::UnitTypes::Protoss_Dragoon, 5);
-	CreateUnit* createGate = new CreateUnit(BWAPI::UnitTypes::Protoss_Gateway, 3);
+	//CreateUnit* createGate = new CreateUnit(BWAPI::UnitTypes::Protoss_Gateway, 3);
 	//CreateUnit* createReaver = new CreateUnit(BWAPI::UnitTypes::Protoss_Reaver, 4);
 	/*CreateUnit* testCreate = new CreateUnit(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 5);
 	CreateUnit* createMarines = new CreateUnit(BWAPI::UnitTypes::Terran_Marine, ceil(1 * EconHelper::getUnitMultiplier()));*/	
 	for each(auto &base in BWTA::getStartLocations())
 	{	
-		Attack* attack = new Attack(MapHelper::getZone(BWAPI::Broodwar->getRegionAt(base->getPosition())));
+		Scout* scout = new Scout(MapHelper::getZone(BWAPI::Broodwar->getRegionAt(base->getPosition())));
 		//Attack* attack2 = new Attack(MapHelper::getZone(BWAPI::Broodwar->getRegionAt(base->getPosition())));
-		TaskHelper::addTask(attack, true);
+		TaskHelper::addTask(scout, true);
 		//TaskHelper::addTask(attack2, true);
 	}
-	TaskHelper::addTask(createGate, true);
+	//TaskHelper::addTask(createGate, true);
 	/*CreateUnit* createHydralisk = new CreateUnit(BWAPI::UnitTypes::Zerg_Hydralisk, 10);
 	CreateUnit* createZergling = new CreateUnit(BWAPI::UnitTypes::Zerg_Zergling, 20);*/
 	//CreateUnit* createZergling = new CreateUnit(BWAPI::UnitTypes::Zerg_Guardian, 1);
@@ -112,7 +112,7 @@ void SwarmCAT::onEnd(bool isWinner)
 void SwarmCAT::onFrame()
 {
 	//std::cout << "---FrameStart---\n";	
-	
+	DesireHelper::updateDesireMaps();
 	drawDebugText();
 	currentTime = std::chrono::high_resolution_clock::now();
 
@@ -301,11 +301,11 @@ void SwarmCAT::drawDebugText()
 		for (auto &task : TaskHelper::getRootTasks())
 			Broodwar->drawTextScreen(200, 60 + (10 * i++), "%d : %s", task->getID(), task->getName().c_str());
 	
-	//Broodwar->drawTextScreen(350, 50, "All Tasks: ");
-	//i = 1;
-	//if (TaskHelper::getAllTasks().size() > 0)
-	//	for (auto &task : TaskHelper::getAllTasks())
-	//		Broodwar->drawTextScreen(350, 50 + (10 * i++), "%d : %s", task->getID(), task->getName().c_str());
+	Broodwar->drawTextScreen(350, 50, "All Tasks: ");
+	i = 1;
+	if (TaskHelper::getAllTasks().size() > 0)
+		for (auto &task : TaskHelper::getAllTasks())
+			Broodwar->drawTextScreen(350, 50 + (10 * i++), "%d : %s", task->getID(), task->getName().c_str());
 
 	/*i = 1;
 	if (CoalitionHelper::getCoalitionset().size() > 0)

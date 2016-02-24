@@ -11,6 +11,7 @@ Attack::Attack(MapHelper::Zone* target)
 	debug = false;
 	scouting = false;
 	scoutingFinished = false;
+	taskType = ATT;
 }
 
 void Attack::createCoalition()

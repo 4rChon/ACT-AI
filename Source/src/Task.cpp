@@ -16,14 +16,18 @@ Task::Task()
 	cost = 0.0;
 	profit = 0.0;
 	debug = false;
+	taskType = NON;
 }
 
 Task::~Task()
 {
 	printDebugInfo("DELETE", true);
 	cleanSubTasks();
-	if(coalition)
-	coalition = nullptr;
+	if (coalition)
+	{
+		CoalitionHelper::removeCoalition(coalition);
+		coalition = nullptr;
+	}
 	//TaskHelper::getAllTasks().erase(this);
 	//TaskHelper::removeTask(this);
 }
@@ -57,6 +61,11 @@ bool Task::isTechSatisfied() const
 bool Task::isComplete() const
 {
 	return complete;
+}
+
+TaskType Task::getType() const
+{
+	return taskType;
 }
 
 int Task::getID() const
@@ -125,8 +134,9 @@ void Task::succeed()
 	profit = 1.0;
 	printDebugInfo("Success!", true);
 	
-	if(taskName.compare("CreateCoalition(Composition, Task*)") != 0)
-		CoalitionHelper::removeCoalition(coalition);
+	/*if(taskName.compare("CreateCoalition(Composition, Task*)") != 0)
+		CoalitionHelper::removeCoalition(coalition);*/
+	TaskHelper::removeTask(this);
 }
 
 void Task::fail()
@@ -135,8 +145,9 @@ void Task::fail()
 	profit = 0.0;
 	printDebugInfo("Failure!", true);
 
-	if (taskName.compare("CreateCoalition(Composition, Task*)") != 0)
-		CoalitionHelper::removeCoalition(coalition);
+	/*if (taskName.compare("CreateCoalition(Composition, Task*)") != 0)
+		CoalitionHelper::removeCoalition(coalition);*/
+	TaskHelper::removeTask(this);
 }
 
 void Task::printDebugInfo(std::string info, bool forceShow)

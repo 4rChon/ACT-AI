@@ -31,7 +31,7 @@ namespace DesireHelper
 		for (auto &expansion : BWTA::getBaseLocations())
 		{
 			double desire = 0.0;
-			if(!expansion->isStartLocation() && !expansion->isIsland())
+			if(!expansion->isIsland())
 				desire = 10 + std::log(1.0 / expansion->getGroundDistance(BWTA::getStartLocation(BWAPI::Broodwar->self())));
 			expansionDesireMap.insert(std::pair<BWTA::BaseLocation*, double>(expansion, desire));
 		}
@@ -59,6 +59,24 @@ namespace DesireHelper
 
 	void updateExpansionDesireMap()
 	{
+		for (auto &expansion : expansionDesireMap)
+			if (BWAPI::Broodwar->getRegionAt(expansion.first->getPosition())->getUnits(BWAPI::Filter::IsResourceDepot).size())
+				expansionDesireMap[expansion.first] = 0.0;
+	}
+
+	BWTA::BaseLocation* getBestExpansionLocation()
+	{
+		BWTA::BaseLocation* bestLocation = (*expansionDesireMap.begin()).first;
+		double bestScore = (*expansionDesireMap.begin()).second;
+		for (auto &expansion : expansionDesireMap)
+			if (bestScore < expansion.second)
+			{
+				bestLocation = expansion.first;
+				bestScore = expansion.second;
+			}
+		if (bestScore == 0.0)
+			return nullptr;
+		return bestLocation;
 	}
 
 	void updateDesireMaps()

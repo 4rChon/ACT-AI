@@ -12,6 +12,7 @@ ResearchTech::ResearchTech(BWAPI::TechType techType)
 	satisfied = true;
 
 	this->techType = techType;	
+	taskType = RES;
 	debug = false;
 }
 

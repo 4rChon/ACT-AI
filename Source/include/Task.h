@@ -7,6 +7,20 @@
 
 typedef BWAPI::SetContainer < Task*, std::hash<void*>> Taskset;
 
+enum TaskType
+{
+	NON,
+	DEF,
+	ATT,
+	CRC,
+	CRU,
+	EXP,
+	RES,
+	STR,
+	SUR,
+	SCO
+};
+
 class Task
 {
 protected:
@@ -24,6 +38,7 @@ protected:
 	bool unitSatisfied;
 	Coalition* coalition;
 	int coalitionID;
+	TaskType taskType;
 public:
 	//constructors and destructors
 	Task();
@@ -39,6 +54,7 @@ public:
 	bool isUnitSatisfied() const;
 	bool isTechSatisfied() const;
 	virtual bool Task::isComplete() const;
+	TaskType getType() const;
 	int getID() const;
 	std::string getName() const;
 	Taskset& getSubTasks();

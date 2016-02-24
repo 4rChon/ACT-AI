@@ -35,7 +35,7 @@ Coalition::Coalition(Composition targetComp, Task* task)
 
 Coalition::~Coalition()
 {
-	std::cout << "~Coalition : " << coalitionID << "\n";
+	/*std::cout << "~Coalition : " << coalitionID << "\n";*/
 	active = false;
 	for (auto agent : agentSet)
 		agent->unbind();
@@ -108,7 +108,7 @@ bool Coalition::addAgent(Agent* agent)
 		{
 			if (agent->getUnit()->getType() == type && this->targetComp[type] > this->currentComp[type])
 			{
-				std::cout << agent->getUnit()->getType().c_str() << " is joining a coalition\n";
+				/*std::cout << agent->getUnit()->getType().c_str() << " is joining a coalition\n";*/
 				this->agentSet.insert(this->agentSet.begin(), agent);
 				this->addUnit(agent->getUnit());
 				agent->setCoalition(this);

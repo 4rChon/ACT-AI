@@ -6,6 +6,7 @@ Scout::Scout(MapHelper::Zone* target)
 {
 	taskName = "Scout(" + std::to_string(target->getID()) + ")";
 	this->target = target;
+	taskType = SCO;
 	debug = false;
 }
 

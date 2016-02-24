@@ -8,6 +8,7 @@ SatisfyTechRequirement::SatisfyTechRequirement(BWAPI::TechType techType)
 	taskName = "SatisfyTechRequirement(" + techType.getName() + ")";
 	
 	this->techType = techType;
+	taskType = STR;
 	debug = false;
 }
 

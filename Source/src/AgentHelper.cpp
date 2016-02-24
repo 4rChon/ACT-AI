@@ -101,7 +101,7 @@ namespace AgentHelper
 			else
 			{
 				agent = new Agent(unit);
-				std::cout << "Added new Unit : " << unit->getType() << " : " << unit->getID() << "\n";
+				/*std::cout << "Added new Unit : " << unit->getType() << " : " << unit->getID() << "\n";*/
 			}
 		}
 		agentSet.insert(agent);

@@ -17,6 +17,7 @@ CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 	building = false;
 	reserved = false;
 	requiresGas = false;
+	taskType = CRU;
 
 	debug = false;
 }
@@ -66,6 +67,7 @@ void CreateUnit::createCoalition()
 
 void CreateUnit::decrementUnitCount()
 {
+	printDebugInfo("Decrementing Unit Count", true);
 	unitCount--;
 }
 
@@ -91,6 +93,7 @@ void CreateUnit::act()
 	printDebugInfo("Acting");
 	if (unitCount > 0)
 	{
+		std::cout << "UnitCount: " << unitCount << "\n";
 		if (unitType == BWAPI::Broodwar->self()->getRace().getRefinery())
 		{
 			for each (auto &agent in coalition->getAgentSet())
@@ -153,10 +156,7 @@ void CreateUnit::act()
 							unitCount--;
 					}
 					else
-					{
-						if(agent->build(unitType))
-							std::cout << "UnitCount for " << unitType << " : " << unitCount;
-					}
+						agent->build(unitType);
 				}
 			}
 			return;

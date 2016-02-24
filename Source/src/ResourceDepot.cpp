@@ -143,22 +143,11 @@ bool ResourceDepot::addGeyser(Worker* worker)
 				BWAPI::Broodwar->registerEvent(
 					[this, worker](BWAPI::Game*)
 				{
-					if (BWAPI::Broodwar->getLastError() != BWAPI::Errors::Insufficient_Gas
-						&& BWAPI::Broodwar->getLastError() != BWAPI::Errors::Insufficient_Minerals
-						&& BWAPI::Broodwar->getLastError() != BWAPI::Errors::Unbuildable_Location
-						&& this->getUnit()->exists()
-						&& worker->getUnit()->exists())
-					{
-						this->updateRefineryCount();
-					}
-					else
-					{
-						BWAPI::Broodwar->setLastError();
-					}
+					this->updateRefineryCount();
 				},
 					[worker](BWAPI::Game*)
 				{
-					return !worker->getUnit()->exists() || worker->getUnit()->getOrder() == BWAPI::Orders::PlayerGuard;
+					return !worker->getUnit()->exists() || !worker->getUnit()->isConstructing();
 				},
 					1);
 				return true;

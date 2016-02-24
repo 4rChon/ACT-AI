@@ -7,103 +7,97 @@
     <Filter Include="include">
       <UniqueIdentifier>{775911f1-7a12-4a74-a42c-c077ac383e74}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Agents">
+      <UniqueIdentifier>{f73b12ad-18fd-43bb-94a4-7b50bd92c72c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Coalitions">
+      <UniqueIdentifier>{dca75c1e-8779-4eed-9abb-f449a25d36a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="include\Tasks">
+      <UniqueIdentifier>{a2c23896-cd56-4cdd-8259-c2c759b2cc40}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Agents">
+      <UniqueIdentifier>{eef9df31-15b2-42d7-ac78-0d5bc8a3aeb5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Coalitions">
+      <UniqueIdentifier>{d3d6dca2-1a11-47fa-9c34-24c8d3f0f53d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Tasks">
+      <UniqueIdentifier>{d2c93f21-da8b-4c1d-a763-7e555db165b5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Source\include\Agent.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\AgentHelper.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\Attack.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\Coalition.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\CoalitionHelper.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\Composition.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\CreateCoalition.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\CreateUnit.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="Source\include\DesireHelper.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="Source\include\EconHelper.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="Source\include\Expand.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="Source\include\MapHelper.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\ResearchTech.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\ResourceDepot.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\SatisfyTechRequirement.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\SatisfyUnitRequirement.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\Scout.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\SCV.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="Source\include\SwarmCAT.h">
       <Filter>include</Filter>
     </ClInclude>
-    <ClInclude Include="Source\include\Task.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\TaskHelper.h">
-      <Filter>include</Filter>
-    </ClInclude>
     <ClInclude Include="Source\include\UtilHelper.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="Source\include\Agent.h">
+      <Filter>include\Agents</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\AgentHelper.h">
+      <Filter>include\Agents</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\Attack.h">
+      <Filter>include\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\Coalition.h">
+      <Filter>include\Coalitions</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\CoalitionHelper.h">
+      <Filter>include\Coalitions</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\Composition.h">
+      <Filter>include\Coalitions</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\CreateCoalition.h">
+      <Filter>include\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\CreateUnit.h">
+      <Filter>include\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\Expand.h">
+      <Filter>include\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\ResearchTech.h">
+      <Filter>include\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\SatisfyTechRequirement.h">
+      <Filter>include\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\SatisfyUnitRequirement.h">
+      <Filter>include\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\Scout.h">
+      <Filter>include\Tasks</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\SCV.h">
+      <Filter>include\Agents</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\Task.h">
+      <Filter>include\Tasks</Filter>
+    </ClInclude>
     <ClInclude Include="Source\include\Worker.h">
-      <Filter>include</Filter>
+      <Filter>include\Agents</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\ResourceDepot.h">
+      <Filter>include\Agents</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\TaskHelper.h">
+      <Filter>include\Tasks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\src\Agent.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\AgentHelper.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\Attack.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\Coalition.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\CoalitionHelper.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\Composition.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\CreateCoalition.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\CreateUnit.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="Source\src\DesireHelper.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -113,41 +107,65 @@
     <ClCompile Include="Source\src\EconHelper.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Source\src\Expand.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="Source\src\MapHelper.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\ResearchTech.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\ResourceDepot.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\SatisfyTechRequirement.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\SatisfyUnitRequirement.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\Scout.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\SCV.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="Source\src\SwarmCAT.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="Source\src\Agent.cpp">
+      <Filter>src\Agents</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\AgentHelper.cpp">
+      <Filter>src\Agents</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\Attack.cpp">
+      <Filter>src\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\Coalition.cpp">
+      <Filter>src\Coalitions</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\CoalitionHelper.cpp">
+      <Filter>src\Coalitions</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\Composition.cpp">
+      <Filter>src\Coalitions</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\CreateCoalition.cpp">
+      <Filter>src\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\CreateUnit.cpp">
+      <Filter>src\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\Expand.cpp">
+      <Filter>src\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\ResearchTech.cpp">
+      <Filter>src\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\SatisfyTechRequirement.cpp">
+      <Filter>src\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\SatisfyUnitRequirement.cpp">
+      <Filter>src\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\Scout.cpp">
+      <Filter>src\Tasks</Filter>
+    </ClCompile>
     <ClCompile Include="Source\src\Task.cpp">
-      <Filter>src</Filter>
+      <Filter>src\Tasks</Filter>
     </ClCompile>
     <ClCompile Include="Source\src\TaskHelper.cpp">
-      <Filter>src</Filter>
+      <Filter>src\Tasks</Filter>
     </ClCompile>
     <ClCompile Include="Source\src\Worker.cpp">
-      <Filter>src</Filter>
+      <Filter>src\Agents</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\ResourceDepot.cpp">
+      <Filter>src\Agents</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\SCV.cpp">
+      <Filter>src\Agents</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

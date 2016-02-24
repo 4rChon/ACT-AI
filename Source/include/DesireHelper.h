@@ -24,5 +24,7 @@ namespace DesireHelper
 	const std::unordered_map<MapHelper::Zone*, double, std::hash<void*>>& getAttackDesireMap();
 	const std::unordered_map<MapHelper::Zone*, double, std::hash<void*>>& getDefendDesireMap();
 
+	BWTA::BaseLocation * getBestExpansionLocation();
+
 	void setExpansionDesire(BWTA::BaseLocation* baseLocation, double desire);
 }
