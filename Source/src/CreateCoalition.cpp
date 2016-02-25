@@ -10,11 +10,7 @@ CreateCoalition::CreateCoalition(Composition composition, Task* task)
 	task->setCoalition(taskCoalition);
 	cost = composition.getCost();
 	taskType = CRC;
-}
-
-CreateCoalition::~CreateCoalition()
-{
-	taskCoalition = nullptr;
+	//debug = true;
 }
 
 // add coalition to open coalitions
@@ -50,7 +46,7 @@ void CreateCoalition::update()
 	printDebugInfo("Update");
 	if (complete)
 	{
-		cleanSubTasks();
+		/*cleanSubTasks();*/
 		return;
 	}
 

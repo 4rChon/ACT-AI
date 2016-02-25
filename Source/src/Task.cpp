@@ -15,7 +15,7 @@ Task::Task()
 	creationFrame = BWAPI::Broodwar->getFrameCount();
 	cost = 0.0;
 	profit = 0.0;
-	debug = false;
+	debug = true;
 	taskType = NON;
 }
 
@@ -23,7 +23,7 @@ Task::~Task()
 {
 	printDebugInfo("DELETE", true);
 	cleanSubTasks();
-	if (coalition)
+	if (taskType != CRC && taskType != NON && coalition)
 	{
 		CoalitionHelper::removeCoalition(coalition);
 		coalition = nullptr;
@@ -112,19 +112,23 @@ void Task::addSubTask(Task* task)
 
 void Task::cleanSubTasks()
 {
-	if (subTasks.size() > 0)
-		for (auto it = subTasks.begin(); it != subTasks.end(); ++it)
-			if((*it)->getName().compare("") != 0)
-				TaskHelper::removeTask(*it);
+	for (auto it = subTasks.begin(); it != subTasks.end(); ++it)
+		TaskHelper::removeTask(*it);
 	subTasks.clear();
 }
 
 void Task::updateTaskTree()
 {	
 	if (subTasks.size() > 0)
+	{
 		for (auto it = subTasks.begin(); it != subTasks.end(); ++it)
+		{
 			if (!(*it)->isComplete())
-				(*it)->updateTaskTree();				
+				(*it)->updateTaskTree();
+			else
+				TaskHelper::removeTask(*it);
+		}
+	}
 	update();
 }
 
@@ -134,9 +138,9 @@ void Task::succeed()
 	profit = 1.0;
 	printDebugInfo("Success!", true);
 	
-	/*if(taskName.compare("CreateCoalition(Composition, Task*)") != 0)
-		CoalitionHelper::removeCoalition(coalition);*/
-	TaskHelper::removeTask(this);
+	if(taskType != CRC)
+		CoalitionHelper::removeCoalition(coalition);
+	//TaskHelper::removeTask(this);
 }
 
 void Task::fail()
@@ -145,9 +149,9 @@ void Task::fail()
 	profit = 0.0;
 	printDebugInfo("Failure!", true);
 
-	/*if (taskName.compare("CreateCoalition(Composition, Task*)") != 0)
-		CoalitionHelper::removeCoalition(coalition);*/
-	TaskHelper::removeTask(this);
+	if (taskType != CRC)
+		CoalitionHelper::removeCoalition(coalition);
+	//TaskHelper::removeTask(this);
 }
 
 void Task::printDebugInfo(std::string info, bool forceShow)

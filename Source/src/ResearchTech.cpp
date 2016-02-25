@@ -13,7 +13,7 @@ ResearchTech::ResearchTech(BWAPI::TechType techType)
 
 	this->techType = techType;	
 	taskType = RES;
-	debug = false;
+	//debug = true;
 }
 
 void ResearchTech::createCoalition()
@@ -78,7 +78,7 @@ void ResearchTech::update() //x2 redundant in create unit
 	printDebugInfo("Update");
 	if (complete)
 	{
-		cleanSubTasks();
+		/*cleanSubTasks();*/
 		return;
 	}
 

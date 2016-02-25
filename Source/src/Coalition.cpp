@@ -35,13 +35,13 @@ Coalition::Coalition(Composition targetComp, Task* task)
 
 Coalition::~Coalition()
 {
-	/*std::cout << "~Coalition : " << coalitionID << "\n";*/
+	std::cout << "~Coalition : " << coalitionID << "\n";
 	active = false;
 	for (auto agent : agentSet)
 		agent->unbind();
 
-	taskID = -1;
-	task = nullptr;
+	//taskID = -1;
+	//task = nullptr;
 
 	agentSet.clear();
 	unitSet.clear();

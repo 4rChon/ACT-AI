@@ -8,7 +8,6 @@ class SatisfyUnitRequirement : public Task
 {
 private:
 	BWAPI::UnitType unitType;
-	CreateUnit* superTask;
 public:
 	SatisfyUnitRequirement(BWAPI::UnitType unitType);
 	void assign();

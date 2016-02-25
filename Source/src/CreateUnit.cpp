@@ -19,7 +19,7 @@ CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 	requiresGas = false;
 	taskType = CRU;
 
-	debug = false;
+	//debug = true;
 }
 
 void CreateUnit::satisfyRequirements()
@@ -93,7 +93,9 @@ void CreateUnit::act()
 	printDebugInfo("Acting");
 	if (unitCount > 0)
 	{
-		std::cout << "UnitCount: " << unitCount << "\n";
+		if (!EconHelper::haveMoney(unitType))
+			return;
+		printDebugInfo("UnitCount: " + std::to_string(unitCount));
 		if (unitType == BWAPI::Broodwar->self()->getRace().getRefinery())
 		{
 			for each (auto &agent in coalition->getAgentSet())
@@ -146,18 +148,16 @@ void CreateUnit::act()
 		{
 			for each (auto &agent in coalition->getAgentSet())
 			{
-				if (!agent->getUnit()->isConstructing())
+				if (unitType.getRace() == BWAPI::Races::Zerg
+					&& (unitType.isResourceDepot() && unitType != BWAPI::UnitTypes::Zerg_Hatchery)
+					|| unitType == BWAPI::UnitTypes::Zerg_Greater_Spire)
 				{
-					if (unitType.getRace() == BWAPI::Races::Zerg
-						&& (unitType.isResourceDepot() && unitType != BWAPI::UnitTypes::Zerg_Hatchery)
-						|| unitType == BWAPI::UnitTypes::Zerg_Greater_Spire)
-					{
-						if (agent->morph(unitType))
-							unitCount--;
-					}
-					else
-						agent->build(unitType);
+					if (agent->morph(unitType))
+						unitCount--;
 				}
+				else
+					if (agent->build(unitType))
+						unitCount--;
 			}
 			return;
 		}
@@ -179,7 +179,7 @@ void CreateUnit::update() //x2 redundant in res tech
 	printDebugInfo("Update");
 	if (complete)
 	{
-		cleanSubTasks();
+		/*cleanSubTasks();*/
 		return;
 	}
 

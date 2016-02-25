@@ -9,7 +9,7 @@ SatisfyTechRequirement::SatisfyTechRequirement(BWAPI::TechType techType)
 	
 	this->techType = techType;
 	taskType = STR;
-	debug = false;
+	//debug = true;
 }
 
 void SatisfyTechRequirement::assign()
@@ -37,7 +37,7 @@ void SatisfyTechRequirement::update()
 	printDebugInfo("Update");
 	if (complete)
 	{
-		cleanSubTasks();
+		/*cleanSubTasks();*/
 		return;
 	}
 

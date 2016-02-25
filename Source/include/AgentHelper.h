@@ -14,6 +14,10 @@ namespace AgentHelper
 {
 	void initialiseHelper();
 
+	bool updateLastError();
+
+	int getLastErrorFrame();
+
 	//setters
 	void setLastServiced(Agentset::iterator lastServiced);
 

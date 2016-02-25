@@ -10,6 +10,7 @@ Expand::Expand()
 	taskName = "Expand()";
 	builder = nullptr;
 	taskType = EXP;
+	//debug = true;
 }
 
 Expand::~Expand()
@@ -46,7 +47,7 @@ void Expand::update()
 	printDebugInfo("Update");
 	if (complete)
 	{
-		cleanSubTasks();
+		/*cleanSubTasks();*/
 		return;
 	}
 

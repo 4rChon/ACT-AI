@@ -10,12 +10,32 @@ namespace AgentHelper
 		static Baseset resourceDepots;		
 		static Agentset::iterator lastServiced;
 		static TypeCountMap typeCountMap;
+		static int lastErrorFrame;
+		static BWAPI::Error lastError;
 	}
 
 	void initialiseHelper()
 	{		
 		lastServiced = agentSet.begin();
 		typeCountMap.clear();
+		lastErrorFrame = 0;
+		lastError = BWAPI::Errors::None;
+	}
+
+	bool updateLastError()
+	{
+		if (BWAPI::Broodwar->getLastError() != BWAPI::Errors::None)
+		{
+			lastErrorFrame = BWAPI::Broodwar->getFrameCount();
+			lastError = BWAPI::Broodwar->getLastError();
+			BWAPI::Broodwar->setLastError();
+		}
+		return true;
+	}
+
+	int getLastErrorFrame()
+	{
+		return lastErrorFrame;
 	}
 
 	Agent* getAgent(int id)

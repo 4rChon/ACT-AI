@@ -10,7 +10,7 @@ SatisfyUnitRequirement::SatisfyUnitRequirement(BWAPI::UnitType unitType)
 	
 	this->unitType = unitType;
 	taskType = SUR;
-	debug = false;
+	//debug = true;
 }
 
 void SatisfyUnitRequirement::assign()
@@ -49,7 +49,7 @@ void SatisfyUnitRequirement::update()
 	printDebugInfo("Update");
 	if (complete)
 	{
-		cleanSubTasks();
+		/*cleanSubTasks();*/
 		return;
 	}
 

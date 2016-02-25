@@ -81,8 +81,6 @@ void ResourceDepot::act()
 	//temp contents
 	if (unit->isIdle())
 		train((*unit->getType().buildsWhat().begin()));	
-	/*if (!train(unit->getPlayer()->getRace().getWorker()))
-		unit->train(unit->getPlayer()->getRace().getSupplyProvider());*/
 }
 
 void ResourceDepot::updateExpandDesire()
@@ -140,7 +138,7 @@ bool ResourceDepot::addGeyser(Worker* worker)
 		{
 			if (worker->build(BWAPI::Broodwar->self()->getRace().getRefinery(), &geyser->getTilePosition()))
 			{
-				BWAPI::Broodwar->registerEvent(
+				/*BWAPI::Broodwar->registerEvent(
 					[this, worker](BWAPI::Game*)
 				{
 					this->updateRefineryCount();
@@ -149,7 +147,8 @@ bool ResourceDepot::addGeyser(Worker* worker)
 				{
 					return !worker->getUnit()->exists() || !worker->getUnit()->isConstructing();
 				},
-					1);
+					1,
+					5);*/
 				return true;
 			}
 		}

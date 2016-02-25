@@ -8,10 +8,10 @@ Attack::Attack(MapHelper::Zone* target)
 {
 	taskName = "Attack(" + std::to_string(target->getID()) + ")";
 	this->target = target;
-	debug = false;
 	scouting = false;
 	scoutingFinished = false;
 	taskType = ATT;
+	//debug = true;
 }
 
 void Attack::createCoalition()
@@ -74,7 +74,7 @@ void Attack::update()
 
 	if (complete)
 	{
-		cleanSubTasks();
+		/*cleanSubTasks();*/
 		return;
 	}	
 

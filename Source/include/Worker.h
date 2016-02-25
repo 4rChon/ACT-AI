@@ -9,6 +9,7 @@ class Worker : public Agent
 private:
 	bool gasMiner;
 	ResourceDepot* miningBase;
+	bool reservedResources;
 public:
 	//constructors and desctructors
 	Worker();

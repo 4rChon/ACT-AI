@@ -44,7 +44,7 @@ namespace TaskHelper
 				std::cout << task->getName().compare(newTask->getName()) << "\n";*/
 
 				if (rootTaskSet.count(task) == 0 
-					&& newTask->getName().compare("CreateCoalition(Composition, Task*)") != 0					
+					&& newTask->getType() != TaskType::CRC
 					&& task->getName().compare(newTask->getName()) == 0)
 				{
 					removeTask(newTask);
@@ -60,11 +60,18 @@ namespace TaskHelper
 
 	void removeTask(Task* task)
 	{
-		/*std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from root taskset\n";*/
-		rootTaskSet.erase(task);
-		/*std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from full taskset\n";*/
-		fullTaskSet.erase(task);
-		delete task;
+		if (rootTaskSet.count(task) > 0)
+		{
+			std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from root taskset\n";
+			rootTaskSet.erase(task);
+		}
+
+		if (fullTaskSet.count(task) > 0)
+		{
+			std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from full taskset\n";
+			fullTaskSet.erase(task);
+			delete task;
+		}		
 	}
 
 	void updateRootTasks()

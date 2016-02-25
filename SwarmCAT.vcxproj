@@ -131,7 +131,7 @@
       <SDLCheck>true</SDLCheck>
     </ClCompile>
     <Link>
-      <AdditionalDependencies>../lib/BWAPI.lib;../lib/BWTA.lib;../lib/libboost_filesystem-vc120-mt-1_56.lib;../lib/libboost_system-vc120-mt-1_56.lib;../lib/libboost_thread-vc120-mt-1_56.lib;../lib/libCGAL-vc120-mt-4.4.lib;../lib/libgmp-10.lib;../lib/libmpfr-4.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>../lib/BWAPId.lib;../lib/BWTAd.lib;../lib/libboost_filesystem-vc120-mt-gd-1_56.lib;../lib/libboost_system-vc120-mt-gd-1_56.lib;../lib/libboost_thread-vc120-mt-gd-1_56.lib;../lib/libCGAL-vc120-mt-gd-4.4.lib;../lib/libgmp-10.lib;../lib/libmpfr-4.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

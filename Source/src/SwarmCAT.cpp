@@ -32,7 +32,7 @@ DWORD WINAPI AnalyzeThread()
 }
 
 void SwarmCAT::onStart()
-{		
+{	
 	std::cout << " ---------------- MATCH START ----------------\n";
 	Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
 
@@ -72,18 +72,18 @@ void SwarmCAT::onStart()
 	//CreateUnit* createDarkTemplar = new CreateUnit(BWAPI::UnitTypes::Protoss_Dark_Templar, 5);
 	//CreateUnit* createCarrier = new CreateUnit(BWAPI::UnitTypes::Protoss_Carrier, 4);
 	//CreateUnit* createDragoon = new CreateUnit(BWAPI::UnitTypes::Protoss_Dragoon, 5);
-	//CreateUnit* createGate = new CreateUnit(BWAPI::UnitTypes::Protoss_Gateway, 3);
+	CreateUnit* createGate = new CreateUnit(BWAPI::UnitTypes::Protoss_Zealot, 5);
 	//CreateUnit* createReaver = new CreateUnit(BWAPI::UnitTypes::Protoss_Reaver, 4);
 	/*CreateUnit* testCreate = new CreateUnit(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 5);
 	CreateUnit* createMarines = new CreateUnit(BWAPI::UnitTypes::Terran_Marine, ceil(1 * EconHelper::getUnitMultiplier()));*/	
-	for each(auto &base in BWTA::getStartLocations())
-	{	
-		Scout* scout = new Scout(MapHelper::getZone(BWAPI::Broodwar->getRegionAt(base->getPosition())));
-		//Attack* attack2 = new Attack(MapHelper::getZone(BWAPI::Broodwar->getRegionAt(base->getPosition())));
-		TaskHelper::addTask(scout, true);
-		//TaskHelper::addTask(attack2, true);
-	}
-	//TaskHelper::addTask(createGate, true);
+	//for each(auto &base in BWTA::getStartLocations())
+	//{	
+	//	Scout* scout = new Scout(MapHelper::getZone(BWAPI::Broodwar->getRegionAt(base->getPosition())));
+	//	//Attack* attack2 = new Attack(MapHelper::getZone(BWAPI::Broodwar->getRegionAt(base->getPosition())));
+	//	TaskHelper::addTask(scout, true);
+	//	//TaskHelper::addTask(attack2, true);
+	//}
+	TaskHelper::addTask(createGate, true);
 	/*CreateUnit* createHydralisk = new CreateUnit(BWAPI::UnitTypes::Zerg_Hydralisk, 10);
 	CreateUnit* createZergling = new CreateUnit(BWAPI::UnitTypes::Zerg_Zergling, 20);*/
 	//CreateUnit* createZergling = new CreateUnit(BWAPI::UnitTypes::Zerg_Guardian, 1);
@@ -91,8 +91,8 @@ void SwarmCAT::onStart()
 	//TaskHelper::addTask(createArchon, true);
 	//TaskHelper::addTask(createDarkTemplar, true);
 	//TaskHelper::addTask(createCarrier, true);
-	/*TaskHelper::addTask(createDragoon, true);
-	TaskHelper::addTask(createDragoon2, true);*/
+	//TaskHelper::addTask(createDragoon, true);
+	/*TaskHelper::addTask(createDragoon2, true);*/
 	//TaskHelper::addTask(createDragoon3, true);
 	//TaskHelper::addTask(createReaver, true);
 	/*TaskHelper::addTask(createMarines, true);

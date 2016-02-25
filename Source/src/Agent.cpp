@@ -129,7 +129,7 @@ bool Agent::isFree() const
 }
 
 void Agent::act()
-{
+{	
 	if (unit->getType().canProduce())
 		train(*unit->getType().buildsWhat().begin());
 	//temp contents
@@ -186,7 +186,8 @@ bool Agent::buildAddon(BWAPI::UnitType addon)
 bool Agent::train(BWAPI::UnitType unitType)
 {
 	if (unit->canTrain(unitType) && EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType) && unit->getTrainingQueue().size() < 1)
-		return this->unit->train(unitType);
+		if (unit->train(unitType))
+			return true;	
 	return false;
 }
 
