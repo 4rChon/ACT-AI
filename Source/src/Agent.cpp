@@ -45,9 +45,7 @@ Agent::~Agent()
 void Agent::initialiseCommandMap()
 {
 	for (auto &commandType : BWAPI::UnitCommandTypes::allUnitCommandTypes())
-	{		
 		commandMap.insert(std::pair<BWAPI::UnitCommandType, double>(commandType, 0.0));
-	}
 }
 
 void Agent::setCoalition(Coalition* coalition)
@@ -185,9 +183,8 @@ bool Agent::buildAddon(BWAPI::UnitType addon)
 
 bool Agent::train(BWAPI::UnitType unitType)
 {
-	if (unit->canTrain(unitType) && EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType) && unit->getTrainingQueue().size() < 1)
-		if (unit->train(unitType))
-			return true;	
+	if (unit->canTrain(unitType) && EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType) && unit->getTrainingQueue().size() < 2 && unit->getRemainingTrainTime() < 5)
+		return unit->train(unitType);
 	return false;
 }
 

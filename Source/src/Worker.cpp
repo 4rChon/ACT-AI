@@ -63,9 +63,6 @@ ResourceDepot* Worker::getMiningBase() const
 
 void Worker::act()
 {
-	if (movingToBuild)
-		return;
-
 	if (BWAPI::Broodwar->self()->getRace() != BWAPI::Races::Zerg
 		&& DesireHelper::getSupplyDesire() >= 0.6
 		&& EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getSupplyProvider()))
@@ -124,35 +121,31 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 		if (unit->build(building, buildLocation))
 		{
 			unsetMiningBase();
-			EconHelper::subtractDebt(building.mineralPrice(), building.gasPrice());
-			reservedResources = false;
-			/*BWAPI::Broodwar->registerEvent(
-				[this, building](BWAPI::Game*)
-			{				
-					EconHelper::subtractDebt(building.mineralPrice(), building.gasPrice());
-					reservedResources = false;
-					if(BWAPI::Broodwar->getLastError() == BWAPI::Errors::Unbuildable_Location
-						|| !this->getUnit()->exists())
+			BWAPI::Broodwar->registerEvent([this, building](BWAPI::Game*)
+			{
+				EconHelper::subtractDebt(building.mineralPrice(), building.gasPrice());
+				reservedResources = false;
+				if (this->getUnit()->getOrder() != BWAPI::Orders::ConstructingBuilding
+					|| !this->getUnit()->exists())
+				{
+					if (building == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
+						DesireHelper::updateSupplyDesire(building, true);
+					if (task)
 					{
-						BWAPI::Broodwar->setLastError();
-						if (building == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
-							DesireHelper::updateSupplyDesire(building, true);
-						if (task)
-						{
-							if (task->getType() == EXP)
-								task->fail();
-						}
-					}
-					else if (task)
-					{
-						if (task->getType() == CRU)
-							((CreateUnit*)task)->decrementUnitCount();
 						if (task->getType() == EXP)
-							task->succeed();
+							task->fail();
 					}
+				}
+				else if (task)
+				{
+					if (task->getType() == CRU)
+						((CreateUnit*)task)->decrementUnitCount();
+					if (task->getType() == EXP)
+						task->succeed();
+				}
 			},
-				[this](BWAPI::Game*){return !getUnit()->exists() || !this->getUnit()->isConstructing();},
-				1);*/
+				[this](BWAPI::Game*) {return !getUnit()->exists() || this->getUnit()->getOrder() == BWAPI::Orders::ConstructingBuilding || !this->getUnit()->isConstructing(); },
+				1);
 			
 		}
 		return unit->isConstructing();

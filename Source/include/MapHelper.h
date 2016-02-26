@@ -15,74 +15,16 @@ namespace MapHelper
 		int resourceScore;
 
 	public:
-		Zone(BWAPI::Region region, int id)
-		{
-			this->region = region;
-			this->id = id;
-			lastVisited = -99999;
-			enemyScore = 0;
-			friendScore = 0;
-			resourceScore = 0;
-		}
-
-		BWAPI::Region getRegion() const
-		{
-			return region;
-		}
-
-		int getID() const
-		{
-			return id;
-		}
-
-		int getLastVisited() const
-		{
-			return lastVisited;
-		}
-
-		int getEnemyScore() const
-		{
-			return enemyScore;
-		}
-
-		int getFriendScore() const
-		{
-			return friendScore;
-		}
-
-		int getResourceScore() const
-		{
-			return resourceScore;
-		}
-
-		void updateLastVisited()
-		{
-			lastVisited = BWAPI::Broodwar->getFrameCount();
-		}
-
-		void resetScores()
-		{
-			enemyScore = 0;
-			friendScore = 0;
-			resourceScore = 0;
-		}
-
-		void updateZone()
-		{			
-			resetScores();
-
-			for each (auto unit in this->region->getUnits())
-			{
-				if (unit->getPlayer() == BWAPI::Broodwar->enemy())
-					this->enemyScore += unit->getType().buildScore() + unit->getType().destroyScore();
-				if (unit->getPlayer() == BWAPI::Broodwar->self())
-					this->friendScore += unit->getType().buildScore() + unit->getType().destroyScore();
-				if (unit->getType().isResourceContainer())
-					this->resourceScore += unit->getResources();
-			}
-
-			updateLastVisited();
-		}
+		Zone(BWAPI::Region region, int id);
+		BWAPI::Region getRegion() const;
+		int getID() const;
+		int getLastVisited() const;
+		int getEnemyScore() const;
+		int getFriendScore() const;
+		int getResourceScore() const;
+		void updateLastVisited();
+		void resetScores();
+		void updateZone();
 	};
 
 	typedef BWAPI::SetContainer<Zone*, std::hash<void*>> Field;

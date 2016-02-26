@@ -138,7 +138,7 @@ bool ResourceDepot::addGeyser(Worker* worker)
 		{
 			if (worker->build(BWAPI::Broodwar->self()->getRace().getRefinery(), &geyser->getTilePosition()))
 			{
-				/*BWAPI::Broodwar->registerEvent(
+				BWAPI::Broodwar->registerEvent(
 					[this, worker](BWAPI::Game*)
 				{
 					this->updateRefineryCount();
@@ -148,7 +148,7 @@ bool ResourceDepot::addGeyser(Worker* worker)
 					return !worker->getUnit()->exists() || !worker->getUnit()->isConstructing();
 				},
 					1,
-					5);*/
+					5);
 				return true;
 			}
 		}

@@ -2,14 +2,14 @@
 #include "Scout.h"
 #include "CreateCoalition.h"
 #include "EconHelper.h"
+#include "ArmyHelper.h"
+#include "CoalitionHelper.h"
 #include <string>
 
 Attack::Attack(MapHelper::Zone* target)
 {
 	taskName = "Attack(" + std::to_string(target->getID()) + ")";
 	this->target = target;
-	scouting = false;
-	scoutingFinished = false;
 	taskType = ATT;
 	//debug = true;
 }
@@ -17,26 +17,9 @@ Attack::Attack(MapHelper::Zone* target)
 void Attack::createCoalition()
 {
 	Composition c;
-	c.addType(BWAPI::UnitTypes::Protoss_Dragoon, 5);
-	c.addType(BWAPI::UnitTypes::Protoss_Zealot, 5);
-	c.addType(BWAPI::UnitTypes::Protoss_Observer, 1);
+	c.addType(BWAPI::UnitTypes::Terran_Marine, 5);	
 	CreateCoalition *createCoalition = new CreateCoalition(c, this);
 	addSubTask(createCoalition);
-}
-
-void Attack::scout()
-{
-	if (BWAPI::Broodwar->getFrameCount() - target->getLastVisited() > 5)
-	{
-		if (!scouting)
-		{
-			Scout* scout = new Scout(target);
-			addSubTask(scout);
-			scouting = true;
-		}
-	}
-	else
-		scoutingFinished = true;
 }
 
 // assign an attacking coalition
@@ -52,10 +35,6 @@ void Attack::assign()
 void Attack::act()
 {	
 	printDebugInfo("Acting");	
-	scout();
-	if (!scoutingFinished)
-		return;
-
 	if (!coalition->isActive())
 		return;
 	coalition->getUnitSet().attack(target->getRegion()->getCenter());
@@ -66,17 +45,9 @@ void Attack::act()
 void Attack::update()
 {	
 	printDebugInfo("Update");
-	if (acting && coalition->getAgentSet().size() == 0)
-	{
-		printDebugInfo("Coalition is dead", true);
-		fail();
-	}
 
 	if (complete)
-	{
-		/*cleanSubTasks();*/
 		return;
-	}	
 
 	if (!assigned)
 		assign();
@@ -88,4 +59,26 @@ void Attack::update()
 		succeed();
 
 	printDebugInfo("Update End");
+}
+
+void Attack::succeed() //move to task?
+{
+	complete = true;
+	profit = 1.0;
+	printDebugInfo("Success!", true);
+	ArmyHelper::defend();
+
+	CoalitionHelper::removeCoalition(coalition);
+	cleanSubTasks();
+}
+
+void Attack::fail() //move to task?
+{
+	complete = true;
+	profit = 0.0;
+	printDebugInfo("Failure!", true);
+	ArmyHelper::defend();
+
+	CoalitionHelper::removeCoalition(coalition);
+	cleanSubTasks();
 }

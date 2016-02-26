@@ -8,7 +8,7 @@
 
 CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 {
-	taskName = "CreateUnit(" + unitType.getName() + " : " + std::to_string(unitCount) + ")";
+	taskName = "CreateUnit(" + unitType.getName() + " - " + std::to_string(unitCount) + ")";
 	
 	this->unitType = unitType;
 	this->unitCount = unitCount;
@@ -156,8 +156,8 @@ void CreateUnit::act()
 						unitCount--;
 				}
 				else
-					if (agent->build(unitType))
-						unitCount--;
+					agent->build(unitType);
+						//unitCount--;
 			}
 			return;
 		}
@@ -178,10 +178,7 @@ void CreateUnit::update() //x2 redundant in res tech
 {
 	printDebugInfo("Update");
 	if (complete)
-	{
-		/*cleanSubTasks();*/
 		return;
-	}
 
 	if (!assigned)
 	{

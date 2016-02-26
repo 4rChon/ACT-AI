@@ -38,10 +38,7 @@ void Scout::update()
 {
 	printDebugInfo("Update");
 	if (complete)
-	{
-		/*cleanSubTasks();*/
 		return;
-	}
 	if (!assigned)
 		assign();
 	if (coalition->isActive())

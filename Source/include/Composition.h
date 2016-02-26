@@ -11,6 +11,22 @@ class Composition
 private:
 	UnitMap unitMap;
 	double cost;
+	struct Attributes
+	{
+		double groundDPS;
+		double airDPS;
+		int totalHealth;
+		double avgGroundRange;
+		double avgAirRange;
+		double avgSpeed;
+		double totalAirRange;
+		double totalGroundRange;
+		double totalSpeed;
+		double maxGroundRange;
+		double maxAirRange;
+		int unitCount;
+		bool detection;
+	} attributes;
 public:
 	//constructors
 	Composition();
@@ -28,8 +44,16 @@ public:
 	std::vector<BWAPI::UnitType> getTypes() const;
 	UnitMap getUnitMap() const;
 	double getCost() const;
+	Attributes &getAttributes();
+
+	void updateMaxRange();
+	void updateDetection();
 
 	//helpers
+	void initAttributes();
+	void updateAttributes(BWAPI::UnitType unitType, int unitCount = 1);
+	void outAttributes();
 	void addType(BWAPI::UnitType unitType, int count);
 	void debugInfo() const;
+	std::string toString() const;
 };

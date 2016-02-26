@@ -2,6 +2,10 @@
 #include "AgentHelper.h"
 #include "CoalitionHelper.h"
 #include "Task.h"
+#include <sstream>
+#include <string>
+#include <iostream>
+#include <fstream>
 
 Coalition::Coalition()
 {
@@ -26,25 +30,25 @@ Coalition::Coalition(Composition targetComp, Task* task)
 
 	coalitionID = CoalitionHelper::getNextID();
 	
-		
 	cost = targetComp.getCost();
 	profit = 0.0;
-	initAttributes();
-	outAttributes();
 }
 
 Coalition::~Coalition()
 {
 	std::cout << "~Coalition : " << coalitionID << "\n";
-	active = false;
+	logPerformance();
+	std::cout << "Unbinding Agents...\n";
 	for (auto agent : agentSet)
+	{
+		std::cout << "\tUnbinding...\n";
 		agent->unbind();
-
-	//taskID = -1;
-	//task = nullptr;
-
+	}
+	std::cout << "Agents Unbound...\n";
 	agentSet.clear();
+	std::cout << "Agentset Clear...\n";
 	unitSet.clear();
+	std::cout << "Unitset Clear...\n";
 	/*CoalitionHelper::removeCoalition(this);*/
 }
 
@@ -55,24 +59,24 @@ int Coalition::getAge() const
 
 int Coalition::getID() const
 {
-	return this->coalitionID;
+	return coalitionID;
 }
 
 BWAPI::Unitset Coalition::getUnitSet() const
 {
-	return this->unitSet;
+	return unitSet;
 }
 
 Agentset Coalition::getAgentSet() const
 {
-	return this->agentSet;
+	return agentSet;
 }
 
 double Coalition::getCost()
 {
 	if (!active)
 		cost += (BWAPI::Broodwar->getFrameCount() - creationFrame);
-	return 1 - (1 / ((this->cost + 500) / 500)); //convert to sigma function instead : 1/(1 + e^-x)
+	return 1 - (1 / ((cost + 500) / 500)); //convert to sigma function instead : 1/(1 + e^-x)
 }
 
 double Coalition::getProfit() const
@@ -87,30 +91,25 @@ Composition Coalition::getCurrentComp() const
 
 Composition Coalition::getTargetComp() const
 {
-	return this->targetComp;
-}
-
-Coalition::Attributes &Coalition::getAttributes()
-{
-	return attributes;
+	return targetComp;
 }
 
 bool Coalition::isActive() const
 {
-	return this->active;
+	return active;
 }
 
 bool Coalition::addAgent(Agent* agent)
 {
 	if (!agentSet.count(agent))
 	{
-		for (auto type : this->targetComp.getTypes())
+		for (auto type : targetComp.getTypes())
 		{
-			if (agent->getUnit()->getType() == type && this->targetComp[type] > this->currentComp[type])
+			if (agent->getUnit()->getType() == type && targetComp[type] > currentComp[type])
 			{
 				/*std::cout << agent->getUnit()->getType().c_str() << " is joining a coalition\n";*/
-				this->agentSet.insert(this->agentSet.begin(), agent);
-				this->addUnit(agent->getUnit());
+				agentSet.insert(agentSet.begin(), agent);
+				addUnit(agent->getUnit());
 				agent->setCoalition(this);
 				agent->setTask(task);				
 				return true;
@@ -122,8 +121,8 @@ bool Coalition::addAgent(Agent* agent)
 
 void Coalition::addUnit(BWAPI::Unit unit)
 {
-	this->unitSet.insert(this->unitSet.begin(), unit);
-	this->currentComp += unit->getType();
+	unitSet.insert(unitSet.begin(), unit);
+	currentComp += unit->getType();
 
 	if (!active && currentComp == targetComp)
 	{
@@ -150,55 +149,23 @@ void Coalition::removeAgent(Agent* agent)
 
 void Coalition::removeUnit(BWAPI::Unit unit)
 {
-	this->unitSet.erase(unit);
-	this->currentComp -= unit->getType();
+	unitSet.erase(unit);
+	currentComp -= unit->getType();
 	std::cout << "A " << unit->getType() << " has left a coalition\n";
-}
-
-void Coalition::initAttributes()
-{
-	attributes.airDPS = 0.0;
-	attributes.groundDPS = 0.0;
-	attributes.avgAirRange = 0.0;
-	attributes.avgGroundRange = 0.0;
-	attributes.avgSpeed = 0.0;
-	attributes.detection = false;	
-	attributes.maxAirRange = 0;
-	attributes.maxGroundRange = 0;
-	attributes.totalHealth = 0;
-	
-	for each(auto &unitType in targetComp.getTypes())
-	{				
-		attributes.airDPS += unitType.airWeapon().damageAmount() ? targetComp.getUnitMap()[unitType] * (unitType.airWeapon().damageAmount() * unitType.maxAirHits() * (24 / (double)unitType.airWeapon().damageCooldown())) : 0;		
-		attributes.groundDPS += unitType.groundWeapon().damageAmount() ? targetComp.getUnitMap()[unitType] * (unitType.groundWeapon().damageAmount() * unitType.maxGroundHits() * (24 / (double)unitType.groundWeapon().damageCooldown())) : 0;
-		attributes.avgAirRange += targetComp.getUnitMap()[unitType] * (unitType.airWeapon().maxRange() / 32);
-		attributes.avgGroundRange += targetComp.getUnitMap()[unitType] * (unitType.groundWeapon().maxRange() / 32);
-		attributes.avgSpeed += targetComp.getUnitMap()[unitType] * (unitType.topSpeed());
-		attributes.detection = unitType.isDetector() ? unitType.isDetector() : attributes.detection;
-		attributes.maxAirRange = unitType.airWeapon().maxRange() / 32 > attributes.maxAirRange ? unitType.airWeapon().maxRange() / 32 : attributes.maxAirRange;
-		attributes.maxGroundRange = unitType.groundWeapon().maxRange() / 32 > attributes.maxGroundRange ? unitType.groundWeapon().maxRange() / 32 : attributes.maxGroundRange;
-		attributes.totalHealth += targetComp.getUnitMap()[unitType] * (unitType.maxHitPoints() + unitType.maxShields());
-	}
-
-	int totalCount = 0;
-	for each(auto &unitType in targetComp.getTypes())
-		totalCount += targetComp.getUnitMap()[unitType];
-
-	attributes.avgAirRange /= totalCount;
-	attributes.avgGroundRange /= totalCount;
-	attributes.avgSpeed /= totalCount;
 }
 
 void Coalition::outAttributes()
 {
 	std::cout << "Coalition " << coalitionID << "\n";
-	std::cout << "\tairDPS: " << attributes.airDPS << "\n";
-	std::cout << "\tgroundDPS: " << attributes.groundDPS << "\n";
-	std::cout << "\tavgAirRange: " << attributes.avgAirRange << "\n";
-	std::cout << "\tavgGroundRange: " << attributes.avgGroundRange << "\n";
-	std::cout << "\tavgSpeed: " << attributes.avgSpeed << "\n";
-	std::cout << "\tdetection: " << attributes.detection << "\n";
-	std::cout << "\tmaxAirRange: " << attributes.maxAirRange << "\n";
-	std::cout << "\tmaxGroundRange: " << attributes.maxGroundRange << "\n";
-	std::cout << "\ttotalHealth: " << attributes.totalHealth << "\n";
+	currentComp.outAttributes();
+}
+
+void Coalition::logPerformance()
+{
+	std::cout << "Logging Performance...\n";
+	std::ofstream composition;
+	auto race = BWAPI::Broodwar->self()->getRace().toString();
+	composition.open(race + "_" + task->getName() + ".txt");
+	composition << targetComp.toString();
+	composition.close();
 }

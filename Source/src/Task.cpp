@@ -1,6 +1,7 @@
 #include "Task.h"
 #include "CoalitionHelper.h"
 #include "TaskHelper.h"
+#include "ArmyHelper.h"
 #include <string>
 
 Task::Task()
@@ -15,7 +16,7 @@ Task::Task()
 	creationFrame = BWAPI::Broodwar->getFrameCount();
 	cost = 0.0;
 	profit = 0.0;
-	debug = true;
+	debug = false;
 	taskType = NON;
 }
 
@@ -23,7 +24,7 @@ Task::~Task()
 {
 	printDebugInfo("DELETE", true);
 	cleanSubTasks();
-	if (taskType != CRC && taskType != NON && coalition)
+	if (taskType != CRC && taskType != STR && taskType != SUR && taskType != NON && coalition != nullptr)
 	{
 		CoalitionHelper::removeCoalition(coalition);
 		coalition = nullptr;
@@ -137,21 +138,27 @@ void Task::succeed()
 	complete = true;
 	profit = 1.0;
 	printDebugInfo("Success!", true);
-	
-	if(taskType != CRC)
+
+	if (taskType == SCO)
+		ArmyHelper::stopScouting();
+
+	if (taskType != CRC && taskType != STR && taskType != SUR)
 		CoalitionHelper::removeCoalition(coalition);
-	//TaskHelper::removeTask(this);
+	cleanSubTasks();	
 }
 
 void Task::fail()
-{	
+{		
 	complete = true;
 	profit = 0.0;
 	printDebugInfo("Failure!", true);
+	
+	if (taskType == SCO)
+		ArmyHelper::stopScouting();
 
-	if (taskType != CRC)
+	if (taskType != CRC && taskType != STR && taskType != SUR)
 		CoalitionHelper::removeCoalition(coalition);
-	//TaskHelper::removeTask(this);
+	cleanSubTasks();	
 }
 
 void Task::printDebugInfo(std::string info, bool forceShow)

@@ -20,4 +20,6 @@ public:
 	void assign();
 	void act();
 	void update();
+	void succeed();
+	void fail();
 };

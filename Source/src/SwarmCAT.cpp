@@ -1,16 +1,17 @@
 #include "swarmCAT.h"
-#include "ResourceDepot.h"
 #include "AgentHelper.h"
-#include "EconHelper.h"
-#include "DesireHelper.h"
-#include "MapHelper.h"
+#include "ArmyHelper.h"
+#include "Attack.h"
 #include "CoalitionHelper.h"
-#include "TaskHelper.h"
-#include "Composition.h"
 #include "CreateUnit.h"
+#include "Composition.h"
+#include "DesireHelper.h"
+#include "EconHelper.h"
+#include "MapHelper.h"
+#include "ResourceDepot.h"
 #include "ResearchTech.h"
 #include "Scout.h"
-#include "Attack.h"
+#include "TaskHelper.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -64,6 +65,7 @@ void SwarmCAT::onStart()
 	EconHelper::initialiseHelper();	
 	DesireHelper::initialiseHelper();
 	TaskHelper::initialiseHelper();
+	ArmyHelper::initialiseHelper();
 
 	/* just for testing */
 
@@ -72,18 +74,11 @@ void SwarmCAT::onStart()
 	//CreateUnit* createDarkTemplar = new CreateUnit(BWAPI::UnitTypes::Protoss_Dark_Templar, 5);
 	//CreateUnit* createCarrier = new CreateUnit(BWAPI::UnitTypes::Protoss_Carrier, 4);
 	//CreateUnit* createDragoon = new CreateUnit(BWAPI::UnitTypes::Protoss_Dragoon, 5);
-	CreateUnit* createGate = new CreateUnit(BWAPI::UnitTypes::Protoss_Zealot, 5);
+	//CreateUnit* createGate = new CreateUnit(BWAPI::UnitTypes::Protoss_Gateway, 3);
 	//CreateUnit* createReaver = new CreateUnit(BWAPI::UnitTypes::Protoss_Reaver, 4);
 	/*CreateUnit* testCreate = new CreateUnit(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 5);
 	CreateUnit* createMarines = new CreateUnit(BWAPI::UnitTypes::Terran_Marine, ceil(1 * EconHelper::getUnitMultiplier()));*/	
-	//for each(auto &base in BWTA::getStartLocations())
-	//{	
-	//	Scout* scout = new Scout(MapHelper::getZone(BWAPI::Broodwar->getRegionAt(base->getPosition())));
-	//	//Attack* attack2 = new Attack(MapHelper::getZone(BWAPI::Broodwar->getRegionAt(base->getPosition())));
-	//	TaskHelper::addTask(scout, true);
-	//	//TaskHelper::addTask(attack2, true);
-	//}
-	TaskHelper::addTask(createGate, true);
+	//TaskHelper::addTask(createGate, true);
 	/*CreateUnit* createHydralisk = new CreateUnit(BWAPI::UnitTypes::Zerg_Hydralisk, 10);
 	CreateUnit* createZergling = new CreateUnit(BWAPI::UnitTypes::Zerg_Zergling, 20);*/
 	//CreateUnit* createZergling = new CreateUnit(BWAPI::UnitTypes::Zerg_Guardian, 1);
@@ -113,6 +108,11 @@ void SwarmCAT::onFrame()
 {
 	//std::cout << "---FrameStart---\n";	
 	DesireHelper::updateDesireMaps();
+	/*std::cout << "Is attacking: " << ArmyHelper::isAttacking() << "\n";*/
+	if (!ArmyHelper::isAttacking())
+	{		
+		
+	}
 	drawDebugText();
 	currentTime = std::chrono::high_resolution_clock::now();
 
@@ -171,6 +171,7 @@ void SwarmCAT::onFrame()
 	}
 
 	TaskHelper::updateRootTasks();
+	ArmyHelper::updateArmyMovement();
 	//std::cout << "---FrameEnd---\n";
 }
 
@@ -201,6 +202,8 @@ void SwarmCAT::onNukeDetect(BWAPI::Position target)
 void SwarmCAT::onUnitDiscover(BWAPI::Unit unit)
 {
 	//std::cout << "UnitDiscover\n";
+	if (unit->getType().isBuilding() && unit->getPlayer() == Broodwar->enemy())
+		ArmyHelper::addTargetPriority(unit);
 }
 
 void SwarmCAT::onUnitEvade(BWAPI::Unit unit)
@@ -245,6 +248,9 @@ void SwarmCAT::onUnitDestroy(BWAPI::Unit unit)
 		AgentHelper::removeAgent(unit->getID());
 		DesireHelper::updateSupplyDesire(unit->getType(), true);
 	}
+
+	if (unit->getType().isBuilding() && unit->getPlayer() == Broodwar->enemy())
+		ArmyHelper::removeTargetPriority(unit);
 }
 
 void SwarmCAT::onUnitMorph(BWAPI::Unit unit)

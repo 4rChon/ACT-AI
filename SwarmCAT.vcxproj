@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClInclude Include="Source\include\Agent.h" />
     <ClInclude Include="Source\include\AgentHelper.h" />
+    <ClInclude Include="Source\include\ArmyHelper.h" />
     <ClInclude Include="Source\include\Attack.h" />
     <ClInclude Include="Source\include\Coalition.h" />
     <ClInclude Include="Source\include\CoalitionHelper.h" />
@@ -46,6 +47,7 @@
   <ItemGroup>
     <ClCompile Include="Source\src\Agent.cpp" />
     <ClCompile Include="Source\src\AgentHelper.cpp" />
+    <ClCompile Include="Source\src\ArmyHelper.cpp" />
     <ClCompile Include="Source\src\Attack.cpp" />
     <ClCompile Include="Source\src\Coalition.cpp" />
     <ClCompile Include="Source\src\CoalitionHelper.cpp" />

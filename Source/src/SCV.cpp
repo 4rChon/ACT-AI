@@ -31,6 +31,16 @@ void SCV::act()
 		auto resourceDepots = AgentHelper::getResourceDepots();
 		for (auto &base : resourceDepots)
 		{
+			if (!base->isGasSaturated())
+			{
+				setMiningBase(base, true);
+				mining = true;
+				return;
+			}
+		}
+
+		for (auto &base : resourceDepots)
+		{
 			if (!base->isMineralSaturated())
 			{
 				setMiningBase(base, false);
