@@ -7,7 +7,8 @@ namespace AgentHelper
 	namespace
 	{
 		static Agentset agentSet;
-		static Baseset resourceDepots;		
+		static Agentset comsatStations;
+		static Baseset resourceDepots;
 		static Agentset::iterator lastServiced;
 		static TypeCountMap typeCountMap;
 		static int lastErrorFrame;
@@ -54,6 +55,11 @@ namespace AgentHelper
 	const Baseset& getResourceDepots()
 	{
 		return resourceDepots;
+	}
+
+	const Agentset& getComsatStations()
+	{
+		return comsatStations;
 	}
 
 	int getTypeCount(BWAPI::UnitType unitType)
@@ -103,28 +109,28 @@ namespace AgentHelper
 			//std::cout << "Added new Resource Depot : " << unit->getID() << "\n";
 			resourceDepots.insert((ResourceDepot*)agent);
 		}
-		else
+		else if (unit->getType().isWorker())
 		{
-			if (unit->getType().isWorker())
+			if (unit->getType() == BWAPI::UnitTypes::Terran_SCV)
 			{
-				if (unit->getType() == BWAPI::UnitTypes::Terran_SCV)
-				{
-					agent = new SCV(unit);
-					//std::cout << "Added new SCV : " << unit->getType() << " : " << unit->getID() << "\n";
-				}
-				else
-				{
-					agent = new Worker(unit);
-					//std::cout << "Added new Worker : " << unit->getType() << " : " << unit->getID() << "\n";
-				}
+				agent = new SCV(unit);
+				//std::cout << "Added new SCV : " << unit->getType() << " : " << unit->getID() << "\n";
 			}
 			else
 			{
-				agent = new Agent(unit);
-				/*std::cout << "Added new Unit : " << unit->getType() << " : " << unit->getID() << "\n";*/
+				agent = new Worker(unit);
+				//std::cout << "Added new Worker : " << unit->getType() << " : " << unit->getID() << "\n";
 			}
 		}
+		else
+		{
+			agent = new Agent(unit);
+			/*std::cout << "Added new Unit : " << unit->getType() << " : " << unit->getID() << "\n";*/
+		}
+
 		agentSet.insert(agent);
+		if (unit->getType() == BWAPI::UnitTypes::Terran_Comsat_Station)
+			comsatStations.insert(agent);
 		typeCountMap[agent->getUnit()->getType()]++;
 	}
 

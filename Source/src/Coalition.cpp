@@ -31,24 +31,25 @@ Coalition::Coalition(Composition targetComp, Task* task)
 	coalitionID = CoalitionHelper::getNextID();
 	
 	cost = targetComp.getCost();
-	profit = 0.0;
+	profit = 0.0;	
 }
 
 Coalition::~Coalition()
 {
 	std::cout << "~Coalition : " << coalitionID << "\n";
-	logPerformance();
-	std::cout << "Unbinding Agents...\n";
+	//logPerformance();
+	active = false;	
+	/*std::cout << "Unbinding Agents...\n";*/
 	for (auto agent : agentSet)
 	{
-		std::cout << "\tUnbinding...\n";
+		/*std::cout << "\tUnbinding...\n";*/
 		agent->unbind();
 	}
-	std::cout << "Agents Unbound...\n";
+	/*std::cout << "Agents Unbound...\n";*/
 	agentSet.clear();
-	std::cout << "Agentset Clear...\n";
+	/*std::cout << "Agentset Clear...\n";*/
 	unitSet.clear();
-	std::cout << "Unitset Clear...\n";
+	/*std::cout << "Unitset Clear...\n";*/
 	/*CoalitionHelper::removeCoalition(this);*/
 }
 
@@ -62,12 +63,12 @@ int Coalition::getID() const
 	return coalitionID;
 }
 
-BWAPI::Unitset Coalition::getUnitSet() const
+BWAPI::Unitset &Coalition::getUnitSet()
 {
 	return unitSet;
 }
 
-Agentset Coalition::getAgentSet() const
+Agentset &Coalition::getAgentSet()
 {
 	return agentSet;
 }
@@ -126,7 +127,7 @@ void Coalition::addUnit(BWAPI::Unit unit)
 
 	if (!active && currentComp == targetComp)
 	{
-		std::cout << "A coalition has been activated!\n";
+		std::cout << "Coalition " << coalitionID << " Activated!\n";
 		active = true;
 		for (auto &agent : agentSet)
 			agent->bind();
@@ -165,7 +166,7 @@ void Coalition::logPerformance()
 	std::cout << "Logging Performance...\n";
 	std::ofstream composition;
 	auto race = BWAPI::Broodwar->self()->getRace().toString();
-	composition.open(race + "_" + task->getName() + ".txt");
+	composition.open("compositions\\" + race + "_" + task->getName() + ".txt");
 	composition << targetComp.toString();
 	composition.close();
 }

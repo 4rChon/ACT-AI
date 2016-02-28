@@ -12,7 +12,7 @@ Composition::Composition(BWAPI::Unitset unitSet)
 	cost = 0;
 	for (auto unit : unitSet)
 		*this += unit->getType();
-	initAttributes();
+	//initAttributes();
 }
 
 Composition::Composition(UnitMap unitMap)
@@ -36,7 +36,7 @@ Composition Composition::operator+=(const BWAPI::UnitType& rhs)
 {
 	unitMap[rhs]++;
 	cost += (rhs.gasPrice() * 1.5) + (rhs.mineralPrice());
-	updateAttributes(rhs);
+	//updateAttributes(rhs);
 	return *this;
 }
 
@@ -44,7 +44,7 @@ Composition Composition::operator-=(const BWAPI::UnitType& rhs)
 {
 	unitMap[rhs]--;
 	cost -= (rhs.gasPrice() * 1.5) + (rhs.mineralPrice());
-	updateAttributes(rhs, -1);
+	//updateAttributes(rhs, -1);
 	return *this;
 }
 
@@ -85,7 +85,7 @@ void Composition::addType(BWAPI::UnitType unitType, int count)
 {
 	unitMap[unitType] += count;
 	cost += ((unitType.gasPrice() * 1.5) + (unitType.mineralPrice())) * count;
-	updateAttributes(unitType, count);
+	//updateAttributes(unitType, count);
 }
 
 Composition::Attributes & Composition::getAttributes()

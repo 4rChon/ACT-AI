@@ -8,13 +8,13 @@ private:
 	int unitCount;
 	bool satisfying;
 	bool satisfied;
-	bool building;
-	bool reserved;
 	bool requiresGas;
 	int successfulOrders;
 public:
 	//constructors
-	CreateUnit(BWAPI::UnitType unitType, int unitCount = 1);	
+	CreateUnit(BWAPI::UnitType unitType, int unitCount = 1);
+
+	BWAPI::UnitType getUnitType();
 
 	//-
 	void assign();

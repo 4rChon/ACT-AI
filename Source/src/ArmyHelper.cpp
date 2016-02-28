@@ -25,10 +25,11 @@ namespace ArmyHelper
 		static bool attacking;
 		static bool defending;
 		static bool scouting;
+		static double productionRatio;
 		static MapHelper::Zone* attackTarget;
 		static MapHelper::Zone* defendTarget;
 		static MapHelper::Zone* scoutTarget;
-		static MapHelper::Zone* enemyStart;
+		static MapHelper::Zone* enemyStart;		
 		static std::map<UnitCostPair, MapHelper::Zone*, compareUnit> targetPriorityList;
 	}
 
@@ -90,7 +91,7 @@ namespace ArmyHelper
 
 	void attack()
 	{
-		if (targetPriorityList.size() != 0 && !attacking)
+		if (targetPriorityList.size() > 0 && !attacking)
 		{
 			attacking = true;
 			defending = false;
@@ -134,4 +135,16 @@ namespace ArmyHelper
 		attackTarget = (*targetPriorityList.begin()).second;
 	}
 
+	void updateProductionRatio()
+	{
+		productionRatio = 1.0;
+	}
+
+	bool scan(BWAPI::Position target)
+	{
+		for each(auto &comsatStation in AgentHelper::getComsatStations())
+			if (comsatStation->useAbility(BWAPI::TechTypes::Scanner_Sweep, target))
+				return true;
+		return false;
+	}
 }

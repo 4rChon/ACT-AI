@@ -18,6 +18,12 @@ void Attack::createCoalition()
 {
 	Composition c;
 	c.addType(BWAPI::UnitTypes::Terran_Marine, 5);	
+	c.addType(BWAPI::UnitTypes::Terran_Medic, 5);
+	for each(auto &unit in BWAPI::Broodwar->self()->getUnits())
+	{
+		if (!unit->getType().isWorker() && !unit->getType().isBuilding())
+			c.addType(unit->getType(), 1);
+	}
 	CreateCoalition *createCoalition = new CreateCoalition(c, this);
 	addSubTask(createCoalition);
 }
@@ -49,36 +55,20 @@ void Attack::update()
 	if (complete)
 		return;
 
+	if (BWAPI::Broodwar->getFrameCount() - target->getLastVisited() < 5 && target->getEnemyScore() == 0)
+	{
+		succeed();
+		return;
+	}
+
 	if (!assigned)
+	{
 		assign();
+		return;
+	}
 
 	if (!acting && assigned)
 		act();
 
-	if (BWAPI::Broodwar->getFrameCount() - target->getLastVisited() < 5 && target->getEnemyScore() == 0)
-		succeed();
-
 	printDebugInfo("Update End");
-}
-
-void Attack::succeed() //move to task?
-{
-	complete = true;
-	profit = 1.0;
-	printDebugInfo("Success!", true);
-	ArmyHelper::defend();
-
-	CoalitionHelper::removeCoalition(coalition);
-	cleanSubTasks();
-}
-
-void Attack::fail() //move to task?
-{
-	complete = true;
-	profit = 0.0;
-	printDebugInfo("Failure!", true);
-	ArmyHelper::defend();
-
-	CoalitionHelper::removeCoalition(coalition);
-	cleanSubTasks();
 }

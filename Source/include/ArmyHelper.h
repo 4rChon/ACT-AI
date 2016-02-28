@@ -13,4 +13,6 @@ namespace ArmyHelper
 	bool isAttacking();
 	void addTargetPriority(BWAPI::Unit unit);
 	void removeTargetPriority(BWAPI::Unit unit);
+	void updateProductionRatio();
+	bool scan(BWAPI::Position target);
 }

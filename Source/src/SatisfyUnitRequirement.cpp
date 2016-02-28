@@ -15,7 +15,9 @@ SatisfyUnitRequirement::SatisfyUnitRequirement(BWAPI::UnitType unitType)
 
 void SatisfyUnitRequirement::assign()
 {
+	printDebugInfo("Assign");
 	assigned = true;
+	printDebugInfo("Assign End");
 }
 
 void SatisfyUnitRequirement::act()
@@ -48,22 +50,32 @@ void SatisfyUnitRequirement::update()
 {
 	printDebugInfo("Update");
 	if (complete)
+		return;
+
+	if (!assigned)
 	{
-		/*cleanSubTasks();*/
+		assign();
 		return;
 	}
 
-	if (!assigned)
-		assign();				
-
-	if(!acting)
+	if (!acting && assigned)
+	{
 		act();
+		return;
+	}
 
 	if (acting)
 	{
-		for (auto &task : subTasks)
-			if (!task->isComplete())
+		for each (auto &requirement in unitType.requiredUnits())
+		{
+			if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(requirement.first, requirement.second))
 				return;
+		}
+		if (unitType.requiredTech() != BWAPI::TechTypes::None)
+		{
+			if (!BWAPI::Broodwar->self()->hasResearched(unitType.requiredTech()))
+				return;
+		}
 		succeed();
 	}
 	printDebugInfo("Update End");

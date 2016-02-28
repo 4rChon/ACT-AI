@@ -16,7 +16,7 @@ Task::Task()
 	creationFrame = BWAPI::Broodwar->getFrameCount();
 	cost = 0.0;
 	profit = 0.0;
-	debug = false;
+	//debug = true;
 	taskType = NON;
 }
 
@@ -24,11 +24,17 @@ Task::~Task()
 {
 	printDebugInfo("DELETE", true);
 	cleanSubTasks();
+	/*std::cout << "SubTasks Cleaned...\n";*/
 	if (taskType != CRC && taskType != STR && taskType != SUR && taskType != NON && coalition != nullptr)
 	{
 		CoalitionHelper::removeCoalition(coalition);
+		/*std::cout << "Coalition Removed...\n";*/
 		coalition = nullptr;
+		coalitionID = -1;
 	}
+	superTasks.clear();
+	/*else
+		std::cout << "No Coalition Found...\n";*/
 	//TaskHelper::getAllTasks().erase(this);
 	//TaskHelper::removeTask(this);
 }
@@ -84,6 +90,11 @@ Taskset& Task::getSubTasks()
 	return subTasks;
 }
 
+Taskset& Task::getSuperTasks()
+{
+	return superTasks;
+}
+
 Coalition* Task::getCoalition() const
 {
 	return coalition;
@@ -108,26 +119,40 @@ double Task::getProfit()
 
 void Task::addSubTask(Task* task)
 {
-	subTasks.insert(TaskHelper::addTask(task));
+	auto newTask = TaskHelper::addTask(task);
+	subTasks.insert(newTask);
+	newTask->addSuperTask(this);
+}
+
+void Task::addSuperTask(Task* task)
+{
+	superTasks.insert(task);
 }
 
 void Task::cleanSubTasks()
 {
-	for (auto it = subTasks.begin(); it != subTasks.end(); ++it)
-		TaskHelper::removeTask(*it);
+	for (auto &taskIt = subTasks.begin(); taskIt != subTasks.end(); ++taskIt)
+	{
+		(*taskIt)->getSuperTasks().erase(this);
+		printDebugInfo("\n\tRemoving sub task: " + (*taskIt)->getName() + " \n\tfrom super task: " + this->getName(), true);
+		for (auto &superTaskIt = (*taskIt)->getSuperTasks().begin(); superTaskIt != (*taskIt)->getSuperTasks().end(); ++superTaskIt)
+		{
+			printDebugInfo("\n\tRemoving sub task: " + (*taskIt)->getName() + " \n\tfrom super task: " + (*superTaskIt)->getName(), true);
+			(*superTaskIt)->getSubTasks().erase(*taskIt);
+		}
+		TaskHelper::removeTask(*taskIt);
+	}
 	subTasks.clear();
 }
 
 void Task::updateTaskTree()
 {	
 	if (subTasks.size() > 0)
-	{
-		for (auto it = subTasks.begin(); it != subTasks.end(); ++it)
+	{		
+		for (auto &it = subTasks.begin(); it != subTasks.end(); ++it)
 		{
 			if (!(*it)->isComplete())
 				(*it)->updateTaskTree();
-			else
-				TaskHelper::removeTask(*it);
 		}
 	}
 	update();
@@ -139,12 +164,21 @@ void Task::succeed()
 	profit = 1.0;
 	printDebugInfo("Success!", true);
 
+	if (taskType == ATT)
+	{
+		ArmyHelper::defend();
+	}
+
 	if (taskType == SCO)
+	{
 		ArmyHelper::stopScouting();
+	}
 
 	if (taskType != CRC && taskType != STR && taskType != SUR)
+	{
 		CoalitionHelper::removeCoalition(coalition);
-	cleanSubTasks();	
+	}
+	cleanSubTasks();
 }
 
 void Task::fail()
@@ -153,12 +187,21 @@ void Task::fail()
 	profit = 0.0;
 	printDebugInfo("Failure!", true);
 	
+	if (taskType == ATT)
+	{
+		ArmyHelper::defend();
+	}
+
 	if (taskType == SCO)
+	{
 		ArmyHelper::stopScouting();
+	}
 
 	if (taskType != CRC && taskType != STR && taskType != SUR)
+	{
 		CoalitionHelper::removeCoalition(coalition);
-	cleanSubTasks();	
+	}
+	cleanSubTasks();
 }
 
 void Task::printDebugInfo(std::string info, bool forceShow)

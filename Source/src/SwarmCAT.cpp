@@ -69,34 +69,8 @@ void SwarmCAT::onStart()
 
 	/* just for testing */
 
-	//CreateUnit* createZealot = new CreateUnit(BWAPI::UnitTypes::Protoss_Zealot, 10);
-	//CreateUnit* createArchon = new CreateUnit(BWAPI::UnitTypes::Protoss_Archon, 5);
-	//CreateUnit* createDarkTemplar = new CreateUnit(BWAPI::UnitTypes::Protoss_Dark_Templar, 5);
-	//CreateUnit* createCarrier = new CreateUnit(BWAPI::UnitTypes::Protoss_Carrier, 4);
-	//CreateUnit* createDragoon = new CreateUnit(BWAPI::UnitTypes::Protoss_Dragoon, 5);
-	//CreateUnit* createGate = new CreateUnit(BWAPI::UnitTypes::Protoss_Gateway, 3);
-	//CreateUnit* createReaver = new CreateUnit(BWAPI::UnitTypes::Protoss_Reaver, 4);
-	/*CreateUnit* testCreate = new CreateUnit(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 5);
-	CreateUnit* createMarines = new CreateUnit(BWAPI::UnitTypes::Terran_Marine, ceil(1 * EconHelper::getUnitMultiplier()));*/	
-	//TaskHelper::addTask(createGate, true);
-	/*CreateUnit* createHydralisk = new CreateUnit(BWAPI::UnitTypes::Zerg_Hydralisk, 10);
-	CreateUnit* createZergling = new CreateUnit(BWAPI::UnitTypes::Zerg_Zergling, 20);*/
-	//CreateUnit* createZergling = new CreateUnit(BWAPI::UnitTypes::Zerg_Guardian, 1);
-	//CreateUnit* createComsat = new CreateUnit(BWAPI::UnitTypes::Terran_Comsat_Station, 1);
-	//TaskHelper::addTask(createArchon, true);
-	//TaskHelper::addTask(createDarkTemplar, true);
-	//TaskHelper::addTask(createCarrier, true);
-	//TaskHelper::addTask(createDragoon, true);
-	/*TaskHelper::addTask(createDragoon2, true);*/
-	//TaskHelper::addTask(createDragoon3, true);
-	//TaskHelper::addTask(createReaver, true);
-	/*TaskHelper::addTask(createMarines, true);
-	TaskHelper::addTask(testCreate, true);*/
-	//TaskHelper::addTask(createCarrier, true);
-	//TaskHelper::addTask(createReaver, true);
-	//TaskHelper::addTask(createHydralisk, true);
-	//TaskHelper::addTask(createZergling, true);
-	//TaskHelper::addTask(createComsat, true);
+	//CreateUnit* createUnit = new CreateUnit(BWAPI::UnitTypes::Terran_Firebat, 1);
+	//TaskHelper::addTask(createUnit, true);
 }
 
 void SwarmCAT::onEnd(bool isWinner)
@@ -108,12 +82,8 @@ void SwarmCAT::onFrame()
 {
 	//std::cout << "---FrameStart---\n";	
 	DesireHelper::updateDesireMaps();
-	/*std::cout << "Is attacking: " << ArmyHelper::isAttacking() << "\n";*/
-	if (!ArmyHelper::isAttacking())
-	{		
-		
-	}
 	drawDebugText();
+
 	currentTime = std::chrono::high_resolution_clock::now();
 
 	if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
@@ -164,9 +134,9 @@ void SwarmCAT::onFrame()
 
 		AgentHelper::setLastServiced(++a);
 
-		std::chrono::duration<double> diff = std::chrono::high_resolution_clock::now() - currentTime;
+		auto diff = std::chrono::high_resolution_clock::now() - currentTime;
 
-		if (diff.count() > 0.005)
+		if (diff.count() > 0.0005)
 			return;
 	}
 
@@ -218,6 +188,10 @@ void SwarmCAT::onUnitShow(BWAPI::Unit unit)
 
 void SwarmCAT::onUnitHide(BWAPI::Unit unit)
 {	
+	if (unit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
+	{
+		ArmyHelper::scan(unit->getPosition());
+	}
 	//std::cout << "UnitHide\n";
 }
 

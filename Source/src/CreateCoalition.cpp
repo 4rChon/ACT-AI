@@ -45,13 +45,13 @@ void CreateCoalition::update()
 {
 	printDebugInfo("Update");
 	if (complete)
-	{
-		/*cleanSubTasks();*/
 		return;
-	}
 
 	if (!assigned)
+	{
 		assign();
+		return;
+	}
 
 	if (taskCoalition->isActive())
 	{

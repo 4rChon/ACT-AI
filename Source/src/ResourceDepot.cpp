@@ -64,29 +64,33 @@ int ResourceDepot::getRefineryCount()
 	return refineryCount;
 }
 
+void ResourceDepot::act()
+{	
+	updateExpandDesire();
+	updateRefineryCount();
+	//temp contents
+	if (unit->isIdle())
+	{
+		if (unit->canBuildAddon())
+			unit->buildAddon(BWAPI::UnitTypes::Terran_Comsat_Station);
+		train((*unit->getType().buildsWhat().begin()));
+	}
+}
+
 void ResourceDepot::updateRefineryCount()
 {
 	refineryCount = 0;
 	for each (auto &geyser in baseLocation->getGeysers())
 	{
-		if (geyser->getType().isRefinery())
+		if (geyser->getType().isRefinery() && !geyser->isBeingConstructed())
 			refineryCount++;
 	}
-}
-
-void ResourceDepot::act()
-{		
-	updateExpandDesire();
-
-	//temp contents
-	if (unit->isIdle())
-		train((*unit->getType().buildsWhat().begin()));	
 }
 
 void ResourceDepot::updateExpandDesire()
 {	
 	//temp contents
-	if (isMineralSaturated() && expandDesire == 1.0)
+	if (mineralMiners > 2 * baseLocation->getMinerals().size() && expandDesire == 1.0)
 	{		
 		Task* expand = new Expand();
 		TaskHelper::addTask(expand, true);
@@ -135,23 +139,7 @@ bool ResourceDepot::addGeyser(Worker* worker)
 	for each (auto &geyser in baseLocation->getGeysers())
 	{
 		if (!geyser->getType().isRefinery())
-		{
-			if (worker->build(BWAPI::Broodwar->self()->getRace().getRefinery(), &geyser->getTilePosition()))
-			{
-				BWAPI::Broodwar->registerEvent(
-					[this, worker](BWAPI::Game*)
-				{
-					this->updateRefineryCount();
-				},
-					[worker](BWAPI::Game*)
-				{
-					return !worker->getUnit()->exists() || !worker->getUnit()->isConstructing();
-				},
-					1,
-					5);
-				return true;
-			}
-		}
+			return worker->build(BWAPI::Broodwar->self()->getRace().getRefinery(), &geyser->getTilePosition());
 	}
 	return false;
 }

@@ -117,7 +117,11 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 		if (!BWAPI::Broodwar->isVisible(*desiredPosition))
 			return move((BWAPI::Position)*desiredPosition);		
 
-		auto buildLocation = BWAPI::Broodwar->getBuildLocation(building, *desiredPosition);
+		BWAPI::TilePosition buildLocation;
+		if (!building.isResourceDepot())
+			buildLocation = BWAPI::Broodwar->getBuildLocation(building, *desiredPosition);
+		else
+			buildLocation = *desiredPosition;
 		if (unit->build(building, buildLocation))
 		{
 			unsetMiningBase();
@@ -142,11 +146,10 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 						((CreateUnit*)task)->decrementUnitCount();
 					if (task->getType() == EXP)
 						task->succeed();
-				}
+				}				
 			},
 				[this](BWAPI::Game*) {return !getUnit()->exists() || this->getUnit()->getOrder() == BWAPI::Orders::ConstructingBuilding || !this->getUnit()->isConstructing(); },
 				1);
-			
 		}
 		return unit->isConstructing();
 	}

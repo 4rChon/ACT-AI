@@ -39,12 +39,25 @@ void Scout::update()
 	printDebugInfo("Update");
 	if (complete)
 		return;
-	if (!assigned)
-		assign();
-	if (coalition->isActive())
-		act();
+
 	if (BWAPI::Broodwar->getFrameCount() - target->getLastVisited() < 5)
+	{
 		succeed();
+		return;
+	}
+
+	if (!assigned)
+	{
+		assign();
+		return;
+	}
+
+	if (coalition->isActive())
+	{
+		act();
+		return;
+	}	
+
 	printDebugInfo("Update End");
 }
 

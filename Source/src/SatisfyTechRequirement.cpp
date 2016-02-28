@@ -36,23 +36,24 @@ void SatisfyTechRequirement::update()
 {
 	printDebugInfo("Update");
 	if (complete)
+		return;
+
+	if (!assigned)
 	{
-		/*cleanSubTasks();*/
+		assign();
 		return;
 	}
 
-	if (!assigned)
-		assign();
-
-	if (!acting)
+	if (!acting && assigned)
+	{
 		act();
+		return;
+	}
 
 	if (acting)
 	{
-		for (auto &task : subTasks)
-			if (!task->isComplete())
-				return;
-		succeed();
+		if (BWAPI::Broodwar->self()->isResearchAvailable(techType))
+			succeed();
 	}
 	printDebugInfo("Update End");
 }

@@ -37,8 +37,8 @@ public:
 	bool isActive() const;
 	Composition getCurrentComp() const;
 	Composition getTargetComp() const;
-	BWAPI::Unitset getUnitSet() const;
-	Agentset getAgentSet() const;	
+	BWAPI::Unitset &getUnitSet();
+	Agentset &getAgentSet();
 	
 	//-	
 	bool addAgent(Agent* agent);

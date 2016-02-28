@@ -14,12 +14,15 @@ CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 	this->unitCount = unitCount;
 	satisfying = false;	
 	satisfied = true;
-	building = false;
-	reserved = false;
 	requiresGas = false;
 	taskType = CRU;
 
 	//debug = true;
+}
+
+BWAPI::UnitType CreateUnit::getUnitType()
+{
+	return unitType;
 }
 
 void CreateUnit::satisfyRequirements()
@@ -102,9 +105,11 @@ void CreateUnit::act()
 			{
 				for each (auto &resourceDepot in AgentHelper::getResourceDepots())
 					if (resourceDepot->addGeyser((Worker*)agent))
-						return;
+						break;
 			}
+			return;
 		}
+
 		if (unitType == BWAPI::UnitTypes::Zerg_Lurker || unitType == BWAPI::UnitTypes::Zerg_Guardian)
 		{
 			for each (auto &agent in coalition->getAgentSet())
@@ -112,9 +117,10 @@ void CreateUnit::act()
 					unitCount--;
 			return;
 		}
+
 		if (unitType == BWAPI::UnitTypes::Protoss_Archon)
 		{
-			if(coalition->getAgentSet().size()%2 == 0)
+			if(coalition->getAgentSet().size() % 2 == 0)
 				for (auto agent = coalition->getAgentSet().begin(); agent != coalition->getAgentSet().end(); ++agent)
 				{
 					if ((*agent)->useAbility(BWAPI::TechTypes::Archon_Warp, (*++agent)->getUnit()))

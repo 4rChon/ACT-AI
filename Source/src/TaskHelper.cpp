@@ -60,11 +60,11 @@ namespace TaskHelper
 
 	void removeTask(Task* task)
 	{
-		if (rootTaskSet.count(task) > 0)
-		{
-			std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from root taskset\n";
-			rootTaskSet.erase(task);
-		}
+		//if (rootTaskSet.count(task) > 0)
+		//{
+		//	std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from root taskset\n";
+		//	rootTaskSet.erase(task);
+		//}
 
 		if (fullTaskSet.count(task) > 0)
 		{
@@ -78,11 +78,17 @@ namespace TaskHelper
 	{		
 		if (rootTaskSet.size() > 0)
 		{
-			for (auto it = rootTaskSet.begin(); it != rootTaskSet.end(); ++it)
+			for (auto it = rootTaskSet.begin(); it != rootTaskSet.end();)
 				if ((*it)->isComplete())
+				{					
 					removeTask(*it);
+					it = rootTaskSet.erase(it);
+				}
 				else
+				{
 					(*it)->updateTaskTree();
+					++it;
+				}
 		}
 	}
 }

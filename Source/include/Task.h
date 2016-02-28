@@ -26,6 +26,7 @@ class Task
 protected:
 	std::string taskName; //debug purposes
 	Taskset subTasks;
+	Taskset superTasks;
 	bool assigned;
 	bool complete;
 	bool acting;
@@ -58,10 +59,13 @@ public:
 	int getID() const;
 	std::string getName() const;
 	Taskset& getSubTasks();
+	Taskset & getSuperTasks();
 	virtual Coalition* getCoalition() const;
 	virtual double getCost();
 	virtual double getProfit();
 	void addSubTask(Task* task);
+
+	void addSuperTask(Task * task);
 
 	//-
 	virtual void assign() = 0;

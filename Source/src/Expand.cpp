@@ -46,18 +46,19 @@ void Expand::update()
 {
 	printDebugInfo("Update");
 	if (complete)
+		return;
+
+	if (!assigned)
 	{
-		/*cleanSubTasks();*/
+		assign();
 		return;
 	}
 
-	if (!assigned)
-		assign();
-
 	if (coalition->isActive() && !builder)
-		builder = (*coalition->getAgentSet().begin());		
+		builder = (*coalition->getAgentSet().begin());
 
 	if (builder && !complete)
 		act();
+
 	printDebugInfo("Update End");
 }

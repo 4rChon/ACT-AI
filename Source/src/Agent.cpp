@@ -183,7 +183,7 @@ bool Agent::buildAddon(BWAPI::UnitType addon)
 
 bool Agent::train(BWAPI::UnitType unitType)
 {
-	if (unit->canTrain(unitType) && EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType) && unit->getTrainingQueue().size() < 2 && unit->getRemainingTrainTime() < 5)
+	if (unit->canTrain(unitType) && EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType) && unit->getTrainingQueue().size() < 2)
 		return unit->train(unitType);
 	return false;
 }

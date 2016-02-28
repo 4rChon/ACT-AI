@@ -46,12 +46,11 @@ public:
 	double getCost() const;
 	Attributes &getAttributes();
 
-	void updateMaxRange();
-	void updateDetection();
-
 	//helpers
 	void initAttributes();
 	void updateAttributes(BWAPI::UnitType unitType, int unitCount = 1);
+	void updateMaxRange();
+	void updateDetection();
 	void outAttributes();
 	void addType(BWAPI::UnitType unitType, int count);
 	void debugInfo() const;
