@@ -44,7 +44,8 @@ namespace TaskHelper
 				std::cout << task->getName().compare(newTask->getName()) << "\n";*/
 
 				if (rootTaskSet.count(task) == 0 
-					&& newTask->getType() != TaskType::CRC
+					&& (newTask->getType() == TaskType::STR
+					|| newTask->getType() == TaskType::SUR)
 					&& task->getName().compare(newTask->getName()) == 0)
 				{
 					removeTask(newTask);

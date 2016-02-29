@@ -28,14 +28,14 @@ public:
 	Workerset& getWorkers();
 	int getMineralMiners();
 	int getGasMiners();
-
 	int getRefineryCount();
-	void updateRefineryCount();
+	double getExpandDesire();	
 
 	//-
 	virtual void act();
 
 	void updateExpandDesire();
+	void updateRefineryCount();
 
 	//helpers
 	bool isMineralSaturated();

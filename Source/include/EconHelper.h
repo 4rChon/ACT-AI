@@ -17,4 +17,7 @@ namespace EconHelper
 	double getMineralIncome();
 	double getGasIncome();
 	double getUnitMultiplier();
+	void doneExpanding();
+	void updateEconomy();
+	void expand();
 }

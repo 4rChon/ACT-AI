@@ -1,4 +1,7 @@
 #include "EconHelper.h"
+#include "TaskHelper.h"
+#include "DesireHelper.h"
+#include "Expand.h"
 
 namespace EconHelper
 {
@@ -16,7 +19,8 @@ namespace EconHelper
 		static int lastCheckGas;
 
 		static double unitMultiplier;
-		//measure current resource difference between two time frames and get income data from that
+
+		static bool expanding;
 	}
 
 	void initialiseHelper()
@@ -105,5 +109,24 @@ namespace EconHelper
 	double getUnitMultiplier()
 	{
 		return unitMultiplier;
+	}
+
+	void doneExpanding()
+	{
+		expanding = false;
+	}
+
+	void updateEconomy()
+	{
+		DesireHelper::updateExpandDesire();
+		if (DesireHelper::getExpandDesire() >= 1 && !expanding)
+			expand();
+	}
+
+	void expand()
+	{
+		expanding = true;
+		Task* expand = new Expand();
+		TaskHelper::addTask(expand, true);
 	}
 }

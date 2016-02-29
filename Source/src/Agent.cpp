@@ -2,6 +2,7 @@
 #include "EconHelper.h"
 #include "CoalitionHelper.h"
 #include "Coalition.h"
+#include "DesireHelper.h"
 #include "Task.h"
 #include "CreateUnit.h"
 
@@ -129,7 +130,9 @@ bool Agent::isFree() const
 void Agent::act()
 {	
 	if (unit->getType().canProduce())
-		train(*unit->getType().buildsWhat().begin());
+	{
+		train(DesireHelper::getMostDesirableUnit(&unit->getType()));
+	}
 	//temp contents
 }
 
@@ -183,7 +186,7 @@ bool Agent::buildAddon(BWAPI::UnitType addon)
 
 bool Agent::train(BWAPI::UnitType unitType)
 {
-	if (unit->canTrain(unitType) && EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType) && unit->getTrainingQueue().size() < 2)
+	if (unit->canTrain(unitType) && EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType) && unit->getTrainingQueue().size() < 1)
 		return unit->train(unitType);
 	return false;
 }

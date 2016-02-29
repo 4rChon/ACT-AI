@@ -54,7 +54,7 @@ namespace ArmyHelper
 
 	void updateArmyMovement()
 	{
-		scout();
+		//scout();
 		attack();		
 	}
 

@@ -2,6 +2,7 @@
 #include "CoalitionHelper.h"
 #include "TaskHelper.h"
 #include "ArmyHelper.h"
+#include "EconHelper.h"
 #include <string>
 
 Task::Task()
@@ -23,20 +24,13 @@ Task::Task()
 Task::~Task()
 {
 	printDebugInfo("DELETE", true);
-	cleanSubTasks();
-	/*std::cout << "SubTasks Cleaned...\n";*/
 	if (taskType != CRC && taskType != STR && taskType != SUR && taskType != NON && coalition != nullptr)
 	{
 		CoalitionHelper::removeCoalition(coalition);
-		/*std::cout << "Coalition Removed...\n";*/
 		coalition = nullptr;
 		coalitionID = -1;
 	}
 	superTasks.clear();
-	/*else
-		std::cout << "No Coalition Found...\n";*/
-	//TaskHelper::getAllTasks().erase(this);
-	//TaskHelper::removeTask(this);
 }
 
 void Task::setCoalition(Coalition* coalition)
@@ -153,6 +147,8 @@ void Task::updateTaskTree()
 		{
 			if (!(*it)->isComplete())
 				(*it)->updateTaskTree();
+			else
+				(*it)->cleanSubTasks();
 		}
 	}
 	update();
@@ -172,6 +168,11 @@ void Task::succeed()
 	if (taskType == SCO)
 	{
 		ArmyHelper::stopScouting();
+	}
+
+	if (taskType == EXP)
+	{
+		EconHelper::doneExpanding();
 	}
 
 	if (taskType != CRC && taskType != STR && taskType != SUR)
@@ -195,6 +196,11 @@ void Task::fail()
 	if (taskType == SCO)
 	{
 		ArmyHelper::stopScouting();
+	}
+
+	if (taskType == EXP)
+	{
+		EconHelper::doneExpanding();
 	}
 
 	if (taskType != CRC && taskType != STR && taskType != SUR)

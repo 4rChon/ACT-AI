@@ -82,12 +82,12 @@ double Coalition::getCost()
 
 double Coalition::getProfit() const
 {
-	return this->profit;
+	return profit;
 }
 
 Composition Coalition::getCurrentComp() const
 {
-	return this->currentComp;
+	return currentComp;
 }
 
 Composition Coalition::getTargetComp() const

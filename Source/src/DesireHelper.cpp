@@ -1,4 +1,5 @@
 #include "DesireHelper.h"
+#include "AgentHelper.h"
 #include "UtilHelper.h"
 
 namespace DesireHelper
@@ -12,6 +13,7 @@ namespace DesireHelper
 		static std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> attackDesireMap;
 		static std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> defendDesireMap;
 		static double supplyDesire;
+		static double expandDesire;
 	}
 
 	void initialiseHelper()
@@ -42,11 +44,33 @@ namespace DesireHelper
 			defendDesireMap.insert(std::pair<MapHelper::Zone*, double>(MapHelper::getZone(region), 0.0));
 		}
 
-		supplyDesire = 1.00;
+		supplyDesire = 1.0;
+		expandDesire = 0.0;
 	}
 
 	void updateUnitDesireMap()
 	{
+		unitDesireMap[BWAPI::UnitTypes::Terran_Marine] = 1.0;
+		if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::Broodwar->self()->getRace().getWorker()) >= 70)
+			unitDesireMap[BWAPI::Broodwar->self()->getRace().getWorker()] = 0.0;
+		else
+			unitDesireMap[BWAPI::Broodwar->self()->getRace().getWorker()] = 1.0;
+	}
+
+	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType* producer)
+	{
+		
+		auto bestUnit = std::pair<BWAPI::UnitType, double>(BWAPI::UnitTypes::None, 0.0);
+		for each(auto &unit in unitDesireMap)
+		{
+			if (producer != nullptr)
+				if (unit.first.whatBuilds().first != *producer)
+					continue;
+			if (unit.second > bestUnit.second)
+				bestUnit = unit;
+		}
+		return bestUnit.first;
+		
 	}
 
 	void updateUpgradeDesireMap()
@@ -101,6 +125,15 @@ namespace DesireHelper
 		supplyDesire -= (double)unitSupply / BWAPI::Broodwar->self()->getRace().getCenter().supplyProvided();		
 	}
 
+	void updateExpandDesire()
+	{
+		expandDesire = 0;
+		auto resourceDepots = AgentHelper::getResourceDepots();
+		for each(auto &resourceDepot in resourceDepots)
+			expandDesire += resourceDepot->getExpandDesire();
+		expandDesire /= BWAPI::Broodwar->self()->allUnitCount(BWAPI::Broodwar->self()->getRace().getCenter());
+	}
+
 	const std::unordered_map<BWAPI::UnitType, double>& getUnitDesireMap()
 	{
 		return unitDesireMap;
@@ -124,6 +157,11 @@ namespace DesireHelper
 	double getSupplyDesire()
 	{
 		return supplyDesire;
+	}
+
+	double getExpandDesire()
+	{
+		return expandDesire;
 	}
 
 	void setExpansionDesire(BWTA::BaseLocation* baseLocation, double desire)

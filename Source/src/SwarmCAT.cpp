@@ -136,12 +136,13 @@ void SwarmCAT::onFrame()
 
 		auto diff = std::chrono::high_resolution_clock::now() - currentTime;
 
-		if (diff.count() > 0.0005)
+		if (diff.count() > 0.005)
 			return;
 	}
 
 	TaskHelper::updateRootTasks();
-	ArmyHelper::updateArmyMovement();
+	EconHelper::updateEconomy();
+	//ArmyHelper::updateArmyMovement();
 	//std::cout << "---FrameEnd---\n";
 }
 
@@ -178,6 +179,10 @@ void SwarmCAT::onUnitDiscover(BWAPI::Unit unit)
 
 void SwarmCAT::onUnitEvade(BWAPI::Unit unit)
 {
+	if (unit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
+	{
+		ArmyHelper::scan(unit->getPosition());
+	}
 	//std::cout << "UnitEvade\n";
 }
 
@@ -188,10 +193,6 @@ void SwarmCAT::onUnitShow(BWAPI::Unit unit)
 
 void SwarmCAT::onUnitHide(BWAPI::Unit unit)
 {	
-	if (unit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
-	{
-		ArmyHelper::scan(unit->getPosition());
-	}
 	//std::cout << "UnitHide\n";
 }
 
@@ -273,8 +274,7 @@ void SwarmCAT::drawDebugText()
 	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
 	Broodwar->drawTextScreen(200, 10, "Average FPS: %f", Broodwar->getAverageFPS());
 	//Broodwar->drawTextScreen(200, 30, "Candidate Base Count: %d", AgentHelper::getCandidateBases().size());
-	Broodwar->drawTextScreen(200, 40, "Agent Count: %d", AgentHelper::getAgentset().size());
-	Broodwar->drawTextScreen(200, 50, "Supply Desire: %.3f", DesireHelper::getSupplyDesire());
+	Broodwar->drawTextScreen(200, 40, "Agent Count: %d", AgentHelper::getAgentset().size());	
 	Broodwar->drawTextScreen(200, 60, "Root Tasks: ");
 	int i = 1;
 	if (TaskHelper::getRootTasks().size() > 0)
@@ -343,15 +343,18 @@ void SwarmCAT::drawDebugText()
 	{
 		Broodwar->drawTextMap(expansion.first->getPosition(), "Expansion Desire: %f", expansion.second);
 	}
-
-	for (auto &zone : MapHelper::getRegionField())
-	{
-		Broodwar->drawTextMap(zone->getRegion()->getCenter(), "ZoneID : %d", zone->getID());
-		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 16, "FriendScore : %d", zone->getFriendScore());
-		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 32, "ResourceScore : %d", zone->getResourceScore());
-		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 48, "LastVisited : %d", zone->getLastVisited());
-		//everything  but id should be 0 because we're not updating the zones yet
-	}
+	
+	Broodwar->drawTextScreen(10, 10, "Worker Count: %d", Broodwar->self()->allUnitCount(Broodwar->self()->getRace().getWorker()));
+	Broodwar->drawTextScreen(10, 20, "Expand Desire: %.2f", DesireHelper::getExpandDesire());
+	Broodwar->drawTextScreen(10, 30, "Supply Desire: %.3f", DesireHelper::getSupplyDesire());
+	//for (auto &zone : MapHelper::getRegionField())
+	//{
+	//	Broodwar->drawTextMap(zone->getRegion()->getCenter(), "ZoneID : %d", zone->getID());
+	//	Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 16, "FriendScore : %d", zone->getFriendScore());
+	//	Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 32, "ResourceScore : %d", zone->getResourceScore());
+	//	Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 48, "LastVisited : %d", zone->getLastVisited());
+	//	//everything  but id should be 0 because we're not updating the zones yet
+	//}
 }
 
 void SwarmCAT::drawTerrainData()

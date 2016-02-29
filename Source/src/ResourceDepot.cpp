@@ -4,6 +4,7 @@
 #include "Task.h"
 #include "Expand.h"
 #include "CreateUnit.h"
+#include "DesireHelper.h"
 
 ResourceDepot::ResourceDepot()
 {	
@@ -23,7 +24,7 @@ ResourceDepot::ResourceDepot(BWAPI::Unit unit)
 	workers.clear();
 	mineralMiners = 0;
 	gasMiners = 0;
-	expandDesire = 1.0;
+	expandDesire = 0;
 	refineryCount = 0;
 }
 
@@ -73,7 +74,7 @@ void ResourceDepot::act()
 	{
 		if (unit->canBuildAddon())
 			unit->buildAddon(BWAPI::UnitTypes::Terran_Comsat_Station);
-		train((*unit->getType().buildsWhat().begin()));
+		train(DesireHelper::getMostDesirableUnit(&unit->getType()));
 	}
 }
 
@@ -88,14 +89,19 @@ void ResourceDepot::updateRefineryCount()
 }
 
 void ResourceDepot::updateExpandDesire()
-{	
-	//temp contents
-	if (mineralMiners > 2 * baseLocation->getMinerals().size() && expandDesire == 1.0)
-	{		
-		Task* expand = new Expand();
-		TaskHelper::addTask(expand, true);
-		expandDesire = 0.0;
+{
+	if (baseLocation->getMinerals().size() > 0)
+	{
+		if ((double)(mineralMiners) / (2.0 * baseLocation->getMinerals().size()) >= 1)
+			expandDesire = 1;
 	}
+	else
+		expandDesire = 1;
+}
+
+double ResourceDepot::getExpandDesire()
+{
+	return expandDesire;
 }
 
 bool ResourceDepot::isMineralSaturated()
