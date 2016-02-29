@@ -17,11 +17,13 @@ Attack::Attack(MapHelper::Zone* target)
 void Attack::createCoalition()
 {
 	Composition c;
-	c.addType(BWAPI::UnitTypes::Terran_Marine, 5);	
-	c.addType(BWAPI::UnitTypes::Terran_Medic, 5);
+	//c.addType(BWAPI::UnitTypes::Terran_Marine, 5);	
+	//c.addType(BWAPI::UnitTypes::Terran_Medic, 5);
+	c.addType(BWAPI::UnitTypes::Terran_Firebat, 5);
+	//c.addType(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 5);
 	for each(auto &unit in BWAPI::Broodwar->self()->getUnits())
 	{
-		if (!unit->getType().isWorker() && !unit->getType().isBuilding())
+		if (!unit->getType().isWorker() && !unit->getType().isBuilding() && !unit->getType().isAddon())
 			c.addType(unit->getType(), 1);
 	}
 	CreateCoalition *createCoalition = new CreateCoalition(c, this);

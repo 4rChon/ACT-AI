@@ -30,6 +30,13 @@ Task::~Task()
 		coalition = nullptr;
 		coalitionID = -1;
 	}
+
+	for (auto &superTaskIt = superTasks.begin(); superTaskIt != superTasks.end(); ++superTaskIt)
+	{
+		printDebugInfo("\n\tRemoving sub task: " + taskName + " \n\tfrom super task: " + (*superTaskIt)->getName(), true);
+		(*superTaskIt)->getSubTasks().erase(this);
+	}
+
 	superTasks.clear();
 }
 
@@ -125,16 +132,11 @@ void Task::addSuperTask(Task* task)
 
 void Task::cleanSubTasks()
 {
-	for (auto &taskIt = subTasks.begin(); taskIt != subTasks.end(); ++taskIt)
+	for (auto &taskIt = subTasks.begin(); taskIt != subTasks.end();)
 	{
 		(*taskIt)->getSuperTasks().erase(this);
-		printDebugInfo("\n\tRemoving sub task: " + (*taskIt)->getName() + " \n\tfrom super task: " + this->getName(), true);
-		for (auto &superTaskIt = (*taskIt)->getSuperTasks().begin(); superTaskIt != (*taskIt)->getSuperTasks().end(); ++superTaskIt)
-		{
-			printDebugInfo("\n\tRemoving sub task: " + (*taskIt)->getName() + " \n\tfrom super task: " + (*superTaskIt)->getName(), true);
-			(*superTaskIt)->getSubTasks().erase(*taskIt);
-		}
-		TaskHelper::removeTask(*taskIt);
+		printDebugInfo("\n\tRemoving sub task: " + (*taskIt)->getName() + " \n\tfrom super task: " + this->getName(), true);	
+		TaskHelper::removeTask(*taskIt++);
 	}
 	subTasks.clear();
 }
@@ -143,12 +145,12 @@ void Task::updateTaskTree()
 {	
 	if (subTasks.size() > 0)
 	{		
-		for (auto &it = subTasks.begin(); it != subTasks.end(); ++it)
+		for (auto &it = subTasks.begin(); it != subTasks.end();)
 		{
 			if (!(*it)->isComplete())
-				(*it)->updateTaskTree();
+				(*it++)->updateTaskTree();
 			else
-				(*it)->cleanSubTasks();
+				TaskHelper::removeTask(*it++);
 		}
 	}
 	update();
@@ -174,11 +176,6 @@ void Task::succeed()
 	{
 		EconHelper::doneExpanding();
 	}
-
-	if (taskType != CRC && taskType != STR && taskType != SUR)
-	{
-		CoalitionHelper::removeCoalition(coalition);
-	}
 	cleanSubTasks();
 }
 
@@ -201,11 +198,6 @@ void Task::fail()
 	if (taskType == EXP)
 	{
 		EconHelper::doneExpanding();
-	}
-
-	if (taskType != CRC && taskType != STR && taskType != SUR)
-	{
-		CoalitionHelper::removeCoalition(coalition);
 	}
 	cleanSubTasks();
 }

@@ -138,6 +138,9 @@ namespace AgentHelper
 	{
 		agent->unbind();
 		agentSet.erase(agent);
+		if(agent->getUnit()->getType().isResourceDepot())
+			resourceDepots.erase((ResourceDepot*)agent);
+		comsatStations.erase(agent);
 		typeCountMap[agent->getUnit()->getType()]--;
 	}
 

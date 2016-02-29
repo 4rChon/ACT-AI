@@ -1,5 +1,6 @@
 #include "TaskHelper.h"
 #include "CoalitionHelper.h"
+#include "CreateUnit.h"
 #include <string>
 
 namespace TaskHelper
@@ -43,10 +44,10 @@ namespace TaskHelper
 				/*std::cout << "Task : " << task->getName() << "\nNewTask : " << newTask->getName() << "\n";
 				std::cout << task->getName().compare(newTask->getName()) << "\n";*/
 
-				if (rootTaskSet.count(task) == 0 
-					&& (newTask->getType() == TaskType::STR
-					|| newTask->getType() == TaskType::SUR)
-					&& task->getName().compare(newTask->getName()) == 0)
+				if (rootTaskSet.count(task) == 0 && 
+					(newTask->getType() == STR 
+					|| newTask->getType() == SUR 
+					&& task->getName().compare(newTask->getName()) == 0))
 				{
 					removeTask(newTask);
 					return task;
@@ -66,7 +67,6 @@ namespace TaskHelper
 		//	std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from root taskset\n";
 		//	rootTaskSet.erase(task);
 		//}
-
 		if (fullTaskSet.count(task) > 0)
 		{
 			std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from full taskset\n";

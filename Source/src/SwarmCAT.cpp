@@ -99,7 +99,7 @@ void SwarmCAT::onFrame()
 	while (a != AgentHelper::getAgentset().end())
 	{
 		auto u = (*a)->getUnit();
-		MapHelper::getZone(BWAPI::Broodwar->getRegionAt(u->getPosition()))->updateZone();
+		
 		if (!u->exists())
 		{
 			AgentHelper::setLastServiced(++a);
@@ -132,9 +132,10 @@ void SwarmCAT::onFrame()
 			continue;
 		}
 
+		MapHelper::getZone(BWAPI::Broodwar->getRegionAt(u->getPosition()))->updateZone();
 		AgentHelper::setLastServiced(++a);
 
-		auto diff = std::chrono::high_resolution_clock::now() - currentTime;
+		auto diff = std::chrono::high_resolution_clock::now() - currentTime;		
 
 		if (diff.count() > 0.005)
 			return;
@@ -142,7 +143,7 @@ void SwarmCAT::onFrame()
 
 	TaskHelper::updateRootTasks();
 	EconHelper::updateEconomy();
-	//ArmyHelper::updateArmyMovement();
+	ArmyHelper::updateArmyMovement();
 	//std::cout << "---FrameEnd---\n";
 }
 
@@ -179,16 +180,16 @@ void SwarmCAT::onUnitDiscover(BWAPI::Unit unit)
 
 void SwarmCAT::onUnitEvade(BWAPI::Unit unit)
 {
-	if (unit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
-	{
-		ArmyHelper::scan(unit->getPosition());
-	}
 	//std::cout << "UnitEvade\n";
 }
 
 void SwarmCAT::onUnitShow(BWAPI::Unit unit)
 {
 	//std::cout << "UnitShow\n";
+	if (unit->getType() == BWAPI::UnitTypes::Zerg_Lurker)
+	{
+		ArmyHelper::scan(unit->getPosition());
+	}
 }
 
 void SwarmCAT::onUnitHide(BWAPI::Unit unit)
@@ -346,7 +347,7 @@ void SwarmCAT::drawDebugText()
 	
 	Broodwar->drawTextScreen(10, 10, "Worker Count: %d", Broodwar->self()->allUnitCount(Broodwar->self()->getRace().getWorker()));
 	Broodwar->drawTextScreen(10, 20, "Expand Desire: %.2f", DesireHelper::getExpandDesire());
-	Broodwar->drawTextScreen(10, 30, "Supply Desire: %.3f", DesireHelper::getSupplyDesire());
+	Broodwar->drawTextScreen(10, 30, "Supply Desire: %.2f", DesireHelper::getSupplyDesire());
 	//for (auto &zone : MapHelper::getRegionField())
 	//{
 	//	Broodwar->drawTextMap(zone->getRegion()->getCenter(), "ZoneID : %d", zone->getID());

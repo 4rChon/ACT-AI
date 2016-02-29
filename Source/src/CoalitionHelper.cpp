@@ -47,7 +47,4 @@ namespace CoalitionHelper
 			delete coalition;
 		}
 	}
-	//Coalitionset::iterator removeCoalition(Coalitionset::iterator coalition);
-	//void activateCoalition(Coalition* coalition);
-	//void disbandCoalition(Coalition* coalition);
 };
