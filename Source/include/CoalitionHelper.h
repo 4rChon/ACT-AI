@@ -18,4 +18,5 @@ namespace CoalitionHelper
 	//helpers
 	Coalition* addCoalition(Composition composition, Task* task);	
 	void removeCoalition(Coalition* coalition);
+	void updateFreeCoalitions();
 };

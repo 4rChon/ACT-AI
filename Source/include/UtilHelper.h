@@ -67,7 +67,6 @@ namespace std
 			return lhs.getID() == rhs.getID();
 		}
 	};
-
 	//template<> struct hash < BWTA::BaseLocation* >
 	//{
 	//	size_t operator()(const BWAPI::TechType &a) const

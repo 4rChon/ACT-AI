@@ -14,9 +14,11 @@ Coalition::Coalition()
 	taskID = -1;
 	active = false;	
 		
-	coalitionID = CoalitionHelper::getNextID();
+	coalitionID = CoalitionHelper::getNextID();	
+	engageDuration = 0;
 	cost = 0.0;
 	profit = 0.0;
+	killCount = 0;
 }
 
 Coalition::Coalition(Composition targetComp, Task* task)
@@ -29,28 +31,26 @@ Coalition::Coalition(Composition targetComp, Task* task)
 	this->targetComp = targetComp;
 
 	coalitionID = CoalitionHelper::getNextID();
-	
-	cost = targetComp.getCost();
+	engageDuration = 0;
+	killCount = 0;
+	cost = 0;
 	profit = 0.0;	
 }
 
 Coalition::~Coalition()
 {
 	std::cout << "~Coalition : " << coalitionID << "\n";
-	//logPerformance();
+	logPerformance();
 	active = false;	
-	/*std::cout << "Unbinding Agents...\n";*/
 	for (auto agent : agentSet)
-	{
-		/*std::cout << "\tUnbinding...\n";*/
 		agent->unbind();
-	}
-	/*std::cout << "Agents Unbound...\n";*/
 	agentSet.clear();
-	/*std::cout << "Agentset Clear...\n";*/
 	unitSet.clear();
-	/*std::cout << "Unitset Clear...\n";*/
-	/*CoalitionHelper::removeCoalition(this);*/
+}
+
+Task* Coalition::getTask() const
+{
+	return task;
 }
 
 int Coalition::getAge() const
@@ -75,14 +75,45 @@ Agentset &Coalition::getAgentSet()
 
 double Coalition::getCost()
 {
-	if (!active)
-		cost += (BWAPI::Broodwar->getFrameCount() - creationFrame);
-	return 1 - (1 / ((cost + 500) / 500)); //convert to sigma function instead : 1/(1 + e^-x)
+	std::vector<double> valueArr;
+	std::vector<double> coeffArr;
+	valueArr.push_back(currentComp.getCost());
+	coeffArr.push_back(0.001);
+	valueArr.push_back(BWAPI::Broodwar->getFrameCount() - creationFrame);
+	coeffArr.push_back(0.0001);
+	cost = normaliseValues(valueArr, coeffArr);
+	return cost;
 }
 
-double Coalition::getProfit() const
+double Coalition::getProfit()
 {
+	std::vector<double> valueArr;
+	std::vector<double> coeffArr;
+	valueArr.push_back(killCount);
+	coeffArr.push_back(1.0);
+	valueArr.push_back(engageDuration);
+	coeffArr.push_back(1.0);
+	profit = normaliseValues(valueArr, coeffArr);
 	return profit;
+}
+
+double Coalition::normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr) //TO DO: put in util file
+{
+	double total = 0.0;
+	for (std::size_t i = 0; i < valueArr.size(); i++)
+		total += 1 / (1 + std::exp(-coeffArr[i] * valueArr[i]));
+
+	return ((2 / valueArr.size()) * total) - 1;
+}
+
+void Coalition::addEngagement()
+{
+	engageDuration++;
+}
+
+void Coalition::addKillCount(int killCount)
+{
+	this->killCount += killCount;
 }
 
 Composition Coalition::getCurrentComp() const
@@ -167,6 +198,9 @@ void Coalition::logPerformance()
 	std::ofstream composition;
 	auto race = BWAPI::Broodwar->self()->getRace().toString();
 	composition.open("compositions\\" + race + "_" + task->getName() + ".txt");
+	composition << "EngageDuration: " << engageDuration << "\n";
+	composition << "KillCount: " << killCount << "\n";
+	composition << profit << " | " << cost << "\n";
 	composition << targetComp.toString();
 	composition.close();
 }

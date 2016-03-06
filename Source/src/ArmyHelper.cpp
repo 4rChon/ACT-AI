@@ -2,6 +2,7 @@
 #include "Attack.h"
 #include "TaskHelper.h"
 #include "MapHelper.h"
+#include "EconHelper.h"
 #include "Scout.h"
 #include <BWAPI.h>
 #include <BWTA.h>
@@ -133,11 +134,6 @@ namespace ArmyHelper
 	{
 		targetPriorityList.erase(UnitCostPair(unit->getID(), unit->getType().buildScore()));
 		attackTarget = (*targetPriorityList.begin()).second;
-	}
-
-	void updateProductionRatio()
-	{
-		productionRatio = 1.0;
 	}
 
 	bool scan(BWAPI::Position target)

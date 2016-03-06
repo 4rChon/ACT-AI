@@ -6,7 +6,7 @@ class ResourceDepot;
 
 class Worker : public Agent
 {
-private:
+protected:
 	bool gasMiner;
 	ResourceDepot* miningBase;
 	bool reservedResources;

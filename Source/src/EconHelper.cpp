@@ -111,6 +111,11 @@ namespace EconHelper
 		return unitMultiplier;
 	}
 
+	void updateUnitMultiplier()
+	{
+		unitMultiplier = mineralIncome / 1000;
+	}
+
 	void doneExpanding()
 	{
 		expanding = false;
@@ -119,6 +124,7 @@ namespace EconHelper
 	void updateEconomy()
 	{
 		DesireHelper::updateExpandDesire();
+		updateUnitMultiplier();
 		if (DesireHelper::getExpandDesire() >= 1 && !expanding)
 			expand();
 	}

@@ -48,29 +48,29 @@ namespace DesireHelper
 		expandDesire = 0.0;
 	}
 
-	void updateUnitDesireMap()
+	void updateUnitDesireMap(Composition composition)
 	{
-		unitDesireMap[BWAPI::UnitTypes::Terran_Marine] = 1.0;
+		for (auto& unit : composition.getUnitMap())
+			unitDesireMap[unit.first] = unit.second;
+	}
+
+	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType producer)
+	{
 		if (BWAPI::Broodwar->self()->allUnitCount(BWAPI::Broodwar->self()->getRace().getWorker()) >= 70)
 			unitDesireMap[BWAPI::Broodwar->self()->getRace().getWorker()] = 0.0;
 		else
 			unitDesireMap[BWAPI::Broodwar->self()->getRace().getWorker()] = 1.0;
-	}
 
-	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType* producer)
-	{
-		
 		auto bestUnit = std::pair<BWAPI::UnitType, double>(BWAPI::UnitTypes::None, 0.0);
 		for each(auto &unit in unitDesireMap)
 		{
-			if (producer != nullptr)
-				if (unit.first.whatBuilds().first != *producer)
+			if (producer != BWAPI::UnitTypes::None)
+				if (unit.first.whatBuilds().first != producer || !BWAPI::Broodwar->self()->isUnitAvailable(unit.first))
 					continue;
 			if (unit.second > bestUnit.second)
 				bestUnit = unit;
 		}
-		return bestUnit.first;
-		
+		return bestUnit.first;		
 	}
 
 	void updateUpgradeDesireMap()
@@ -105,7 +105,6 @@ namespace DesireHelper
 
 	void updateDesireMaps()
 	{
-		updateUnitDesireMap();
 		updateUpgradeDesireMap();
 		updateTechDesireMap();
 		updateExpansionDesireMap();
@@ -127,7 +126,16 @@ namespace DesireHelper
 
 	void updateExpandDesire()
 	{
+		bool canExpand = false;
 		expandDesire = 0;
+		for (auto &expand : expansionDesireMap)
+		{
+			if (expand.second > 0)
+				canExpand = true;
+		}
+		if (!canExpand)
+			return;
+
 		auto resourceDepots = AgentHelper::getResourceDepots();
 		for each(auto &resourceDepot in resourceDepots)
 			expandDesire += resourceDepot->getExpandDesire();

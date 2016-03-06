@@ -18,14 +18,16 @@ void Attack::createCoalition()
 {
 	Composition c;
 	//c.addType(BWAPI::UnitTypes::Terran_Marine, 5);	
-	//c.addType(BWAPI::UnitTypes::Terran_Medic, 5);
-	c.addType(BWAPI::UnitTypes::Terran_Firebat, 5);
-	//c.addType(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 5);
+	c.addType(BWAPI::UnitTypes::Terran_Medic, 5 + (int)(5 * EconHelper::getUnitMultiplier()));
+	c.addType(BWAPI::UnitTypes::Terran_Marine, 5 + (int)(5 * EconHelper::getUnitMultiplier()));
+	//c.addType(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 1 + (int)(1 * EconHelper::getUnitMultiplier()));
+
 	for each(auto &unit in BWAPI::Broodwar->self()->getUnits())
 	{
-		if (!unit->getType().isWorker() && !unit->getType().isBuilding() && !unit->getType().isAddon())
+		if (!unit->getType().isWorker() && !unit->getType().isBuilding() && !BWAPI::UnitTypes::Spell_Scanner_Sweep)
 			c.addType(unit->getType(), 1);
 	}
+	//c.addType(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 5);
 	CreateCoalition *createCoalition = new CreateCoalition(c, this);
 	addSubTask(createCoalition);
 }

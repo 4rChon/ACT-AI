@@ -22,8 +22,11 @@ protected:
 	int taskID;
 
 	bool free;
-	bool movingToBuild;
 
+	int engageDuration;
+	int lastEngaged;
+	bool isEngaged;	
+	int lastKillCount;
 	CommandMap commandMap;
 
 	void initialiseCommandMap();
@@ -47,8 +50,9 @@ public:
 	Task * getTask() const;
 	BWAPI::Unit getUnit() const;
 	double getPrice() const;
-	bool isMovingToBuild() const;
 	bool isFree() const;
+
+	void updateCoalitionStatus();
 
 	//-
 	virtual void act();

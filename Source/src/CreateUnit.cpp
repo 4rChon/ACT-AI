@@ -4,6 +4,7 @@
 #include "SatisfyUnitRequirement.h"
 #include "TaskHelper.h"
 #include "CoalitionHelper.h"
+#include "DesireHelper.h"
 #include <string>
 
 CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
@@ -60,10 +61,12 @@ void CreateUnit::createCoalition()
 	Composition producer;
 	auto whatBuilds = unitType.whatBuilds().first;
 
-	if (whatBuilds == BWAPI::UnitTypes::Zerg_Larva)
-		producer.addType(BWAPI::UnitTypes::Zerg_Hatchery, 1);
-	else
-		producer.addType(unitType.whatBuilds().first, unitType.whatBuilds().second);
+	producer.addType(whatBuilds, unitType.whatBuilds().second);
+	if (!whatBuilds.isWorker())
+	{
+		for (int i = 0; i < unitCount / 5; i++)
+			producer.addType(whatBuilds, unitType.whatBuilds().second);
+	}
 	CreateCoalition* createCoalition = new CreateCoalition(producer, this);
 	subTasks.insert(createCoalition);
 }
@@ -92,7 +95,7 @@ void CreateUnit::assign()
 
 // produce a unit
 void CreateUnit::act()
-{
+{	
 	printDebugInfo("Acting");
 	if (unitCount > 0)
 	{
@@ -186,6 +189,12 @@ void CreateUnit::update() //x2 redundant in res tech
 	if (complete)
 		return;
 
+	if (!EconHelper::haveSupply(unitType) && BWAPI::Broodwar->self()->supplyTotal() == 200)
+	{
+		succeed();
+		return;
+	}
+
 	if (!assigned)
 	{
 		assign();
@@ -193,6 +202,8 @@ void CreateUnit::update() //x2 redundant in res tech
 	}
 
 	if (coalition->isActive())
-		act();
+	{
+		act();		
+	}
 	printDebugInfo("Update End");
 }

@@ -19,9 +19,11 @@ private:
 	bool active;
 	int creationFrame;
 	int taskID;	
-	int coalitionID;
+	int coalitionID;	
 	double cost;
-	double profit;	
+	double profit;
+	int engageDuration;
+	int killCount;
 public:
 	//constructors and destructors;
 	Coalition();	
@@ -29,11 +31,16 @@ public:
 	
 	~Coalition();
 
+	Task * getTask() const;
+
 	//getters	
 	int getAge() const;
 	int getID() const;
 	double getCost();
-	double getProfit() const;
+	double getProfit();
+	double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr);
+	void addEngagement();
+	void addKillCount(int killCount = 1);
 	bool isActive() const;
 	Composition getCurrentComp() const;
 	Composition getTargetComp() const;

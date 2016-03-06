@@ -2,14 +2,15 @@
 #include "BWAPI.h"
 #include "BWTA.h"
 #include "MapHelper.h"
+#include "Composition.h"
 #include <unordered_map>
 
 namespace DesireHelper
 {
 	void initialiseHelper();
-	
-	void updateUnitDesireMap();
-	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType* producer = nullptr);
+
+	void updateUnitDesireMap(Composition composition);
+	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType producer = BWAPI::UnitTypes::None);
 	void updateUpgradeDesireMap();
 	void updateTechDesireMap();
 	void updateExpansionDesireMap();

@@ -14,10 +14,14 @@ Agent::Agent()
 	taskID = -1;
 
 	free = true;
-	movingToBuild = false;
 
 	task = nullptr;
 	coalition = nullptr;
+
+	engageDuration = 0;
+	lastEngaged = 0;
+	isEngaged = false;
+	lastKillCount = 0;
 
 	initialiseCommandMap();
 }
@@ -117,23 +121,43 @@ double Agent::getPrice() const
 	return unit->getType().mineralPrice() + (unit->getType().gasPrice() * 1.5);
 }
 
-bool Agent::isMovingToBuild() const
-{
-	return movingToBuild;
-}
-
 bool Agent::isFree() const
 {
 	return free;
 }
 
-void Agent::act()
-{	
-	if (unit->getType().canProduce())
+void Agent::updateCoalitionStatus()
+{
+	int framesSinceLastEngage = BWAPI::Broodwar->getFrameCount() - lastEngaged;
+
+	if (framesSinceLastEngage > 24 * 10)
 	{
-		train(DesireHelper::getMostDesirableUnit(&unit->getType()));
+		isEngaged = false;
 	}
+
+	if (!isEngaged && (unit->isUnderAttack() || unit->isAttacking()))
+	{
+		lastEngaged = BWAPI::Broodwar->getFrameCount();
+		engageDuration++;
+		coalition->addEngagement();
+		isEngaged = true;
+	}		
+
+	if(unit->canAttack())
+		coalition->addKillCount(unit->getKillCount() - lastKillCount);
+	lastKillCount = unit->getKillCount();
+}
+
+void Agent::act()
+{		
 	//temp contents
+	if (free)
+	{
+		if (unit->getType().canProduce())
+			train(DesireHelper::getMostDesirableUnit(unit->getType()));
+	}	
+	else
+		updateCoalitionStatus();
 }
 
 bool Agent::pollCoalitions()

@@ -99,7 +99,7 @@ void SwarmCAT::onFrame()
 	while (a != AgentHelper::getAgentset().end())
 	{
 		auto u = (*a)->getUnit();
-		
+				
 		if (!u->exists())
 		{
 			AgentHelper::setLastServiced(++a);
@@ -124,13 +124,13 @@ void SwarmCAT::onFrame()
 			continue;
 		}
 		
+		(*a)->act();
 		if ((*a)->isFree())
 		{	
 			(*a)->pollCoalitions();
-			(*a)->act();
 			AgentHelper::setLastServiced(++a);
 			continue;
-		}
+		}		
 
 		MapHelper::getZone(BWAPI::Broodwar->getRegionAt(u->getPosition()))->updateZone();
 		AgentHelper::setLastServiced(++a);
@@ -144,6 +144,7 @@ void SwarmCAT::onFrame()
 	TaskHelper::updateRootTasks();
 	EconHelper::updateEconomy();
 	ArmyHelper::updateArmyMovement();
+	CoalitionHelper::updateFreeCoalitions();
 	//std::cout << "---FrameEnd---\n";
 }
 
@@ -278,21 +279,26 @@ void SwarmCAT::drawDebugText()
 	Broodwar->drawTextScreen(200, 40, "Agent Count: %d", AgentHelper::getAgentset().size());	
 	Broodwar->drawTextScreen(200, 60, "Root Tasks: ");
 	int i = 1;
-	if (TaskHelper::getRootTasks().size() > 0)
-		for (auto &task : TaskHelper::getRootTasks())
-			Broodwar->drawTextScreen(200, 60 + (10 * i++), "%d : %s", task->getID(), task->getName().c_str());
+	for (auto &task : TaskHelper::getRootTasks())
+		Broodwar->drawTextScreen(200, 60 + (10 * i++), "%d : %s", task->getID(), task->getName().c_str());
 	
 	Broodwar->drawTextScreen(350, 50, "All Tasks: ");
 	i = 1;
-	if (TaskHelper::getAllTasks().size() > 0)
-		for (auto &task : TaskHelper::getAllTasks())
-			Broodwar->drawTextScreen(350, 50 + (10 * i++), "%d : %s", task->getID(), task->getName().c_str());
+	for (auto &task : TaskHelper::getAllTasks())
+		Broodwar->drawTextScreen(350, 50 + (10 * i++), "%d : %s", task->getID(), task->getName().c_str());
 
-	/*i = 1;
-	if (CoalitionHelper::getCoalitionset().size() > 0)
-		for (auto &coalition : CoalitionHelper::getCoalitionset())*/
-			//coalition->outAttributes();
-			//Broodwar->drawTextScreen(10, 10 + (10 * i++), "%d : %s", coalition->getID());
+	i = 1;
+	for (auto &coalition : CoalitionHelper::getCoalitionset())
+	{
+		Broodwar->drawTextScreen(5, 100 + (10 * i++), "%d : %.2f | %.2f", coalition->getID(), coalition->getCost(), coalition->getProfit());
+		for (auto &unitType : coalition->getTargetComp().getUnitMap())
+			Broodwar->drawTextScreen(10, 100 + (10 * i++), "%s : %d/%d", unitType.first.c_str(), coalition->getCurrentComp().getUnitMap()[unitType.first], unitType.second);
+	}
+
+	Broodwar->drawTextScreen(400, 250, "Most Desirable Unit: %s", DesireHelper::getMostDesirableUnit().c_str());
+	Broodwar->drawTextScreen(400, 260, "Most Desirable Unit (Barracks): %s", DesireHelper::getMostDesirableUnit(BWAPI::UnitTypes::Terran_Barracks).c_str());
+	Broodwar->drawTextScreen(400, 270, "Most Desirable Unit (Factory): %s", DesireHelper::getMostDesirableUnit(BWAPI::UnitTypes::Terran_Factory).c_str());
+	Broodwar->drawTextScreen(400, 280, "Most Desirable Unit (Starport): %s", DesireHelper::getMostDesirableUnit(BWAPI::UnitTypes::Terran_Starport).c_str());
 
 	for (auto &a : AgentHelper::getAgentset())
 	{

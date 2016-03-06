@@ -66,16 +66,21 @@ int ResourceDepot::getRefineryCount()
 }
 
 void ResourceDepot::act()
-{	
+{		
 	updateExpandDesire();
 	updateRefineryCount();
 	//temp contents
-	if (unit->isIdle())
+	if (free)
 	{
-		if (unit->canBuildAddon())
-			unit->buildAddon(BWAPI::UnitTypes::Terran_Comsat_Station);
-		train(DesireHelper::getMostDesirableUnit(&unit->getType()));
+		if (unit->isIdle())
+		{
+			if (unit->canBuildAddon())
+				unit->buildAddon(BWAPI::UnitTypes::Terran_Comsat_Station);
+			train(DesireHelper::getMostDesirableUnit(unit->getType()));
+		}
 	}
+	else
+		updateCoalitionStatus();
 }
 
 void ResourceDepot::updateRefineryCount()

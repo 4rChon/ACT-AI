@@ -1,5 +1,6 @@
 #pragma once
 #include "CoalitionHelper.h"
+#include "DesireHelper.h"
 
 namespace CoalitionHelper
 {
@@ -46,5 +47,20 @@ namespace CoalitionHelper
 			coalitionSet.erase(coalition);
 			delete coalition;
 		}
+	}
+
+	void updateFreeCoalitions()
+	{
+		Composition comp = Composition();
+		for (auto& coalition : coalitionSet)
+		{
+			if (!coalition->isActive())
+			{
+				Composition differenceComposition = coalition->getCurrentComp() - coalition->getTargetComp();
+				for (auto& unit : differenceComposition.getUnitMap())
+					comp.addType(unit.first, unit.second);				
+			}			
+		}	
+		DesireHelper::updateUnitDesireMap(comp);
 	}
 };

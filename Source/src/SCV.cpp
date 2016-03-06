@@ -11,44 +11,48 @@ SCV::SCV(BWAPI::Unit unit)
 
 void SCV::act()
 {	
-	//temp contents
-	if (repair())
-		return;
-
-	if (DesireHelper::getSupplyDesire() > 0.6
-		&& EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getSupplyProvider()))
+	if (free)
 	{
-		if (build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr))
-		{
-			DesireHelper::updateSupplyDesire(BWAPI::Broodwar->self()->getRace().getSupplyProvider());
+		//temp contents
+		if (repair())
 			return;
-		}
-	}
 
-	if (unit->isIdle())
-	{
-		bool mining = false;
-		auto resourceDepots = AgentHelper::getResourceDepots();
-		for (auto &base : resourceDepots)
+		if (DesireHelper::getSupplyDesire() > 0.6
+			&& EconHelper::haveMoney(BWAPI::UnitTypes::Terran_Supply_Depot))
 		{
-			if (!base->isGasSaturated())
-			{
-				setMiningBase(base, true);
-				mining = true;
-				return;
-			}
+			if(miningBase)
+				build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), &miningBase->getBaseLocation()->getTilePosition());
+			else
+				build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr);
 		}
 
-		for (auto &base : resourceDepots)
+		if (unit->isIdle())
 		{
-			if (!base->isMineralSaturated())
+			bool mining = false;
+			auto resourceDepots = AgentHelper::getResourceDepots();
+			for (auto &base : resourceDepots)
 			{
-				setMiningBase(base, false);
-				mining = true;
-				return;
+				if (!base->isGasSaturated())
+				{
+					setMiningBase(base, true);
+					mining = true;
+					return;
+				}
+			}
+
+			for (auto &base : resourceDepots)
+			{
+				if (!base->isMineralSaturated())
+				{
+					setMiningBase(base, false);
+					mining = true;
+					return;
+				}
 			}
 		}
 	}
+	else
+		updateCoalitionStatus();
 }
 
 bool SCV::repair(BWAPI::Unit damagedUnit)
