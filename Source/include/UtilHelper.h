@@ -83,3 +83,5 @@ namespace std
 	//	}
 	//};
 }
+
+double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr);

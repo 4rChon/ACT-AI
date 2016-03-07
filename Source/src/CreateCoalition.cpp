@@ -1,11 +1,20 @@
 #include "CreateCoalition.h"
 #include "CoalitionHelper.h"
 #include "TaskHelper.h"
+#include "EconHelper.h"
 #include "CreateUnit.h"
 
 CreateCoalition::CreateCoalition(Composition composition, Task* task)
 {
 	taskName = "CreateCoalition(Composition, " + task->getName() + ")";
+	if (task->getType() == ATT)
+	{
+		for (auto& unit : composition.getUnitMap())
+		{
+			if (!unit.first.isBuilding())
+				composition.getUnitMap()[unit.first] += (int)(unit.second * EconHelper::getUnitMultiplier());
+		}		
+	}
 	taskCoalition = CoalitionHelper::addCoalition(composition, task);	
 	task->setCoalition(taskCoalition);
 	cost = composition.getCost();
@@ -28,12 +37,13 @@ void CreateCoalition::act()
 	Composition differenceComposition = taskCoalition->getTargetComp() - taskCoalition->getCurrentComp();
 	for (auto unitType : differenceComposition.getTypes())
 	{
+		int unitCount = differenceComposition[unitType];
 		if (unitType.isWorker())
 			continue;
-		if (differenceComposition[unitType] > 0)
-		{
+		if (unitCount > 0)
+		{			
 			//std::cout << "I need " << differenceComposition[unitType] << " more " << unitType.c_str() << "\n";
-			CreateUnit *createUnit = new CreateUnit(unitType, differenceComposition[unitType]);
+			CreateUnit *createUnit = new CreateUnit(unitType, unitCount);
 			addSubTask(createUnit);
 		}
 	}

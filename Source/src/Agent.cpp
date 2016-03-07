@@ -203,21 +203,21 @@ bool Agent::build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPositio
 
 bool Agent::buildAddon(BWAPI::UnitType addon)
 {
-	if (unit->canBuildAddon(addon) && EconHelper::haveMoney(addon))
+	if (BWAPI::Broodwar->canMake(addon, unit) && EconHelper::haveMoney(addon))
 		return unit->buildAddon(addon);	
 	return false;
 }
 
 bool Agent::train(BWAPI::UnitType unitType)
 {
-	if (unit->canTrain(unitType) && EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType) && unit->getTrainingQueue().size() < 1)
+	if (BWAPI::Broodwar->canMake(unitType, unit) && EconHelper::haveMoney(unitType) && unit->getTrainingQueue().size() < 1)
 		return unit->train(unitType);
 	return false;
 }
 
 bool Agent::morph(BWAPI::UnitType unitType)
 {
-	if (unit->canMorph(unitType) && EconHelper::haveMoney(unitType))
+	if (BWAPI::Broodwar->canMake(unitType, unit) && EconHelper::haveMoney(unitType))
 		return(unit->morph(unitType));	
 	return false;
 }

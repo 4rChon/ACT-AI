@@ -38,7 +38,6 @@ public:
 	int getID() const;
 	double getCost();
 	double getProfit();
-	double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr);
 	void addEngagement();
 	void addKillCount(int killCount = 1);
 	bool isActive() const;

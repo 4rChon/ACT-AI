@@ -15,7 +15,7 @@ namespace ArmyHelper
 	{
 		struct compareUnit
 		{
-			bool operator()(const std::pair<int, int> a, const std::pair<int, int> b)
+			bool operator()(const UnitCostPair a, const UnitCostPair b)
 			{
 				if (BWAPI::UnitType(a.second).buildScore() == BWAPI::UnitType(b.second).buildScore())
 					return a.first > b.first;
@@ -124,7 +124,7 @@ namespace ArmyHelper
 
 	void addTargetPriority(BWAPI::Unit unit)
 	{
-		auto target = std::pair<UnitCostPair, MapHelper::Zone*>(UnitCostPair(unit->getID(), unit->getType().buildScore()), MapHelper::getZone(unit->getRegion()));
+		auto target = std::pair<UnitCostPair, MapHelper::Zone*>(UnitCostPair(unit->getID(), unit->getType()), MapHelper::getZone(unit->getRegion()));
 		targetPriorityList.insert(target);
 
 		attackTarget = (*targetPriorityList.begin()).second;
@@ -132,15 +132,36 @@ namespace ArmyHelper
 
 	void removeTargetPriority(BWAPI::Unit unit)
 	{
-		targetPriorityList.erase(UnitCostPair(unit->getID(), unit->getType().buildScore()));
+		for (auto& target : targetPriorityList)
+		{
+			if (target.first.first == unit->getID())
+				targetPriorityList.erase(target.first);				
+		}
+
 		attackTarget = (*targetPriorityList.begin()).second;
+	}
+
+	void updateTargetPriority()
+	{
+		for (auto &target : targetPriorityList)
+		{
+			if (target.second->getLastVisited() < 5 && !BWAPI::Broodwar->getUnit(target.first.first)->isVisible())
+				targetPriorityList.erase(target.first);
+		}
 	}
 
 	bool scan(BWAPI::Position target)
 	{
-		for each(auto &comsatStation in AgentHelper::getComsatStations())
+		for (auto &comsatStation : AgentHelper::getComsatStations())
 			if (comsatStation->useAbility(BWAPI::TechTypes::Scanner_Sweep, target))
 				return true;
 		return false;
+	}
+
+	void printPriorityList()
+	{
+		int i = 0;
+		for (auto& target : targetPriorityList)
+			BWAPI::Broodwar->drawTextScreen(125, 250 + (10 * ++i), "%d : %s - %d", target.first.first, ((BWAPI::UnitType)target.first.second).getName().c_str(), target.second->getID());
 	}
 }

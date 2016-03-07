@@ -28,6 +28,7 @@
     <ClInclude Include="Source\include\Composition.h" />
     <ClInclude Include="Source\include\CreateCoalition.h" />
     <ClInclude Include="Source\include\CreateUnit.h" />
+    <ClInclude Include="Source\include\Defend.h" />
     <ClInclude Include="Source\include\DesireHelper.h" />
     <ClInclude Include="Source\include\EconHelper.h" />
     <ClInclude Include="Source\include\Expand.h" />
@@ -54,6 +55,7 @@
     <ClCompile Include="Source\src\Composition.cpp" />
     <ClCompile Include="Source\src\CreateCoalition.cpp" />
     <ClCompile Include="Source\src\CreateUnit.cpp" />
+    <ClCompile Include="Source\src\Defend.cpp" />
     <ClCompile Include="Source\src\DesireHelper.cpp" />
     <ClCompile Include="Source\src\Dll.cpp" />
     <ClCompile Include="Source\src\EconHelper.cpp" />
@@ -68,6 +70,7 @@
     <ClCompile Include="Source\src\SwarmCAT.cpp" />
     <ClCompile Include="Source\src\Task.cpp" />
     <ClCompile Include="Source\src\TaskHelper.cpp" />
+    <ClCompile Include="Source\src\UtilHelper.cpp" />
     <ClCompile Include="Source\src\Worker.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

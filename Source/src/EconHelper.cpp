@@ -113,7 +113,7 @@ namespace EconHelper
 
 	void updateUnitMultiplier()
 	{
-		unitMultiplier = mineralIncome / 1000;
+		unitMultiplier = mineralIncome / 250;
 	}
 
 	void doneExpanding()

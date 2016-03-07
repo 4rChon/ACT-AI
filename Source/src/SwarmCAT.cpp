@@ -81,7 +81,6 @@ void SwarmCAT::onEnd(bool isWinner)
 void SwarmCAT::onFrame()
 {
 	//std::cout << "---FrameStart---\n";	
-	DesireHelper::updateDesireMaps();
 	drawDebugText();
 
 	currentTime = std::chrono::high_resolution_clock::now();
@@ -105,6 +104,8 @@ void SwarmCAT::onFrame()
 			AgentHelper::setLastServiced(++a);
 			continue;
 		}
+
+		MapHelper::getZone(BWAPI::Broodwar->getRegionAt(u->getPosition()))->updateZone();
 
 		if (u->isLockedDown() || u->isMaelstrommed() || u->isStasised())
 		{
@@ -132,19 +133,21 @@ void SwarmCAT::onFrame()
 			continue;
 		}		
 
-		MapHelper::getZone(BWAPI::Broodwar->getRegionAt(u->getPosition()))->updateZone();
 		AgentHelper::setLastServiced(++a);
 
 		auto diff = std::chrono::high_resolution_clock::now() - currentTime;		
 
-		if (diff.count() > 0.005)
-			return;
+		//if (diff.count() > 0.005)
+		//	return;
 	}
 
 	TaskHelper::updateRootTasks();
 	EconHelper::updateEconomy();
 	ArmyHelper::updateArmyMovement();
-	CoalitionHelper::updateFreeCoalitions();
+	DesireHelper::updateDesireMaps();
+
+	if (Broodwar->getFrameCount() % (24 * 60) == 0)
+		DesireHelper::updateSupplyDesire();
 	//std::cout << "---FrameEnd---\n";
 }
 
@@ -295,17 +298,22 @@ void SwarmCAT::drawDebugText()
 			Broodwar->drawTextScreen(10, 100 + (10 * i++), "%s : %d/%d", unitType.first.c_str(), coalition->getCurrentComp().getUnitMap()[unitType.first], unitType.second);
 	}
 
-	Broodwar->drawTextScreen(400, 250, "Most Desirable Unit: %s", DesireHelper::getMostDesirableUnit().c_str());
-	Broodwar->drawTextScreen(400, 260, "Most Desirable Unit (Barracks): %s", DesireHelper::getMostDesirableUnit(BWAPI::UnitTypes::Terran_Barracks).c_str());
-	Broodwar->drawTextScreen(400, 270, "Most Desirable Unit (Factory): %s", DesireHelper::getMostDesirableUnit(BWAPI::UnitTypes::Terran_Factory).c_str());
-	Broodwar->drawTextScreen(400, 280, "Most Desirable Unit (Starport): %s", DesireHelper::getMostDesirableUnit(BWAPI::UnitTypes::Terran_Starport).c_str());
+	auto bestUnit = DesireHelper::getMostDesirableUnit();
+	auto bestRaxUnit = DesireHelper::getMostDesirableUnit(BWAPI::UnitTypes::Terran_Barracks);
+	auto bestFactoryUnit = DesireHelper::getMostDesirableUnit(BWAPI::UnitTypes::Terran_Factory);
+	auto bestStarportUnit = DesireHelper::getMostDesirableUnit(BWAPI::UnitTypes::Terran_Starport);
+	auto unitDesireMap = DesireHelper::getUnitDesireMap();
+	Broodwar->drawTextScreen(325, 250, "Most Desirable Unit: %s - %.2f", bestUnit.c_str(), unitDesireMap[bestUnit]);
+	Broodwar->drawTextScreen(325, 260, "Most Desirable Unit (Barracks): %s - %.2f", bestRaxUnit.c_str(), unitDesireMap[bestRaxUnit]);
+	Broodwar->drawTextScreen(325, 270, "Most Desirable Unit (Factory): %s - %.2f", bestFactoryUnit.c_str(), unitDesireMap[bestFactoryUnit]);
+	Broodwar->drawTextScreen(325, 280, "Most Desirable Unit (Starport): %s - %.2f", bestStarportUnit.c_str(), unitDesireMap[bestStarportUnit]);
 
 	for (auto &a : AgentHelper::getAgentset())
 	{
 		auto u = a->getUnit();
 		if (u->exists())
 		{
-			Broodwar->drawTextMap(u->getPosition().x - u->getType().dimensionLeft(), u->getPosition().y + u->getType().dimensionDown(), "%d : %s", a->getID(), u->getOrder().c_str());
+			//Broodwar->drawTextMap(u->getPosition().x - u->getType().dimensionLeft(), u->getPosition().y + u->getType().dimensionDown(), "%d : %s", a->getID(), u->getOrder().c_str());
 			//Broodwar->drawTextMap(u->getPosition().x - u->getType().dimensionLeft(), u->getPosition().y + u->getType().dimensionDown(), "%d : %d : %d - %d", a->getID(), a->getCoalitionID(), a->getTaskID(), a->isFree());
 			if (u->getType().isWorker())
 			{
@@ -331,7 +339,9 @@ void SwarmCAT::drawDebugText()
 				);
 		}
 	}
-	
+
+	ArmyHelper::printPriorityList();
+
 	for (auto &rd : AgentHelper::getResourceDepots())
 	{
 		for (auto &mineral : rd->getBaseLocation()->getMinerals())
@@ -354,14 +364,15 @@ void SwarmCAT::drawDebugText()
 	Broodwar->drawTextScreen(10, 10, "Worker Count: %d", Broodwar->self()->allUnitCount(Broodwar->self()->getRace().getWorker()));
 	Broodwar->drawTextScreen(10, 20, "Expand Desire: %.2f", DesireHelper::getExpandDesire());
 	Broodwar->drawTextScreen(10, 30, "Supply Desire: %.2f", DesireHelper::getSupplyDesire());
-	//for (auto &zone : MapHelper::getRegionField())
-	//{
-	//	Broodwar->drawTextMap(zone->getRegion()->getCenter(), "ZoneID : %d", zone->getID());
-	//	Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 16, "FriendScore : %d", zone->getFriendScore());
-	//	Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 32, "ResourceScore : %d", zone->getResourceScore());
-	//	Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 48, "LastVisited : %d", zone->getLastVisited());
-	//	//everything  but id should be 0 because we're not updating the zones yet
-	//}
+	Broodwar->drawTextScreen(10, 40, "Unit Multiplier: %.2f", EconHelper::getUnitMultiplier());
+
+	for (auto &zone : MapHelper::getRegionField())
+	{
+		Broodwar->drawTextMap(zone->getRegion()->getCenter(), "ZoneID : %d", zone->getID());
+		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 10, "FriendScore : %d", zone->getFriendScore());
+		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 20, "EnemyScore: %d", zone->getEnemyScore());
+		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 30, "Time Since Last : %d", BWAPI::Broodwar->getFrameCount() - zone->getLastVisited());
+	}
 }
 
 void SwarmCAT::drawTerrainData()

@@ -1,6 +1,7 @@
 #include "DesireHelper.h"
 #include "AgentHelper.h"
 #include "UtilHelper.h"
+#include "CoalitionHelper.h"
 
 namespace DesireHelper
 {
@@ -20,21 +21,27 @@ namespace DesireHelper
 	{
 		for (auto &unitType : BWAPI::UnitTypes::allUnitTypes())
 			if(unitType.getRace() == BWAPI::Broodwar->self()->getRace())
-				unitDesireMap.insert(std::pair<BWAPI::UnitType, double>(unitType, 0.1));
+				unitDesireMap.insert(std::pair<BWAPI::UnitType, double>(unitType, 0.0));
 
 		for (auto &upgradeType : BWAPI::UpgradeTypes::allUpgradeTypes())
 			if(upgradeType.getRace() == BWAPI::Broodwar->self()->getRace())
-				upgradeDesireMap.insert(std::pair<BWAPI::UpgradeType, double>(upgradeType, 0.1));
+				upgradeDesireMap.insert(std::pair<BWAPI::UpgradeType, double>(upgradeType, 0.0));
 
 		for (auto &techType : BWAPI::TechTypes::allTechTypes())
 			if (techType.getRace() == BWAPI::Broodwar->self()->getRace())
-				techDesireMap.insert(std::pair<BWAPI::TechType, double>(techType, 0.1));
+				techDesireMap.insert(std::pair<BWAPI::TechType, double>(techType, 0.0));
 
 		for (auto &expansion : BWTA::getBaseLocations())
 		{
 			double desire = 0.0;
-			if(!expansion->isIsland())
-				desire = 10 + std::log(1.0 / expansion->getGroundDistance(BWTA::getStartLocation(BWAPI::Broodwar->self())));
+			if (!expansion->isIsland())
+			{
+				std::vector<double> valueArr;
+				std::vector<double> coeffArr;
+				valueArr.push_back(1/expansion->getGroundDistance(BWTA::getStartLocation(BWAPI::Broodwar->self())));
+				coeffArr.push_back(1);
+				desire = normaliseValues(valueArr, coeffArr);
+			}
 			expansionDesireMap.insert(std::pair<BWTA::BaseLocation*, double>(expansion, desire));
 		}
 
@@ -48,10 +55,18 @@ namespace DesireHelper
 		expandDesire = 0.0;
 	}
 
-	void updateUnitDesireMap(Composition composition)
+	void updateUnitDesireMap()
 	{
-		for (auto& unit : composition.getUnitMap())
-			unitDesireMap[unit.first] = unit.second;
+		Composition comp = Composition();
+		for (auto& coalition : CoalitionHelper::getCoalitionset())
+		{
+			Composition differenceComposition = coalition->getTargetComp() - coalition->getCurrentComp();
+			for (auto& unit : differenceComposition.getUnitMap())
+				comp.addType(unit.first, unit.second);
+		}
+
+		for (auto& unit : unitDesireMap)
+			unitDesireMap[unit.first] = comp[unit.first];
 	}
 
 	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType producer)
@@ -70,7 +85,7 @@ namespace DesireHelper
 			if (unit.second > bestUnit.second)
 				bestUnit = unit;
 		}
-		return bestUnit.first;		
+		return bestUnit.first;
 	}
 
 	void updateUpgradeDesireMap()
@@ -83,9 +98,20 @@ namespace DesireHelper
 
 	void updateExpansionDesireMap()
 	{
-		for (auto &expansion : expansionDesireMap)
-			if (BWAPI::Broodwar->getRegionAt(expansion.first->getPosition())->getUnits(BWAPI::Filter::IsResourceDepot).size())
-				expansionDesireMap[expansion.first] = 0.0;
+		for (auto &expansion : BWTA::getBaseLocations())
+		{
+			if (expansion->isIsland() || BWAPI::Broodwar->getRegionAt(expansion->getPosition())->getUnits(BWAPI::Filter::IsResourceDepot).size() > 0)
+				expansionDesireMap[expansion] = 0.0;
+			else
+			{
+				std::vector<double> valueArr;
+				std::vector<double> coeffArr;
+				valueArr.push_back(1/expansion->getGroundDistance(BWTA::getStartLocation(BWAPI::Broodwar->self())));
+				coeffArr.push_back(1.0);
+				expansionDesireMap[expansion] = normaliseValues(valueArr, coeffArr);
+			}
+		}
+
 	}
 
 	BWTA::BaseLocation* getBestExpansionLocation()
@@ -108,20 +134,26 @@ namespace DesireHelper
 		updateUpgradeDesireMap();
 		updateTechDesireMap();
 		updateExpansionDesireMap();
+		updateUnitDesireMap();
 	}
 
 	void updateSupplyDesire(BWAPI::UnitType unitType, bool justDied)
 	{
-		if (BWAPI::Broodwar->self()->supplyTotal() >= 200)
-		{
-			supplyDesire = 0.0;
-			return;
-		}
-		
 		int unitSupply = unitType.supplyProvided() - unitType.supplyRequired();
 		if (justDied)
 			unitSupply *= -1;
 		supplyDesire -= (double)unitSupply / BWAPI::Broodwar->self()->getRace().getCenter().supplyProvided();		
+	}
+
+	void updateSupplyDesire()
+	{
+		if (BWAPI::Broodwar->self()->supplyTotal() >= 400)
+		{
+			supplyDesire = 0.0;
+			return;
+		}
+
+		supplyDesire = 1 - ((double)(BWAPI::Broodwar->self()->supplyTotal() - BWAPI::Broodwar->self()->supplyUsed())/BWAPI::Broodwar->self()->getRace().getCenter().supplyProvided());
 	}
 
 	void updateExpandDesire()

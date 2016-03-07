@@ -138,9 +138,10 @@ namespace AgentHelper
 	{
 		agent->unbind();
 		agentSet.erase(agent);
-		if(agent->getUnit()->getType().isResourceDepot())
+		if (resourceDepots.count((ResourceDepot*)agent))
 			resourceDepots.erase((ResourceDepot*)agent);
-		comsatStations.erase(agent);
+		if(comsatStations.count(agent))
+			comsatStations.erase(agent);
 		typeCountMap[agent->getUnit()->getType()]--;
 	}
 
@@ -154,11 +155,8 @@ namespace AgentHelper
 		{
 			if (agent->getCoalitionID() != -1)
 				agent->getCoalition()->removeAgent(agent);
-			else
-				agent->unbind();
-			agentSet.erase(agent);
-			if (resourceDepots.count((ResourceDepot*)agent))
-				resourceDepots.erase((ResourceDepot*)agent);
+			
+			removeAgent(agent);
 			delete agent;
 		}
 		resetLastServiced();

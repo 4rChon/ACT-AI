@@ -57,7 +57,10 @@ Composition Composition::operator-(const Composition& b)
 {
 	Composition composition = Composition(unitMap);
 	for (auto &unit : b.getUnitMap())
-		composition -= unit.first;
+	{
+		for (int i = 0; i < unit.second; i++)
+			composition -= unit.first;
+	}
 
 	return composition;
 }

@@ -99,6 +99,9 @@
     <ClInclude Include="Source\include\ArmyHelper.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="Source\include\Defend.h">
+      <Filter>include\Tasks</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\src\DesireHelper.cpp">
@@ -171,6 +174,12 @@
       <Filter>src\Agents</Filter>
     </ClCompile>
     <ClCompile Include="Source\src\ArmyHelper.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\Defend.cpp">
+      <Filter>src\Tasks</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\UtilHelper.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>

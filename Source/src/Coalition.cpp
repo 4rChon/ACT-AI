@@ -2,6 +2,7 @@
 #include "AgentHelper.h"
 #include "CoalitionHelper.h"
 #include "Task.h"
+#include "UtilHelper.h"
 #include <sstream>
 #include <string>
 #include <iostream>
@@ -78,9 +79,9 @@ double Coalition::getCost()
 	std::vector<double> valueArr;
 	std::vector<double> coeffArr;
 	valueArr.push_back(currentComp.getCost());
-	coeffArr.push_back(0.001);
-	valueArr.push_back(BWAPI::Broodwar->getFrameCount() - creationFrame);
 	coeffArr.push_back(0.0001);
+	valueArr.push_back(BWAPI::Broodwar->getFrameCount() - creationFrame);
+	coeffArr.push_back(0.00001);
 	cost = normaliseValues(valueArr, coeffArr);
 	return cost;
 }
@@ -92,18 +93,9 @@ double Coalition::getProfit()
 	valueArr.push_back(killCount);
 	coeffArr.push_back(1.0);
 	valueArr.push_back(engageDuration);
-	coeffArr.push_back(1.0);
+	coeffArr.push_back(0.8);
 	profit = normaliseValues(valueArr, coeffArr);
 	return profit;
-}
-
-double Coalition::normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr) //TO DO: put in util file
-{
-	double total = 0.0;
-	for (std::size_t i = 0; i < valueArr.size(); i++)
-		total += 1 / (1 + std::exp(-coeffArr[i] * valueArr[i]));
-
-	return ((2 / valueArr.size()) * total) - 1;
 }
 
 void Coalition::addEngagement()
@@ -197,7 +189,9 @@ void Coalition::logPerformance()
 	std::cout << "Logging Performance...\n";
 	std::ofstream composition;
 	auto race = BWAPI::Broodwar->self()->getRace().toString();
-	composition.open("compositions\\" + race + "_" + task->getName() + ".txt");
+	//composition.open("compositions\\" + BWAPI::Broodwar->mapName() + "\\" + BWAPI::Broodwar->enemy()->getRace().getName() + "\\" + race + "_" + task->getName() + ".txt");
+	composition.open("compositions\\" + BWAPI::Broodwar->enemy()->getRace().getName() + "\\" + race + "_" + task->getName() + ".txt");
+	composition << "Map Name: " << BWAPI::Broodwar->mapName() << " : " << BWAPI::Broodwar->mapFileName() << "\n";
 	composition << "EngageDuration: " << engageDuration << "\n";
 	composition << "KillCount: " << killCount << "\n";
 	composition << profit << " | " << cost << "\n";

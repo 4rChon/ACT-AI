@@ -1,9 +1,9 @@
 #include "Attack.h"
 #include "Scout.h"
 #include "CreateCoalition.h"
-#include "EconHelper.h"
 #include "ArmyHelper.h"
 #include "CoalitionHelper.h"
+#include "EconHelper.h"
 #include <string>
 
 Attack::Attack(MapHelper::Zone* target)
@@ -17,14 +17,14 @@ Attack::Attack(MapHelper::Zone* target)
 void Attack::createCoalition()
 {
 	Composition c;
-	//c.addType(BWAPI::UnitTypes::Terran_Marine, 5);	
-	c.addType(BWAPI::UnitTypes::Terran_Medic, 5 + (int)(5 * EconHelper::getUnitMultiplier()));
-	c.addType(BWAPI::UnitTypes::Terran_Marine, 5 + (int)(5 * EconHelper::getUnitMultiplier()));
+	c.addType(BWAPI::UnitTypes::Terran_Marine, (int)(5 * EconHelper::getUnitMultiplier()));
+	c.addType(BWAPI::UnitTypes::Terran_Medic, (int)(5 * EconHelper::getUnitMultiplier()));
+	c.addType(BWAPI::UnitTypes::Terran_Firebat, (int)(5 * EconHelper::getUnitMultiplier()));
+	//c.addType(BWAPI::UnitTypes::Terran_Marine, 5);
 	//c.addType(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 1 + (int)(1 * EconHelper::getUnitMultiplier()));
-
-	for each(auto &unit in BWAPI::Broodwar->self()->getUnits())
+	for (auto &unit : BWAPI::Broodwar->self()->getUnits())
 	{
-		if (!unit->getType().isWorker() && !unit->getType().isBuilding() && !BWAPI::UnitTypes::Spell_Scanner_Sweep)
+		if (!unit->getType().isWorker() && !unit->getType().isBuilding() && !unit->getType().isSpell())
 			c.addType(unit->getType(), 1);
 	}
 	//c.addType(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 5);
@@ -71,7 +71,7 @@ void Attack::update()
 		return;
 	}
 
-	if (!acting && assigned)
+	if (!acting && assigned || BWAPI::Broodwar->self()->supplyUsed() == 200)
 		act();
 
 	printDebugInfo("Update End");

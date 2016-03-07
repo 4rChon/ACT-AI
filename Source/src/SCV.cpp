@@ -23,7 +23,7 @@ void SCV::act()
 			if(miningBase)
 				build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), &miningBase->getBaseLocation()->getTilePosition());
 			else
-				build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), nullptr);
+				build(BWAPI::Broodwar->self()->getRace().getSupplyProvider());
 		}
 
 		if (unit->isIdle())

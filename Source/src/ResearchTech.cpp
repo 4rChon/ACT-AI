@@ -10,7 +10,6 @@ ResearchTech::ResearchTech(BWAPI::TechType techType)
 	taskName = "ResearchTech(" + techType.getName() + ")";
 	satisfying = false;
 	satisfied = true;
-
 	this->techType = techType;	
 	taskType = RES;
 	//debug = true;

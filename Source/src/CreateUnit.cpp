@@ -5,13 +5,14 @@
 #include "TaskHelper.h"
 #include "CoalitionHelper.h"
 #include "DesireHelper.h"
+#include "EconHelper.h"
 #include <string>
 
 CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
 {
 	taskName = "CreateUnit(" + unitType.getName() + " - " + std::to_string(unitCount) + ")";
-	
-	this->unitType = unitType;
+		
+	this->unitType = unitType;	
 	this->unitCount = unitCount;
 	satisfying = false;	
 	satisfied = true;
@@ -34,11 +35,7 @@ void CreateUnit::satisfyRequirements()
 		satisfied = false;		
 	}
 
-	for (auto &required : unitType.requiredUnits())
-		if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(required.first))
-			satisfied = false;
-
-	if (unitType.requiredTech() != BWAPI::TechTypes::None && !BWAPI::Broodwar->self()->hasResearched(unitType.requiredTech()))
+	if(!BWAPI::Broodwar->canMake(unitType))
 		satisfied = false;
 
 	if (!satisfying && !satisfied)

@@ -103,6 +103,9 @@ void Worker::act()
 
 bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPosition)
 {	
+	if (!BWAPI::Broodwar->canMake(building, unit))
+		return false;
+
 	if (EconHelper::haveMoney(building) && !unit->isConstructing())
 	{
 		if (!reservedResources)
@@ -110,7 +113,7 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 			EconHelper::addDebt(building.mineralPrice(), building.gasPrice());
 			reservedResources = true;
 		}
-		/*std::cout << "Building : " << building.getName().c_str() << "\n";		*/
+	
 		if (!desiredPosition)
 		{
 			if (miningBase != nullptr)
@@ -128,8 +131,8 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 		else
 			buildLocation = *desiredPosition;
 		if (unit->build(building, buildLocation))
-		{
-			if(building == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
+		{		
+			if (building == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
 				DesireHelper::updateSupplyDesire(building);
 			unsetMiningBase();
 			BWAPI::Broodwar->registerEvent([this, building](BWAPI::Game*)
@@ -153,7 +156,7 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 						((CreateUnit*)task)->decrementUnitCount();
 					if (task->getType() == EXP)
 						task->succeed();
-				}
+				}				
 			},
 				[this](BWAPI::Game*) {return !getUnit()->exists() || this->getUnit()->getOrder() == BWAPI::Orders::ConstructingBuilding || !this->getUnit()->isConstructing(); },
 				1);

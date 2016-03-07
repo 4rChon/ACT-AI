@@ -165,6 +165,7 @@ void Task::succeed()
 	if (taskType == ATT)
 	{
 		ArmyHelper::defend();
+		ArmyHelper::updateTargetPriority();
 	}
 
 	if (taskType == SCO)

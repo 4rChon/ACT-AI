@@ -9,14 +9,14 @@ namespace DesireHelper
 {
 	void initialiseHelper();
 
-	void updateUnitDesireMap(Composition composition);
+	void updateUnitDesireMap();
 	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType producer = BWAPI::UnitTypes::None);
 	void updateUpgradeDesireMap();
 	void updateTechDesireMap();
 	void updateExpansionDesireMap();
 	void updateDesireMaps();
 	void updateSupplyDesire(BWAPI::UnitType unitType, bool justDied = false);
-
+	void updateSupplyDesire();
 	void updateExpandDesire();
 
 	const std::unordered_map<BWAPI::UnitType, double>& getUnitDesireMap();
