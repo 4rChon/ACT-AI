@@ -3,7 +3,6 @@
 #include "TaskHelper.h"
 #include "ArmyHelper.h"
 #include "EconHelper.h"
-#include <string>
 
 Task::Task()
 {
@@ -17,13 +16,14 @@ Task::Task()
 	creationFrame = BWAPI::Broodwar->getFrameCount();
 	cost = 0.0;
 	profit = 0.0;
-	//debug = true;
+	target = nullptr;
+	debug = false;
 	taskType = NON;
 }
 
 Task::~Task()
 {
-	printDebugInfo("DELETE", true);
+	printDebugInfo("DELETE");
 	if (taskType != CRC && taskType != STR && taskType != SUR && taskType != NON && coalition != nullptr)
 	{
 		CoalitionHelper::removeCoalition(coalition);
@@ -33,7 +33,7 @@ Task::~Task()
 
 	for (auto &superTaskIt = superTasks.begin(); superTaskIt != superTasks.end(); ++superTaskIt)
 	{
-		printDebugInfo("\n\tRemoving sub task: " + taskName + " \n\tfrom super task: " + (*superTaskIt)->getName(), true);
+		printDebugInfo("\n\tRemoving sub task: " + taskName + " \n\tfrom super task: " + (*superTaskIt)->getName());
 		(*superTaskIt)->getSubTasks().erase(this);
 	}
 
@@ -54,6 +54,11 @@ void Task::setUnitSatisfied(bool unitSatisfied)
 void Task::setTechSatisfied(bool techSatisfied)
 {
 	this->techSatisfied = techSatisfied;
+}
+
+MapHelper::Zone* Task::getTarget()
+{
+	return target;
 }
 
 bool Task::isUnitSatisfied() const
@@ -135,7 +140,7 @@ void Task::cleanSubTasks()
 	for (auto &taskIt = subTasks.begin(); taskIt != subTasks.end();)
 	{
 		(*taskIt)->getSuperTasks().erase(this);
-		printDebugInfo("\n\tRemoving sub task: " + (*taskIt)->getName() + " \n\tfrom super task: " + this->getName(), true);	
+		printDebugInfo("\n\tRemoving sub task: " + (*taskIt)->getName() + " \n\tfrom super task: " + this->getName());	
 		TaskHelper::removeTask(*taskIt++);
 	}
 	subTasks.clear();
@@ -162,21 +167,6 @@ void Task::succeed()
 	profit = 1.0;
 	printDebugInfo("Success!", true);
 
-	if (taskType == ATT)
-	{
-		ArmyHelper::defend();
-		ArmyHelper::updateTargetPriority();
-	}
-
-	if (taskType == SCO)
-	{
-		ArmyHelper::stopScouting();
-	}
-
-	if (taskType == EXP)
-	{
-		EconHelper::doneExpanding();
-	}
 	cleanSubTasks();
 }
 
@@ -207,4 +197,31 @@ void Task::printDebugInfo(std::string info, bool forceShow)
 {
 	if(debug || forceShow)
 		std::cout << taskName << " : " << taskID << " : " << info << "\n";
+}
+
+std::string Task::getTypeString()
+{
+	switch (taskType)
+	{
+	case DEF:
+		return "DEF";
+	case ATT:
+		return "ATT";
+	case CRC:
+		return "CRC";
+	case CRU:
+		return "CRU";
+	case EXP:
+		return "EXP";
+	case RES:
+		return "RES";
+	case STR:
+		return "STR";
+	case SUR:
+		return "SUR";
+	case SCO:
+		return "SCO";
+	default:
+		return "NON";
+	}
 }

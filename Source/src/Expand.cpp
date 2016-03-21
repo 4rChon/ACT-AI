@@ -4,6 +4,7 @@
 #include "TaskHelper.h"
 #include "CreateCoalition.h"
 #include "CoalitionHelper.h"
+#include "CompositionHelper.h"
 
 Expand::Expand()
 {
@@ -20,8 +21,7 @@ Expand::~Expand()
 
 void Expand::createCoalition()
 {
-	Composition c;
-	c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 1);
+	Composition c = CompositionHelper::getComposition(taskType);	
 	CreateCoalition *createCoalition = new CreateCoalition(c, this);
 	addSubTask(createCoalition);
 }
@@ -61,4 +61,15 @@ void Expand::update()
 		act();
 
 	printDebugInfo("Update End");
+}
+
+void Expand::succeed()
+{
+	complete = true;
+	profit = 1.0;
+	printDebugInfo("Success!", true);
+
+	EconHelper::doneExpanding();
+
+	cleanSubTasks();
 }

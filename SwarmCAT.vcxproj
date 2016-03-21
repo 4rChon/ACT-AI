@@ -26,6 +26,7 @@
     <ClInclude Include="Source\include\Coalition.h" />
     <ClInclude Include="Source\include\CoalitionHelper.h" />
     <ClInclude Include="Source\include\Composition.h" />
+    <ClInclude Include="Source\include\CompositionHelper.h" />
     <ClInclude Include="Source\include\CreateCoalition.h" />
     <ClInclude Include="Source\include\CreateUnit.h" />
     <ClInclude Include="Source\include\Defend.h" />
@@ -53,6 +54,7 @@
     <ClCompile Include="Source\src\Coalition.cpp" />
     <ClCompile Include="Source\src\CoalitionHelper.cpp" />
     <ClCompile Include="Source\src\Composition.cpp" />
+    <ClCompile Include="Source\src\CompositionHelper.cpp" />
     <ClCompile Include="Source\src\CreateCoalition.cpp" />
     <ClCompile Include="Source\src\CreateUnit.cpp" />
     <ClCompile Include="Source\src\Defend.cpp" />
@@ -72,6 +74,9 @@
     <ClCompile Include="Source\src\TaskHelper.cpp" />
     <ClCompile Include="Source\src\UtilHelper.cpp" />
     <ClCompile Include="Source\src\Worker.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{936DE1D4-76CC-40F5-9586-B39F835B1E0B}</ProjectGuid>
@@ -127,7 +132,7 @@
     <IncludePath>D:\Games\StarCraft\BWAPI\SwarmCAT\Source\include;D:\Games\StarCraft\BWAPI\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>D:\Games\StarCraft\BWAPI\SwarmCAT\Source\include;D:\Games\StarCraft\BWAPI\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Games\StarCraft\BWAPI\SwarmCAT\packages\boost.1.60.0.0\lib\native\include;D:\Games\StarCraft\BWAPI\SwarmCAT\Source\include;D:\Games\StarCraft\BWAPI\include;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -176,6 +181,13 @@
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">
+  <ImportGroup Label="ExtensionTargets">    
+    <Import Project="packages\boost.1.56.0.0\build\native\boost.targets" Condition="Exists('packages\boost.1.56.0.0\build\native\boost.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\boost.1.56.0.0\build\native\boost.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\boost.1.56.0.0\build\native\boost.targets'))" />
+  </Target>
 </Project>

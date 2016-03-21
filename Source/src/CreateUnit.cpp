@@ -58,19 +58,21 @@ void CreateUnit::createCoalition()
 	Composition producer;
 	auto whatBuilds = unitType.whatBuilds().first;
 
-	producer.addType(whatBuilds, unitType.whatBuilds().second);
+	
 	if (!whatBuilds.isWorker())
 	{
 		for (int i = 0; i < unitCount / 5; i++)
 			producer.addType(whatBuilds, unitType.whatBuilds().second);
 	}
+	else
+		producer.addType(whatBuilds, unitType.whatBuilds().second);
 	CreateCoalition* createCoalition = new CreateCoalition(producer, this);
 	subTasks.insert(createCoalition);
 }
 
 void CreateUnit::decrementUnitCount()
 {
-	printDebugInfo("Decrementing Unit Count", true);
+	printDebugInfo("Decrementing Unit Count");
 	unitCount--;
 }
 
@@ -93,7 +95,7 @@ void CreateUnit::assign()
 // produce a unit
 void CreateUnit::act()
 {	
-	printDebugInfo("Acting");
+	printDebugInfo("Acting");	
 	if (unitCount > 0)
 	{
 		if (!EconHelper::haveMoney(unitType))
@@ -186,7 +188,13 @@ void CreateUnit::update() //x2 redundant in res tech
 	if (complete)
 		return;
 
-	if (!EconHelper::haveSupply(unitType) && BWAPI::Broodwar->self()->supplyTotal() == 200)
+	if (unitType.isRefinery() && BWAPI::Broodwar->self()->allUnitCount(BWAPI::Broodwar->self()->getRace().getRefinery()) >= AgentHelper::getResourceDepots().size())
+	{
+		succeed();
+		return;
+	}
+
+	if (!EconHelper::haveSupply(unitType) && BWAPI::Broodwar->self()->supplyTotal() >= 400)
 	{
 		succeed();
 		return;

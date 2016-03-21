@@ -27,32 +27,39 @@ private:
 		int unitCount;
 		bool detection;
 	} attributes;
+	struct Parameters
+	{
+		double coverage;
+		BWAPI::Position position;
+	} parameters;
+
+	void initAttributes();
+	void updateMaxRange();
+	void updateDetection();
 public:
-	//constructors
+	///constructors
 	Composition();
 	Composition(BWAPI::Unitset unitSet);
 	Composition(UnitMap unitMap);
 
-	//operator overrides
+	///operator overrides
 	bool operator==(const Composition& rhs) const;
-	Composition operator+=(const BWAPI::UnitType& rhs);
-	Composition operator-=(const BWAPI::UnitType& rhs);
+	bool operator>=(const Composition & rhs) const;	
 	Composition operator-(const Composition& b);
 	int operator[](const BWAPI::UnitType& b);
 
-	//getters
+	///getters
 	std::vector<BWAPI::UnitType> getTypes() const;
 	UnitMap getUnitMap() const;
 	double getCost() const;
 	Attributes &getAttributes();
+	Parameters &getParameters();
 
-	//helpers
-	void initAttributes();
-	void updateAttributes(BWAPI::UnitType unitType, int unitCount = 1);
-	void updateMaxRange();
-	void updateDetection();
+	///helpers		
+	void removeType(const BWAPI::UnitType& unitType, int count = 1);
+	void addType(const BWAPI::UnitType& unitType, int count = 1);
+	void updateAttributes(const BWAPI::UnitType& unitType, int unitCount = 1);
 	void outAttributes();
-	void addType(BWAPI::UnitType unitType, int count);
 	void debugInfo() const;
 	std::string toString() const;
 };

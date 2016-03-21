@@ -12,7 +12,7 @@ CreateCoalition::CreateCoalition(Composition composition, Task* task)
 		for (auto& unit : composition.getUnitMap())
 		{
 			if (!unit.first.isBuilding())
-				composition.getUnitMap()[unit.first] += (int)(unit.second * EconHelper::getUnitMultiplier());
+				composition.addType(unit.first, (int)((double)unit.second * EconHelper::getUnitMultiplier()));
 		}		
 	}
 	taskCoalition = CoalitionHelper::addCoalition(composition, task);	

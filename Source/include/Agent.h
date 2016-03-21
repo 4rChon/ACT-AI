@@ -1,5 +1,6 @@
 #pragma once
 #include "UtilHelper.h"
+#include "MapHelper.h"
 #include <BWAPI.h>
 #include <unordered_map>
 
@@ -22,6 +23,10 @@ protected:
 	int taskID;
 
 	bool free;
+
+	MapHelper::Zone* target;
+
+	bool isAttacking;
 
 	int engageDuration;
 	int lastEngaged;
@@ -61,6 +66,7 @@ public:
 	//commands
 	virtual bool move(BWAPI::Position target);
 	virtual bool attack(BWAPI::PositionOrUnit target);
+	virtual bool defend(BWAPI::Position target);
 	virtual bool expand();
 	virtual bool gather(BWAPI::Unit target);
 	virtual bool build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPosition = nullptr);

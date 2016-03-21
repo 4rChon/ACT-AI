@@ -9,7 +9,8 @@ class Worker : public Agent
 protected:
 	bool gasMiner;
 	ResourceDepot* miningBase;
-	bool reservedResources;
+	int reservedMinerals;
+	int reservedGas;
 public:
 	//constructors and desctructors
 	Worker();
@@ -31,6 +32,9 @@ public:
 	//commands
 	bool build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPosition = nullptr);
 	bool expand();
+
+	void reserveResources(int minerals, int gas);
+	void releaseResources();
 	
 	//helpers
 	void debugInfo() const;

@@ -1,5 +1,6 @@
 #pragma once
 #include <BWAPI.h>
+#include "MapHelper.h"
 
 namespace ArmyHelper
 {
@@ -14,6 +15,7 @@ namespace ArmyHelper
 	void addTargetPriority(BWAPI::Unit unit);
 	void removeTargetPriority(BWAPI::Unit unit);
 	void updateTargetPriority();
+	void clearZoneTargets(MapHelper::Zone * zone);
 	bool scan(BWAPI::Position target);
-	void printPriorityList();
+	void printPriorityList(int i = 0);
 }

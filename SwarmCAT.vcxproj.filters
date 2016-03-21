@@ -102,6 +102,9 @@
     <ClInclude Include="Source\include\Defend.h">
       <Filter>include\Tasks</Filter>
     </ClInclude>
+    <ClInclude Include="Source\include\CompositionHelper.h">
+      <Filter>include\Coalitions</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\src\DesireHelper.cpp">
@@ -182,5 +185,11 @@
     <ClCompile Include="Source\src\UtilHelper.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="Source\src\CompositionHelper.cpp">
+      <Filter>src\Coalitions</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>

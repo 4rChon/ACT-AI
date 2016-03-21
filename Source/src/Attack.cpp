@@ -3,6 +3,7 @@
 #include "CreateCoalition.h"
 #include "ArmyHelper.h"
 #include "CoalitionHelper.h"
+#include "CompositionHelper.h"
 #include "EconHelper.h"
 #include <string>
 
@@ -16,18 +17,7 @@ Attack::Attack(MapHelper::Zone* target)
 
 void Attack::createCoalition()
 {
-	Composition c;
-	c.addType(BWAPI::UnitTypes::Terran_Marine, (int)(5 * EconHelper::getUnitMultiplier()));
-	c.addType(BWAPI::UnitTypes::Terran_Medic, (int)(5 * EconHelper::getUnitMultiplier()));
-	c.addType(BWAPI::UnitTypes::Terran_Firebat, (int)(5 * EconHelper::getUnitMultiplier()));
-	//c.addType(BWAPI::UnitTypes::Terran_Marine, 5);
-	//c.addType(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 1 + (int)(1 * EconHelper::getUnitMultiplier()));
-	for (auto &unit : BWAPI::Broodwar->self()->getUnits())
-	{
-		if (!unit->getType().isWorker() && !unit->getType().isBuilding() && !unit->getType().isSpell())
-			c.addType(unit->getType(), 1);
-	}
-	//c.addType(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, 5);
+	Composition c = CompositionHelper::getComposition(taskType);
 	CreateCoalition *createCoalition = new CreateCoalition(c, this);
 	addSubTask(createCoalition);
 }
@@ -44,11 +34,12 @@ void Attack::assign()
 // attack with coalition
 void Attack::act()
 {	
-	printDebugInfo("Acting");	
-	if (!coalition->isActive())
-		return;
-	coalition->getUnitSet().attack(target->getRegion()->getCenter());
-	acting = true;
+	printDebugInfo("Acting");			
+	if (coalition->isActive() || BWAPI::Broodwar->self()->supplyUsed() >= 400)
+	{
+		coalition->getUnitSet().attack(target->getRegion()->getCenter());
+		acting = true;
+	}
 	printDebugInfo("Acting End");
 }
 
@@ -71,8 +62,21 @@ void Attack::update()
 		return;
 	}
 
-	if (!acting && assigned || BWAPI::Broodwar->self()->supplyUsed() == 200)
+	if (!acting && assigned)
 		act();
 
 	printDebugInfo("Update End");
+}
+
+void Attack::succeed()
+{
+	complete = true;
+	profit = coalition->getProfit();
+	printDebugInfo("Success!", true);
+
+	ArmyHelper::defend();
+	ArmyHelper::updateTargetPriority();
+	ArmyHelper::clearZoneTargets(target);
+
+	cleanSubTasks();
 }

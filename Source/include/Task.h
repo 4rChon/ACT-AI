@@ -40,6 +40,7 @@ protected:
 	Coalition* coalition;
 	int coalitionID;
 	TaskType taskType;
+	MapHelper::Zone* target;
 public:
 	//constructors and destructors
 	Task();
@@ -52,6 +53,7 @@ public:
 	
 
 	//getters
+	MapHelper::Zone* getTarget();
 	bool isUnitSatisfied() const;
 	bool isTechSatisfied() const;
 	virtual bool Task::isComplete() const;
@@ -59,13 +61,12 @@ public:
 	int getID() const;
 	std::string getName() const;
 	Taskset& getSubTasks();
-	Taskset & getSuperTasks();
+	Taskset& getSuperTasks();
 	virtual Coalition* getCoalition() const;
 	virtual double getCost();
 	virtual double getProfit();
 	void addSubTask(Task* task);
-
-	void addSuperTask(Task * task);
+	void addSuperTask(Task* task);
 
 	//-
 	virtual void assign() = 0;
@@ -78,4 +79,5 @@ public:
 	virtual void fail();
 
 	void printDebugInfo(std::string info, bool forceShow = false);
+	std::string getTypeString();
 };

@@ -17,10 +17,10 @@ public:
 	BWAPI::UnitType getUnitType();
 
 	//-
-	void assign();
 	void satisfyRequirements();
 	void createCoalition();
 	void decrementUnitCount();
+	void assign();	
 	void act();
 	void update();
 };

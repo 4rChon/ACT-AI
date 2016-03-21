@@ -12,7 +12,8 @@ Worker::Worker()
 {
 	gasMiner = false;
 	miningBase = nullptr;
-	reservedResources = false;
+	reservedMinerals = 0;
+	reservedGas = 0;
 }
 
 Worker::Worker(BWAPI::Unit unit)
@@ -20,13 +21,15 @@ Worker::Worker(BWAPI::Unit unit)
 	this->unit = unit;
 	unitID = unit->getID();
 	miningBase = nullptr;
-	reservedResources = false;
+	reservedMinerals = 0;
+	reservedGas = 0;
 	gasMiner = false;
 }
 
 Worker::~Worker()
 {
 	/*std::cout << "\t~Worker\n";*/
+	releaseResources();
 	unsetMiningBase();
 }
 
@@ -108,11 +111,8 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 
 	if (EconHelper::haveMoney(building) && !unit->isConstructing())
 	{
-		if (!reservedResources)
-		{
-			EconHelper::addDebt(building.mineralPrice(), building.gasPrice());
-			reservedResources = true;
-		}
+		if (reservedMinerals == 0 && reservedGas == 0)
+			reserveResources(building.mineralPrice(), building.gasPrice());
 	
 		if (!desiredPosition)
 		{
@@ -137,8 +137,7 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 			unsetMiningBase();
 			BWAPI::Broodwar->registerEvent([this, building](BWAPI::Game*)
 			{
-				EconHelper::subtractDebt(building.mineralPrice(), building.gasPrice());
-				reservedResources = false;
+				releaseResources();
 				if (this->getUnit()->getOrder() != BWAPI::Orders::ConstructingBuilding
 					|| !this->getUnit()->exists())
 				{
@@ -175,6 +174,20 @@ bool Worker::expand()
 		return false;
 	}
 	return build(BWAPI::Broodwar->self()->getRace().getCenter(), &bestLocation->getTilePosition());			
+}
+
+void Worker::reserveResources(int minerals, int gas)
+{
+	EconHelper::addDebt(minerals, gas);
+	reservedMinerals = minerals;
+	reservedGas = gas;
+}
+
+void Worker::releaseResources()
+{
+	EconHelper::subtractDebt(reservedMinerals, reservedGas);
+	reservedMinerals = 0;
+	reservedGas = 0;
 }
 
 void Worker::debugInfo() const

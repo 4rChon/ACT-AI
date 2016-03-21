@@ -1,24 +1,28 @@
 #include "Composition.h"
+#include "Task.h"
 #include <string>
 #include <sstream>
 
 Composition::Composition()
 {
 	cost = 0;
+	initAttributes();
 }
 
 Composition::Composition(BWAPI::Unitset unitSet)
 {
 	cost = 0;
 	for (auto unit : unitSet)
-		*this += unit->getType();
-	//initAttributes();
+		addType(unit->getType());
+	initAttributes();
 }
 
 Composition::Composition(UnitMap unitMap)
 {	
+	cost = 0;
 	for (auto &unitType : unitMap)
 		addType(unitType.first, unitType.second);
+	initAttributes();
 }
 
 bool Composition::operator==(const Composition& rhs) const
@@ -32,20 +36,15 @@ bool Composition::operator==(const Composition& rhs) const
 	return true;
 }
 
-Composition Composition::operator+=(const BWAPI::UnitType& rhs)
+bool Composition::operator>=(const Composition& rhs) const
 {
-	unitMap[rhs]++;
-	cost += (rhs.gasPrice() * 1.5) + (rhs.mineralPrice());
-	//updateAttributes(rhs);
-	return *this;
-}
+	if (unitMap.size() < rhs.getUnitMap().size())
+		return false;
 
-Composition Composition::operator-=(const BWAPI::UnitType& rhs)
-{
-	unitMap[rhs]--;
-	cost -= (rhs.gasPrice() * 1.5) + (rhs.mineralPrice());
-	//updateAttributes(rhs, -1);
-	return *this;
+	for each(auto &unitType in unitMap)
+		if (unitType.second < rhs.getUnitMap()[unitType.first])
+			return false;
+	return true;
 }
 
 int Composition::operator[](const BWAPI::UnitType& b)
@@ -56,11 +55,9 @@ int Composition::operator[](const BWAPI::UnitType& b)
 Composition Composition::operator-(const Composition& b)
 {
 	Composition composition = Composition(unitMap);
+	
 	for (auto &unit : b.getUnitMap())
-	{
-		for (int i = 0; i < unit.second; i++)
-			composition -= unit.first;
-	}
+		composition.removeType(unit.first, unit.second);
 
 	return composition;
 }
@@ -84,16 +81,30 @@ double Composition::getCost() const
 	return cost;
 }
 
-void Composition::addType(BWAPI::UnitType unitType, int count)
+void Composition::removeType(const BWAPI::UnitType& unitType, int count)
 {
-	unitMap[unitType] += count;
-	cost += ((unitType.gasPrice() * 1.5) + (unitType.mineralPrice())) * count;
-	//updateAttributes(unitType, count);
+	/*std::cout << "Removing " << count << unitType.c_str() << " from composition\n";*/
+	unitMap[unitType] -= count;
+	cost -= ((unitType.gasPrice() * 1.5) + (unitType.mineralPrice())) * count;
+	updateAttributes(unitType, -count);
 }
 
-Composition::Attributes & Composition::getAttributes()
+void Composition::addType(const BWAPI::UnitType& unitType, int count)
+{
+	/*std::cout << "Adding " << count << unitType.c_str() << " from composition\n";*/
+	unitMap[unitType] += count;
+	cost += ((unitType.gasPrice() * 1.5) + (unitType.mineralPrice())) * count;
+	updateAttributes(unitType, count);
+}
+
+Composition::Attributes& Composition::getAttributes()
 {
 	return attributes;
+}
+
+Composition::Parameters& Composition::getParameters()
+{
+	return parameters;
 }
 
 void Composition::updateMaxRange()
@@ -101,7 +112,7 @@ void Composition::updateMaxRange()
 	attributes.maxAirRange = 0.0;
 	attributes.maxGroundRange = 0.0;
 	for each(auto &unitType in getTypes())
-	{
+	{		
 		attributes.maxAirRange = unitType.airWeapon().maxRange() > attributes.maxAirRange ? unitType.airWeapon().maxRange() : attributes.maxAirRange;
 		attributes.maxGroundRange = unitType.groundWeapon().maxRange() > attributes.maxGroundRange ? unitType.groundWeapon().maxRange() : attributes.maxGroundRange;
 	}
@@ -109,8 +120,15 @@ void Composition::updateMaxRange()
 
 void Composition::updateDetection()
 {
+	attributes.detection = false;
 	for each(auto &unitType in getTypes())
-		attributes.detection = unitType.isDetector() ? unitType.isDetector() : attributes.detection;
+	{
+		if (unitType.isDetector())
+		{
+			attributes.detection = true;
+			return;
+		}
+	}
 }
 
 void Composition::initAttributes()
@@ -133,18 +151,47 @@ void Composition::initAttributes()
 		updateAttributes(unitType, unitMap[unitType]);
 }
 
-void Composition::updateAttributes(BWAPI::UnitType unitType, int unitCount)
+void Composition::updateAttributes(const BWAPI::UnitType& unitType, int unitCount)
 {
-	attributes.airDPS += unitType.airWeapon().damageAmount() ? unitCount * (unitType.airWeapon().damageAmount() * unitType.maxAirHits() * (24 / (double)unitType.airWeapon().damageCooldown())) : 0;
-	attributes.groundDPS += unitType.groundWeapon().damageAmount() ? unitCount * (unitType.groundWeapon().damageAmount() * unitType.maxGroundHits() * (24 / (double)unitType.groundWeapon().damageCooldown())) : 0;
-	attributes.avgAirRange += unitCount * (unitType.airWeapon().maxRange() / 32);
-	attributes.avgGroundRange += unitCount * (unitType.groundWeapon().maxRange() / 32);
-	attributes.avgSpeed += unitCount * (unitType.topSpeed());	
+	/*std::cout << "Before update-----------\n";
+	std::cout << "UnitCount: " << unitCount << "\n";
+	std::cout << "Damage Before: " << attributes.groundDPS << "\n";*/
+	
+	if (unitType.canAttack())
+	{				
+		if (unitType.airWeapon() != BWAPI::WeaponTypes::None)
+		{
+			auto airDPS = BWAPI::Broodwar->self()->damage(unitType.airWeapon()) * unitType.maxAirHits() * (24 / (double)BWAPI::Broodwar->self()->weaponDamageCooldown(unitType));
+			auto maxAirRange = BWAPI::Broodwar->self()->weaponMaxRange(unitType.airWeapon()) / 32;
+			attributes.totalAirRange += unitCount * maxAirRange;
+			attributes.airDPS += unitCount * airDPS;
+		}
+
+		if (unitType.groundWeapon() != BWAPI::WeaponTypes::None)
+		{
+			auto groundDPS = BWAPI::Broodwar->self()->damage(unitType.groundWeapon()) * unitType.maxGroundHits() * (24 / (double)BWAPI::Broodwar->self()->weaponDamageCooldown(unitType));
+			auto maxGroundRange = BWAPI::Broodwar->self()->weaponMaxRange(unitType.groundWeapon()) / 32;
+			attributes.totalGroundRange += unitCount * maxGroundRange;
+			attributes.groundDPS += unitCount * groundDPS;
+			/*std::cout << "Damage After: " << attributes.groundDPS << "\n";*/
+		}
+	}
+	
+	if (unitType.canMove())
+		attributes.totalSpeed += unitCount * (BWAPI::Broodwar->self()->topSpeed(unitType));
+	
+	if (attributes.groundDPS < 1)
+		attributes.groundDPS = 0;
+	if (attributes.airDPS < 1)
+		attributes.airDPS = 0;
+
 	attributes.totalHealth += unitCount * (unitType.maxHitPoints() + unitType.maxShields());
 	attributes.unitCount += unitCount;
+
 	attributes.avgAirRange = attributes.totalAirRange / attributes.unitCount;
 	attributes.avgGroundRange = attributes.totalGroundRange / attributes.unitCount;
 	attributes.avgSpeed = attributes.totalSpeed / attributes.unitCount;
+
 	updateMaxRange();
 	updateDetection();
 }

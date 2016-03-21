@@ -40,7 +40,7 @@ namespace DesireHelper
 				std::vector<double> coeffArr;
 				valueArr.push_back(1/expansion->getGroundDistance(BWTA::getStartLocation(BWAPI::Broodwar->self())));
 				coeffArr.push_back(1);
-				desire = normaliseValues(valueArr, coeffArr);
+				desire = util::normaliseValues(valueArr, coeffArr);
 			}
 			expansionDesireMap.insert(std::pair<BWTA::BaseLocation*, double>(expansion, desire));
 		}
@@ -108,7 +108,7 @@ namespace DesireHelper
 				std::vector<double> coeffArr;
 				valueArr.push_back(1/expansion->getGroundDistance(BWTA::getStartLocation(BWAPI::Broodwar->self())));
 				coeffArr.push_back(1.0);
-				expansionDesireMap[expansion] = normaliseValues(valueArr, coeffArr);
+				expansionDesireMap[expansion] = util::normaliseValues(valueArr, coeffArr);
 			}
 		}
 

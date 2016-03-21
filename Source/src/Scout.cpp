@@ -1,5 +1,7 @@
 #include "Scout.h"
 #include "CreateCoalition.h"
+#include "CompositionHelper.h"
+#include "ArmyHelper.h"
 #include <string>
 
 Scout::Scout(MapHelper::Zone* target)
@@ -12,9 +14,7 @@ Scout::Scout(MapHelper::Zone* target)
 
 void Scout::createCoalition()
 {
-	Composition c;
-	c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 1);
-	//c.addType(BWAPI::UnitTypes::Protoss_Probe, 1);
+	Composition c = CompositionHelper::getComposition(taskType);
 	CreateCoalition *createCoalition = new CreateCoalition(c, this);
 	addSubTask(createCoalition);
 }
@@ -59,5 +59,16 @@ void Scout::update()
 	}	
 
 	printDebugInfo("Update End");
+}
+
+void Scout::succeed()
+{
+	complete = true;
+	profit = 1.0;
+	printDebugInfo("Success!", true);
+
+	ArmyHelper::stopScouting();
+
+	cleanSubTasks();
 }
 

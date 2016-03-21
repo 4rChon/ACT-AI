@@ -50,6 +50,9 @@ void SCV::act()
 				}
 			}
 		}
+
+		if (defend(BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation())))
+			return;
 	}
 	else
 		updateCoalitionStatus();
@@ -69,4 +72,10 @@ bool SCV::repair()
 	for (auto &damagedUnit : repairSet)
 		return(repair(damagedUnit));
 	return false;
+}
+
+bool SCV::defend(BWAPI::PositionOrUnit target)
+{
+	return false;/*build(BWAPI::UnitTypes::Terran_Bunker, &BWAPI::TilePosition(BWTA::getNearestChokepoint((target.getPosition()))->getCenter()));*/
+	//build(BWAPI::UnitTypes::Terran_Missile_Turret, &BWAPI::TilePosition(target.getPosition()));
 }

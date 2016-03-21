@@ -1,6 +1,10 @@
 #pragma once
+#define BOOST_FILESYSTEM_VERSION 3
+#define BOOST_FILESYSTEM_NO_DEPRECATED
+
 #include "BWAPI.h"
 #include "BWTA.h"
+#include "boost\filesystem.hpp"
 
 namespace std
 {
@@ -84,4 +88,15 @@ namespace std
 	//};
 }
 
-double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr);
+namespace util
+{
+	namespace fs = ::boost::filesystem;
+
+	//Normalises an array of values after weighing them with coefficients
+	double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr);
+
+	//Get all files in root path with ext extension and places them in ret
+	void getFiles(const fs::path& root, const std::string& ext, std::vector<fs::path>& ret);
+	//void serialise();
+	//void deserialise();
+}

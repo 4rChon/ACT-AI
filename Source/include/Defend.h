@@ -8,6 +8,8 @@ public:
 	//constructors and destructors
 	Defend();
 
+	void createCoalition();
+
 	//-
 	void assign();
 	void act();

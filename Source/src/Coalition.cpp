@@ -1,16 +1,21 @@
 #include "Coalition.h"
 #include "AgentHelper.h"
 #include "CoalitionHelper.h"
+#include "EconHelper.h"
 #include "Task.h"
 #include "UtilHelper.h"
+#include "CompositionHelper.h"
+#include <string>
 #include <sstream>
 #include <string>
 #include <iostream>
+#include <istream>
 #include <fstream>
 
 Coalition::Coalition()
 {
 	creationFrame = BWAPI::Broodwar->getFrameCount();
+	activationFrame = -1;
 	task = nullptr;
 	taskID = -1;
 	active = false;	
@@ -30,7 +35,10 @@ Coalition::Coalition(Composition targetComp, Task* task)
 	active = false;
 
 	this->targetComp = targetComp;
-
+	if (task->getType() == ATT)
+		unitMultiplier = EconHelper::getUnitMultiplier();
+	else
+		unitMultiplier = 1;
 	coalitionID = CoalitionHelper::getNextID();
 	engageDuration = 0;
 	killCount = 0;
@@ -40,9 +48,11 @@ Coalition::Coalition(Composition targetComp, Task* task)
 
 Coalition::~Coalition()
 {
-	std::cout << "~Coalition : " << coalitionID << "\n";
-	logPerformance();
-	active = false;	
+	/*std::cout << "~Coalition : " << coalitionID << "\n";*/
+
+	CompositionHelper::saveComposition(this);
+
+	active = false;
 	for (auto agent : agentSet)
 		agent->unbind();
 	agentSet.clear();
@@ -56,7 +66,9 @@ Task* Coalition::getTask() const
 
 int Coalition::getAge() const
 {
-	return BWAPI::Broodwar->getFrameCount() - creationFrame;
+	if(!active)
+		return BWAPI::Broodwar->getFrameCount() - creationFrame;
+	return BWAPI::Broodwar->getFrameCount() - activationFrame;
 }
 
 int Coalition::getID() const
@@ -80,9 +92,9 @@ double Coalition::getCost()
 	std::vector<double> coeffArr;
 	valueArr.push_back(currentComp.getCost());
 	coeffArr.push_back(0.0001);
-	valueArr.push_back(BWAPI::Broodwar->getFrameCount() - creationFrame);
+	valueArr.push_back(getAge());
 	coeffArr.push_back(0.00001);
-	cost = normaliseValues(valueArr, coeffArr);
+	cost = util::normaliseValues(valueArr, coeffArr);
 	return cost;
 }
 
@@ -94,8 +106,18 @@ double Coalition::getProfit()
 	coeffArr.push_back(1.0);
 	valueArr.push_back(engageDuration);
 	coeffArr.push_back(0.8);
-	profit = normaliseValues(valueArr, coeffArr);
+	profit = util::normaliseValues(valueArr, coeffArr);
 	return profit;
+}
+
+double Coalition::getFitness()
+{
+	return profit / cost;
+}
+
+double Coalition::getUnitMultiplier()
+{
+	return unitMultiplier;
 }
 
 void Coalition::addEngagement()
@@ -146,11 +168,11 @@ bool Coalition::addAgent(Agent* agent)
 void Coalition::addUnit(BWAPI::Unit unit)
 {
 	unitSet.insert(unitSet.begin(), unit);
-	currentComp += unit->getType();
+	currentComp.addType(unit->getType());
 
-	if (!active && currentComp == targetComp)
+	if (!active && currentComp >= targetComp)
 	{
-		std::cout << "Coalition " << coalitionID << " Activated!\n";
+		/*std::cout << "Coalition " << coalitionID << " Activated!\n";*/
 		active = true;
 		for (auto &agent : agentSet)
 			agent->bind();
@@ -164,18 +186,26 @@ void Coalition::removeAgent(Agent* agent)
 
 	if (active)
 	{
-		agent->unbind();
+		agent->unbind();		
 		//if all agents die while coalition is activated, the task is a failure
-		if(agentSet.size() == 0)
+		if (agentSet.size() == 0)
 			task->fail();
+		//if no agents can deal damage ni an attack coalition, the task is a failure
+		if (task->getType() == ATT)
+		{
+			std::cout << "GroundDPS: " << currentComp.getAttributes().groundDPS << "\n";
+			std::cout << "AirDPS: " << currentComp.getAttributes().airDPS << "\n";
+			if (currentComp.getAttributes().groundDPS == 0 && currentComp.getAttributes().airDPS == 0)
+				task->fail();
+		}
 	}
 }
 
 void Coalition::removeUnit(BWAPI::Unit unit)
 {
 	unitSet.erase(unit);
-	currentComp -= unit->getType();
-	std::cout << "A " << unit->getType() << " has left a coalition\n";
+	currentComp.removeType(unit->getType());
+	/*std::cout << "A " << unit->getType() << " has left a coalition\n";*/
 }
 
 void Coalition::outAttributes()
@@ -184,7 +214,7 @@ void Coalition::outAttributes()
 	currentComp.outAttributes();
 }
 
-void Coalition::logPerformance()
+void Coalition::logCoalition()
 {
 	std::cout << "Logging Performance...\n";
 	std::ofstream composition;
@@ -194,7 +224,9 @@ void Coalition::logPerformance()
 	composition << "Map Name: " << BWAPI::Broodwar->mapName() << " : " << BWAPI::Broodwar->mapFileName() << "\n";
 	composition << "EngageDuration: " << engageDuration << "\n";
 	composition << "KillCount: " << killCount << "\n";
-	composition << profit << " | " << cost << "\n";
+	composition << "Fitness: " << getFitness() << "\n";
+	composition << "Cost: " << getCost() << "\n";
+	composition << "Profit: " << getProfit() << "\n";
 	composition << targetComp.toString();
 	composition.close();
 }

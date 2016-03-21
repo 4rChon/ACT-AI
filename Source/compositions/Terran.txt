@@ -1,3 +1,0 @@
-1.0,
-Terran_Marine, 5,
-Terran_Medic, 5

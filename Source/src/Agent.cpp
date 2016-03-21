@@ -18,6 +18,10 @@ Agent::Agent()
 	task = nullptr;
 	coalition = nullptr;
 
+	target = nullptr;
+
+	isAttacking = false;
+
 	engageDuration = 0;
 	lastEngaged = 0;
 	isEngaged = false;
@@ -38,6 +42,15 @@ Agent::Agent(BWAPI::Unit unit)
 	task = nullptr;
 	coalition = nullptr;
 
+	target = nullptr;
+
+	isAttacking = false;
+
+	engageDuration = 0;
+	lastEngaged = 0;
+	isEngaged = false;
+	lastKillCount = 0;
+
 	initialiseCommandMap();
 }
 
@@ -56,13 +69,14 @@ void Agent::initialiseCommandMap()
 void Agent::setCoalition(Coalition* coalition)
 {
 	coalitionID = coalition->getID();	
-	this->coalition = coalition;
+	this->coalition = coalition;	
 }
 
 void Agent::setTask(Task* task)
 {
 	taskID = task->getID();
 	this->task = task;
+	target = task->getTarget();
 }
 
 void Agent::setUnit(BWAPI::Unit unit)
@@ -83,6 +97,7 @@ void Agent::unbind()
 	coalition = nullptr;
 	taskID = -1;
 	task = nullptr;
+	target = nullptr;
 	free = true;
 }
 
@@ -128,6 +143,46 @@ bool Agent::isFree() const
 
 void Agent::updateCoalitionStatus()
 {
+	if (unit->isStuck())
+	{
+		coalition->removeAgent(this);
+		return;
+	}
+
+	if (task->getType() == ATT)
+	{	
+		BWAPI::Position coalitionCenter = coalition->getUnitSet().getPosition();
+		int coalitionSize = coalition->getUnitSet().size();
+		
+		if(unit->getDistance(coalitionCenter) > coalitionSize * 5)
+		{
+			if (unit->hasPath(coalitionCenter))
+			{
+				if(!attack(coalitionCenter))
+					move(coalitionCenter);
+				isAttacking = false;
+			}
+		}
+		else if (unit->getType() == BWAPI::UnitTypes::Terran_Medic)
+		{
+			auto injuredUnit = unit->getClosestUnit(
+				!BWAPI::Filter::IsBeingHealed
+				&& BWAPI::Filter::IsAlly
+				&& BWAPI::Filter::HP_Percent < 100
+				&& BWAPI::Filter::ArmorUpgrade == BWAPI::UpgradeTypes::Terran_Infantry_Armor,
+				coalitionSize * 3
+				);
+
+			if (!useAbility(BWAPI::TechTypes::Healing, injuredUnit))
+				attack(target->getRegion()->getCenter());
+		}
+		else if (!isAttacking)
+		{
+			attack(target->getRegion()->getCenter());
+			isAttacking = true;
+		}
+	}
+
 	int framesSinceLastEngage = BWAPI::Broodwar->getFrameCount() - lastEngaged;
 
 	if (framesSinceLastEngage > 24 * 10)
@@ -150,16 +205,39 @@ void Agent::updateCoalitionStatus()
 
 void Agent::act()
 {		
-	//temp contents
+	//temp contents	
 	if (free)
 	{
 		if (unit->getType().canProduce())
+		{
 			train(DesireHelper::getMostDesirableUnit(unit->getType()));
+			return;
+		}
+
+		if (unit->canUpgrade())
+		{
+			for (auto upgradeType : unit->getType().upgradesWhat())
+			{
+				if (upgrade(upgradeType))
+					return;
+			}			
+		}
+		if (unit->canResearch())
+		{
+			for (auto researchType : unit->getType().researchesWhat())
+			{
+				if (research(researchType))
+					return;
+			}
+		}
+		
+		defend(BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()));
 	}	
 	else
-		updateCoalitionStatus();
+		updateCoalitionStatus();	
 }
 
+//add swarm equation
 bool Agent::pollCoalitions()
 {
 	for (auto &coalition : CoalitionHelper::getCoalitionset())
@@ -181,6 +259,40 @@ bool Agent::attack(BWAPI::PositionOrUnit target)
 	if (unit->canAttack(target))
 		return unit->attack(target);
 	return false;
+}
+
+bool Agent::defend(BWAPI::Position target)
+{
+	if (unit->getType() == BWAPI::UnitTypes::Terran_Bunker)
+	{			
+		int spaceRemaining = unit->getSpaceRemaining();
+		auto closestUnit = unit->getClosestUnit(
+			BWAPI::Filter::ArmorUpgrade == BWAPI::UpgradeTypes::Terran_Infantry_Armor
+			&& !BWAPI::Filter::IsWorker
+			&& BWAPI::Filter::SpaceRequired <= spaceRemaining
+			&& BWAPI::Filter::IsIdle
+			);
+
+		if (closestUnit != nullptr)
+		{
+			if (AgentHelper::getAgent(closestUnit->getID())->isFree())
+			{
+				std::cout << "Found a nearby bunker\n";
+				return unit->load(closestUnit);
+			}
+		}
+		return false;
+	}
+	else if(unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode)
+	{
+		if (move(target))
+			return useAbility(BWAPI::TechTypes::Tank_Siege_Mode, target);
+	}
+
+	if (unit->isIdle())
+		return attack(target);
+	else
+		return false;
 }
 
 bool Agent::expand()

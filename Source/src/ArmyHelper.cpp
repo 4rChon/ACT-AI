@@ -145,7 +145,16 @@ namespace ArmyHelper
 	{
 		for (auto &target : targetPriorityList)
 		{
-			if (target.second->getLastVisited() < 5 && !BWAPI::Broodwar->getUnit(target.first.first)->isVisible())
+			if (target.second->getLastVisited() < 5 && !BWAPI::Broodwar->getUnit(target.first.first)->exists())
+				targetPriorityList.erase(target.first);
+		}
+	}
+
+	void clearZoneTargets(MapHelper::Zone *zone)
+	{
+		for (auto &target : targetPriorityList)
+		{
+			if (target.second == zone)
 				targetPriorityList.erase(target.first);
 		}
 	}
@@ -158,10 +167,14 @@ namespace ArmyHelper
 		return false;
 	}
 
-	void printPriorityList()
+	void printPriorityList(int count)
 	{
 		int i = 0;
 		for (auto& target : targetPriorityList)
+		{
 			BWAPI::Broodwar->drawTextScreen(125, 250 + (10 * ++i), "%d : %s - %d", target.first.first, ((BWAPI::UnitType)target.first.second).getName().c_str(), target.second->getID());
+			if (i == count)
+				break;
+		}
 	}
 }

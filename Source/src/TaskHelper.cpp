@@ -46,8 +46,8 @@ namespace TaskHelper
 
 				if (rootTaskSet.count(task) == 0 && 
 					(newTask->getType() == STR 
-					|| newTask->getType() == SUR 
-					&& task->getName().compare(newTask->getName()) == 0))
+					|| newTask->getType() == SUR)
+					&& task->getName().compare(newTask->getName()) == 0)
 				{
 					removeTask(newTask);
 					return task;
@@ -69,7 +69,7 @@ namespace TaskHelper
 		//}
 		if (fullTaskSet.count(task) > 0)
 		{
-			std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from full taskset\n";
+			/*std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from full taskset\n";*/
 			fullTaskSet.erase(task);
 			delete task;
 		}		
