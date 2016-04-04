@@ -5,18 +5,19 @@
 #include "DesireHelper.h"
 #include "Task.h"
 #include "CreateUnit.h"
+#include "ArmyHelper.h"
 
 Agent::Agent()
 {
 	unit = nullptr;
+	task = nullptr;
+	coalition = nullptr;
+
 	unitID = -1;
 	coalitionID = -1;
 	taskID = -1;
 
 	free = true;
-
-	task = nullptr;
-	coalition = nullptr;
 
 	target = nullptr;
 
@@ -27,7 +28,7 @@ Agent::Agent()
 	isEngaged = false;
 	lastKillCount = 0;
 
-	initialiseCommandMap();
+	/*initialiseCommandMap();*/
 }
 
 Agent::Agent(BWAPI::Unit unit)
@@ -51,25 +52,25 @@ Agent::Agent(BWAPI::Unit unit)
 	isEngaged = false;
 	lastKillCount = 0;
 
-	initialiseCommandMap();
+	/*initialiseCommandMap();*/
 }
 
 Agent::~Agent()
 {
 	//std::cout << "~Agent\n";
-	/*AgentHelper::removeAgent(this);*/	
+	/*AgentHelper::removeAgent(this);*/
 }
 
-void Agent::initialiseCommandMap()
-{
-	for (auto &commandType : BWAPI::UnitCommandTypes::allUnitCommandTypes())
-		commandMap.insert(std::pair<BWAPI::UnitCommandType, double>(commandType, 0.0));
-}
+//void Agent::initialiseCommandMap()
+//{
+//	for (auto &commandType : BWAPI::UnitCommandTypes::allUnitCommandTypes())
+//		commandMap.insert(std::pair<BWAPI::UnitCommandType, double>(commandType, 0.0));
+//}
 
 void Agent::setCoalition(Coalition* coalition)
 {
-	coalitionID = coalition->getID();	
-	this->coalition = coalition;	
+	coalitionID = coalition->getID();
+	this->coalition = coalition;
 }
 
 void Agent::setTask(Task* task)
@@ -86,13 +87,13 @@ void Agent::setUnit(BWAPI::Unit unit)
 
 void Agent::bind()
 {
-	std::cout << unitID << " : Binding agent\n";
+	//std::cout << unitID << " : Binding agent\n";
 	free = false;
 }
 
 void Agent::unbind()
 {
-	std::cout << unitID << " : Unbinding Agent\n";
+	//std::cout << unitID << " : Unbinding Agent\n";
 	coalitionID = -1;
 	coalition = nullptr;
 	taskID = -1;
@@ -143,6 +144,12 @@ bool Agent::isFree() const
 
 void Agent::updateCoalitionStatus()
 {
+	if (!task)
+	{
+		unbind();
+		return;
+	}
+
 	if (unit->isStuck())
 	{
 		coalition->removeAgent(this);
@@ -150,15 +157,15 @@ void Agent::updateCoalitionStatus()
 	}
 
 	if (task->getType() == ATT)
-	{	
+	{
 		BWAPI::Position coalitionCenter = coalition->getUnitSet().getPosition();
 		int coalitionSize = coalition->getUnitSet().size();
-		
-		if(unit->getDistance(coalitionCenter) > coalitionSize * 5)
+
+		if (unit->getDistance(coalitionCenter) > (coalitionSize * 5 * (unit->getType().width() / 8)))
 		{
 			if (unit->hasPath(coalitionCenter))
 			{
-				if(!attack(coalitionCenter))
+				if (!attack(coalitionCenter))
 					move(coalitionCenter);
 				isAttacking = false;
 			}
@@ -196,16 +203,28 @@ void Agent::updateCoalitionStatus()
 		engageDuration++;
 		coalition->addEngagement();
 		isEngaged = true;
-	}		
+	}
 
-	if(unit->canAttack())
+	if (unit->canAttack())
 		coalition->addKillCount(unit->getKillCount() - lastKillCount);
 	lastKillCount = unit->getKillCount();
 }
 
 void Agent::act()
-{		
-	//temp contents	
+{
+	if (unit->getID() == 0)
+		return;
+
+	if (unit->isUnderAttack())
+	{
+		auto allBullets = BWAPI::Broodwar->getBullets();
+		for (auto bullet : allBullets)
+		{
+			if (bullet->getType() == BWAPI::BulletTypes::Subterranean_Spines)
+				ArmyHelper::scan(bullet->getPosition());
+		}
+	}
+
 	if (free)
 	{
 		if (unit->getType().canProduce())
@@ -220,7 +239,7 @@ void Agent::act()
 			{
 				if (upgrade(upgradeType))
 					return;
-			}			
+			}
 		}
 		if (unit->canResearch())
 		{
@@ -230,11 +249,11 @@ void Agent::act()
 					return;
 			}
 		}
-		
-		defend(BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation()));
-	}	
+
+		defend(BWAPI::Position(util::getSelf()->getStartLocation()));
+	}
 	else
-		updateCoalitionStatus();	
+		updateCoalitionStatus();
 }
 
 //add swarm equation
@@ -264,7 +283,7 @@ bool Agent::attack(BWAPI::PositionOrUnit target)
 bool Agent::defend(BWAPI::Position target)
 {
 	if (unit->getType() == BWAPI::UnitTypes::Terran_Bunker)
-	{			
+	{
 		int spaceRemaining = unit->getSpaceRemaining();
 		auto closestUnit = unit->getClosestUnit(
 			BWAPI::Filter::ArmorUpgrade == BWAPI::UpgradeTypes::Terran_Infantry_Armor
@@ -283,7 +302,7 @@ bool Agent::defend(BWAPI::Position target)
 		}
 		return false;
 	}
-	else if(unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode)
+	else if (unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode)
 	{
 		if (move(target))
 			return useAbility(BWAPI::TechTypes::Tank_Siege_Mode, target);
@@ -304,7 +323,7 @@ bool Agent::gather(BWAPI::Unit target)
 {
 	if (unit->canGather(target))
 		return unit->gather(target);
-	return false;	
+	return false;
 }
 
 bool Agent::build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPosition)
@@ -316,7 +335,7 @@ bool Agent::build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPositio
 bool Agent::buildAddon(BWAPI::UnitType addon)
 {
 	if (BWAPI::Broodwar->canMake(addon, unit) && EconHelper::haveMoney(addon))
-		return unit->buildAddon(addon);	
+		return unit->buildAddon(addon);
 	return false;
 }
 
@@ -330,7 +349,7 @@ bool Agent::train(BWAPI::UnitType unitType)
 bool Agent::morph(BWAPI::UnitType unitType)
 {
 	if (BWAPI::Broodwar->canMake(unitType, unit) && EconHelper::haveMoney(unitType))
-		return(unit->morph(unitType));	
+		return(unit->morph(unitType));
 	return false;
 }
 

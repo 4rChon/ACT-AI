@@ -27,10 +27,10 @@ void SatisfyUnitRequirement::act()
 	for (auto &requirement : unitType.requiredUnits())
 	{
 		printDebugInfo("Require : " + requirement.first.getName());
-		if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(requirement.first, requirement.second)
-			&& BWAPI::Broodwar->self()->incompleteUnitCount(requirement.first) < requirement.second)
+		if (!util::getSelf()->hasUnitTypeRequirement(requirement.first, requirement.second)
+			&& util::getSelf()->incompleteUnitCount(requirement.first) < requirement.second)
 		{
-			CreateUnit* createUnit = new CreateUnit(requirement.first, requirement.second - AgentHelper::getTypeCount(requirement.first));
+			CreateUnit* createUnit = new CreateUnit(requirement.first, requirement.second - util::getSelf()->allUnitCount(requirement.first));
 			printDebugInfo(" Creating : " + requirement.first.getName() + " : " + std::to_string(requirement.second));
 			addSubTask(createUnit);
 		}
@@ -68,12 +68,12 @@ void SatisfyUnitRequirement::update()
 	{
 		for each (auto &requirement in unitType.requiredUnits())
 		{
-			if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(requirement.first, requirement.second))
+			if (!util::getSelf()->hasUnitTypeRequirement(requirement.first, requirement.second))
 				return;
 		}
 		if (unitType.requiredTech() != BWAPI::TechTypes::None)
 		{
-			if (!BWAPI::Broodwar->self()->hasResearched(unitType.requiredTech()))
+			if (!util::getSelf()->hasResearched(unitType.requiredTech()))
 				return;
 		}
 		succeed();

@@ -10,33 +10,11 @@ namespace AgentHelper
 		static Agentset comsatStations;
 		static Baseset resourceDepots;
 		static Agentset::iterator lastServiced;
-		static TypeCountMap typeCountMap;
-		static int lastErrorFrame;
-		static BWAPI::Error lastError;
 	}
 
 	void initialiseHelper()
-	{		
+	{
 		lastServiced = agentSet.begin();
-		typeCountMap.clear();
-		lastErrorFrame = 0;
-		lastError = BWAPI::Errors::None;
-	}
-
-	bool updateLastError()
-	{
-		if (BWAPI::Broodwar->getLastError() != BWAPI::Errors::None)
-		{
-			lastErrorFrame = BWAPI::Broodwar->getFrameCount();
-			lastError = BWAPI::Broodwar->getLastError();
-			BWAPI::Broodwar->setLastError();
-		}
-		return true;
-	}
-
-	int getLastErrorFrame()
-	{
-		return lastErrorFrame;
 	}
 
 	Agent* getAgent(int id)
@@ -60,11 +38,6 @@ namespace AgentHelper
 	const Agentset& getComsatStations()
 	{
 		return comsatStations;
-	}
-
-	int getTypeCount(BWAPI::UnitType unitType)
-	{
-		return typeCountMap[unitType];
 	}
 
 	Agentset::iterator getLastServiced()
@@ -131,7 +104,6 @@ namespace AgentHelper
 		agentSet.insert(agent);
 		if (unit->getType() == BWAPI::UnitTypes::Terran_Comsat_Station)
 			comsatStations.insert(agent);
-		typeCountMap[agent->getUnit()->getType()]++;
 	}
 
 	void removeAgent(Agent* agent)
@@ -140,9 +112,8 @@ namespace AgentHelper
 		agentSet.erase(agent);
 		if (resourceDepots.count((ResourceDepot*)agent))
 			resourceDepots.erase((ResourceDepot*)agent);
-		if(comsatStations.count(agent))
+		if (comsatStations.count(agent))
 			comsatStations.erase(agent);
-		typeCountMap[agent->getUnit()->getType()]--;
 	}
 
 	void removeAgent(int id)
@@ -155,7 +126,7 @@ namespace AgentHelper
 		{
 			if (agent->getCoalitionID() != -1)
 				agent->getCoalition()->removeAgent(agent);
-			
+
 			removeAgent(agent);
 			delete agent;
 		}

@@ -4,6 +4,7 @@
 
 #include "CompositionHelper.h"
 #include "UtilHelper.h"
+#include "ArmyHelper.h"
 #include <sstream>
 #include <string>
 #include <iostream>
@@ -35,9 +36,40 @@ namespace CompositionHelper
 		{
 			if (usedComposition.taskType == taskType)
 				candidateSet.push_back(usedComposition);
-		}
+		}				
 
-		if (candidateSet.size() == 0)
+		if (candidateSet.size() > 0)
+		{
+			auto scoutedUnits = ArmyHelper::getScoutedUnits();
+			scoutedUnits.debugInfo();
+			for each(auto unitType in scoutedUnits.getTypes())
+			{
+				auto counters = getCounters(unitType);
+				for (auto it = candidateSet.begin(); it != candidateSet.end();)
+				{
+					bool canCounter = false;
+					//if usedComposition contains at least one counter...
+					for each(auto counterType in counters.getTypes())
+					{
+						if ((*it).composition[counterType] > 0)
+						{
+							canCounter = true;
+							break;
+						}
+					}
+
+					if (!canCounter)
+					{
+						auto nextIt = candidateSet.erase(it);
+						it = nextIt;
+					}
+					else
+						it++;
+				}
+			}
+		}
+		
+		if(candidateSet.size() == 0)
 		{
 			Composition c;
 			switch (taskType)
@@ -50,12 +82,12 @@ namespace CompositionHelper
 			}
 			case EXP:
 			{
-				c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 1);
+				c.addType(util::getSelf()->getRace().getWorker(), 1);
 				return c;
 			}
 			case SCO:
 			{
-				c.addType(BWAPI::Broodwar->self()->getRace().getWorker(), 1);
+				c.addType(util::getSelf()->getRace().getWorker(), 1);
 				return c;
 			}
 			default:
@@ -68,22 +100,127 @@ namespace CompositionHelper
 			if (candidate.fitness > bestComposition.fitness)
 				bestComposition = candidate;
 		}
+		if (taskType == ATT)
+		{
+			std::cout << "Countering with...\n";
+			bestComposition.composition.debugInfo();
+		}
 		return bestComposition.composition;
 	}
+
+	Composition getCounters(BWAPI::UnitType enemyUnitType)
+	{
+		auto allUnitTypes = BWAPI::UnitTypes::allUnitTypes();
+			
+		std::unordered_map<BWAPI::UnitType, int> unitTypeCounterAmount; //LF new name pls
+
+		auto groundDamageType = enemyUnitType.groundWeapon().damageType();
+		auto airDamageType = enemyUnitType.airWeapon().damageType();
+		auto sizeType = enemyUnitType.size();
+		bool flyer = enemyUnitType.isFlyer();
+
+		for each (auto unitType in allUnitTypes)
+		{	
+			if (unitType.getRace() != util::getSelf()->getRace() 
+				|| unitType.isHero() 
+				|| unitType.isBuilding() 
+				|| unitType.isWorker() 
+				|| unitType.supplyProvided() > 0
+				|| unitType == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine
+				|| unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode)
+				continue;
+
+			//if enemy unit flies and friendly unit can damage it...
+			if (flyer)
+			{
+				if (unitType.airWeapon().damageAmount() > 0)
+				{
+					unitTypeCounterAmount[unitType]++;
+
+					//if friendly unit flies and enemy unit can't damage it...
+					if (!(enemyUnitType.airWeapon().damageAmount() > 0))
+						unitTypeCounterAmount[unitType]++;
+
+					//if enemy unit damage type is concussive and friendly unit size is small... 
+					if (airDamageType == BWAPI::DamageTypes::Concussive && unitType.size() == BWAPI::UnitSizeTypes::Small)
+						unitTypeCounterAmount[unitType]++;
+
+					//if enemy unit damage type is explosive and friendly unit size is large... 
+					else if (airDamageType == BWAPI::DamageTypes::Explosive && unitType.size() == BWAPI::UnitSizeTypes::Large)
+						unitTypeCounterAmount[unitType]++;
+
+					//if enemy unit size is small and friendly damage type is explosive...
+					if (sizeType == BWAPI::UnitSizeTypes::Small && unitType.airWeapon().damageType() == BWAPI::DamageTypes::Explosive)
+						unitTypeCounterAmount[unitType]++;
+
+					//if enemy unit size is medium or large and friendly damage type is concussive...
+					else if ((sizeType == BWAPI::UnitSizeTypes::Medium || sizeType == BWAPI::UnitSizeTypes::Large) && unitType.airWeapon().damageType() == BWAPI::DamageTypes::Concussive)
+						unitTypeCounterAmount[unitType]++;
+				}
+				else
+					continue;
+			}
+					
+
+			//if enemy unit is ground unit and friendly unit can damage it...
+			if (!flyer && unitType.groundWeapon().damageAmount() > 0)
+			{
+				unitTypeCounterAmount[unitType]++;
+
+				//if friendly unit flies and enemy unit can't damage it...
+				if (unitType.isFlyer() && !(enemyUnitType.airWeapon().damageAmount() > 0))
+					unitTypeCounterAmount[unitType]++;
+
+				//if enemy unit damage type is concussive and friendly unit size is small... 
+				if (groundDamageType == BWAPI::DamageTypes::Concussive && unitType.size() == BWAPI::UnitSizeTypes::Small)
+					unitTypeCounterAmount[unitType]++;
+
+				//if enemy unit damage type is explosive and friendly unit size is large... 
+				else if (groundDamageType == BWAPI::DamageTypes::Explosive && unitType.size() == BWAPI::UnitSizeTypes::Large)
+					unitTypeCounterAmount[unitType]++;
+
+				//if enemy unit size is small and friendly damage type is explosive...
+				if (sizeType == BWAPI::UnitSizeTypes::Small && unitType.groundWeapon().damageType() == BWAPI::DamageTypes::Explosive)
+					unitTypeCounterAmount[unitType]++;
+
+				//if enemy unit size is medium or large and friendly damage type is concussive...
+				else if ((sizeType == BWAPI::UnitSizeTypes::Medium || sizeType == BWAPI::UnitSizeTypes::Large) && unitType.groundWeapon().damageType() == BWAPI::DamageTypes::Concussive)
+					unitTypeCounterAmount[unitType]++;
+			}
+			else
+				continue;
+		}
+		
+		/*std::cout << "Unit to Counter: \n";		
+		std::cout << "\t" << enemyUnitType.getName() << "\n";*/
+		/*std::cout << "\t\t" << enemyUnitType.size().c_str() << "\n";
+		std::cout << "\t\t" << enemyUnitType.groundWeapon().damageType().c_str() << "\n";
+		std::cout << "\t\t" << enemyUnitType.airWeapon().damageType().c_str() << "\n";*/
+
+		/*std::cout << "Counters: \n";*/
+		Composition counterComposition;
+		for (auto unitType = unitTypeCounterAmount.begin(); unitType != unitTypeCounterAmount.end(); unitType++)
+			counterComposition.addType(unitType->first, unitType->second);
+		/*counterComposition.debugInfo();*/
+		return counterComposition;
+	}
+
 
 	const std::vector<UsedComposition>& getCompositionSet()
 	{
 		return compositionSet;
 	}
 
-	const std::vector<UsedComposition>& getWorkingSet()
-	{
-		return workingSet;
-	}
+	//const std::vector<UsedComposition>& getWorkingSet()
+	//{
+	//	return workingSet;
+	//}
 
 	void loadCompositions()
-	{		
-		auto directory = "compositions\\" + BWAPI::Broodwar->enemy()->getRace().getName() + "\\";
+	{
+		auto enemy = util::getEnemy();// util::getEnemy();
+
+		auto directory = "compositions\\" + enemy->getRace().getName() + "\\";
 		fs::path path = fs::path(directory);
 		std::vector<fs::path> compFiles;
 		util::getFiles(path, ".comp", compFiles);
@@ -95,7 +232,7 @@ namespace CompositionHelper
 
 			Composition c;
 			
-			std::cout << "path: " << compPath.string() << "\n";
+			//std::cout << "path: " << compPath.string() << "\n";
 			compStream.open(directory + compPath.string(), std::ios::binary | std::ios::in);
 
 			int taskType;
@@ -120,10 +257,11 @@ namespace CompositionHelper
 			
 			compStream.close();
 
-			std::cout << "TaskType: " << taskType << "\n";
+			/*std::cout << "TaskType: " << taskType << "\n";
 			std::cout << "Average Activation Time: " << activationFrame << "\n";
 			std::cout << "Average Fitness: " << fitness << "\n";
-			c.debugInfo();
+			c.debugInfo();*/
+
 			UsedComposition usedComposition{
 				c,
 				TaskType(taskType),
@@ -152,18 +290,28 @@ namespace CompositionHelper
 		};
 
 		workingSet.push_back(usedComposition);
-	}	
+	}
+
+	void saveComposition(UsedComposition usedComposition)
+	{
+		workingSet.push_back(usedComposition);
+	}
 
 	void saveCompositions()
 	{
 		std::vector<UsedComposition> uniqueCompositions;
 		for each(auto usedComposition in workingSet)
 		{
+			/*std::cout << "Saving...\n";
+			usedComposition.composition.debugInfo();*/
 			bool unique = true;
 			for each(auto uniqueComposition in uniqueCompositions)
 			{
+				/*std::cout << "\tComparing...\n";*/
+				uniqueComposition.composition.debugInfo();
 				if (usedComposition.composition == uniqueComposition.composition)
 				{
+					/*std::cout << "\tComposition is not unique.\n";*/
 					unique = false;
 					uniqueComposition.fitness += usedComposition.fitness;
 					uniqueComposition.activationFrame += usedComposition.activationFrame;
@@ -173,14 +321,17 @@ namespace CompositionHelper
 			}
 
 			if (unique)
+			{
+				/*std::cout << "\tComposition is unique.\n";*/
 				uniqueCompositions.push_back(usedComposition);
+			}
 		}
 
 		for each(auto uniqueComposition in uniqueCompositions)
 		{
 			std::ofstream compStream;
 			
-			auto directory = "compositions\\" + BWAPI::Broodwar->enemy()->getRace().getName() + "\\";
+			auto directory = "compositions\\" + util::getEnemy()->getRace().getName() + "\\";
 			auto fileName = std::to_string(uniqueComposition.activationFrame) + "_" + std::to_string(uniqueComposition.taskType);
 
 			compStream.open(directory + fileName + ".comp", std::ios::binary | std::ios::out);
@@ -207,7 +358,7 @@ namespace CompositionHelper
 
 			std::ofstream readableStream;
 
-			readableStream.open(directory + "human_" + fileName + ".hcomp", std::ios::out);
+			readableStream.open(directory + "\\human\\" + fileName + ".hcomp", std::ios::out);
 
 			readableStream << "TaskType: " << taskType << "\n";
 			readableStream << "Average Activation Time: " << activationFrame << "\n";

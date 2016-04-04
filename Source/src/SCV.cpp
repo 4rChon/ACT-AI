@@ -21,9 +21,9 @@ void SCV::act()
 			&& EconHelper::haveMoney(BWAPI::UnitTypes::Terran_Supply_Depot))
 		{
 			if(miningBase)
-				build(BWAPI::Broodwar->self()->getRace().getSupplyProvider(), &miningBase->getBaseLocation()->getTilePosition());
+				build(util::getSelf()->getRace().getSupplyProvider(), &miningBase->getBaseLocation()->getTilePosition());
 			else
-				build(BWAPI::Broodwar->self()->getRace().getSupplyProvider());
+				build(util::getSelf()->getRace().getSupplyProvider());
 		}
 
 		if (unit->isIdle())
@@ -51,7 +51,7 @@ void SCV::act()
 			}
 		}
 
-		if (defend(BWAPI::Position(BWAPI::Broodwar->self()->getStartLocation())))
+		if (defend(BWAPI::Position(util::getSelf()->getStartLocation())))
 			return;
 	}
 	else

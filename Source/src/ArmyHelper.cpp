@@ -1,5 +1,6 @@
 #include "ArmyHelper.h"
 #include "Attack.h"
+#include "CreateUnit.h"
 #include "TaskHelper.h"
 #include "MapHelper.h"
 #include "EconHelper.h"
@@ -32,6 +33,7 @@ namespace ArmyHelper
 		static MapHelper::Zone* scoutTarget;
 		static MapHelper::Zone* enemyStart;		
 		static std::map<UnitCostPair, MapHelper::Zone*, compareUnit> targetPriorityList;
+		static std::unordered_map<int, BWAPI::UnitType> scoutedUnits;
 	}
 
 	void initialiseHelper()
@@ -40,11 +42,11 @@ namespace ArmyHelper
 		scouting = false;
 		defending = true;		
 		attackTarget = nullptr;
-		defendTarget = MapHelper::getZone(BWAPI::Broodwar->getRegionAt(BWTA::getNearestChokepoint(BWTA::getStartLocation(BWAPI::Broodwar->self())->getPosition())->getCenter()));
+		defendTarget = MapHelper::getZone(BWAPI::Broodwar->getRegionAt(BWTA::getNearestChokepoint(BWTA::getStartLocation(util::getSelf())->getPosition())->getCenter()));
 		scoutTarget = nullptr;
 		if (BWTA::getStartLocations().size() == 2)
 		{
-			if ((*BWTA::getStartLocations().begin()) == BWTA::getStartLocation(BWAPI::Broodwar->self()))
+			if ((*BWTA::getStartLocations().begin()) == BWTA::getStartLocation(util::getSelf()))
 				enemyStart = MapHelper::getZone(BWAPI::Broodwar->getRegionAt((*(BWTA::getStartLocations().begin()++))->getPosition()));
 			else
 				enemyStart = MapHelper::getZone(BWAPI::Broodwar->getRegionAt((*BWTA::getStartLocations().begin())->getPosition()));
@@ -160,11 +162,29 @@ namespace ArmyHelper
 	}
 
 	bool scan(BWAPI::Position target)
-	{
+	{		
 		for (auto &comsatStation : AgentHelper::getComsatStations())
 			if (comsatStation->useAbility(BWAPI::TechTypes::Scanner_Sweep, target))
 				return true;
 		return false;
+	}
+
+	void addScoutedUnit(int unitID, BWAPI::UnitType unitType)
+	{
+		scoutedUnits.insert(std::pair<int, BWAPI::UnitType>(unitID, unitType));
+	}
+
+	void removeScoutedUnit(int unitID)
+	{
+		scoutedUnits.erase(unitID);
+	}
+
+	Composition getScoutedUnits()
+	{
+		Composition scoutedUnitComposition;
+		for (auto unitType = scoutedUnits.begin(); unitType != scoutedUnits.end(); unitType++)
+			scoutedUnitComposition.addType(unitType->second);
+		return scoutedUnitComposition;
 	}
 
 	void printPriorityList(int count)

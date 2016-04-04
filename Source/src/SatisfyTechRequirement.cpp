@@ -21,8 +21,8 @@ void SatisfyTechRequirement::act()
 {
 	//create units to satisfy requirements
 	printDebugInfo("Acting");
-	if (AgentHelper::getTypeCount(techType.requiredUnit()) < 1
-		&& BWAPI::Broodwar->self()->incompleteUnitCount(techType.requiredUnit()) < 1)
+	if (util::getSelf()->allUnitCount(techType.requiredUnit()) < 1
+		&& util::getSelf()->incompleteUnitCount(techType.requiredUnit()) < 1)
 	{
 		printDebugInfo(techType.c_str());
 		CreateUnit* createUnit = new CreateUnit(techType.requiredUnit());
@@ -52,7 +52,7 @@ void SatisfyTechRequirement::update()
 
 	if (acting)
 	{
-		if (BWAPI::Broodwar->self()->isResearchAvailable(techType))
+		if (util::getSelf()->isResearchAvailable(techType))
 			succeed();
 	}
 	printDebugInfo("Update End");

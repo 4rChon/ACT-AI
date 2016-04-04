@@ -45,7 +45,7 @@ void CreateUnit::satisfyRequirements()
 		addSubTask(satisfyUnitRequirement);
 		if (requiresGas)
 		{
-			CreateUnit* createGas = new CreateUnit(BWAPI::Broodwar->self()->getRace().getRefinery());
+			CreateUnit* createGas = new CreateUnit(util::getSelf()->getRace().getRefinery());
 			addSubTask(createGas);
 		}
 		satisfying = true;
@@ -101,7 +101,7 @@ void CreateUnit::act()
 		if (!EconHelper::haveMoney(unitType))
 			return;
 		printDebugInfo("UnitCount: " + std::to_string(unitCount));
-		if (unitType == BWAPI::Broodwar->self()->getRace().getRefinery())
+		if (unitType == util::getSelf()->getRace().getRefinery())
 		{
 			for each (auto &agent in coalition->getAgentSet())
 			{
@@ -164,8 +164,10 @@ void CreateUnit::act()
 						unitCount--;
 				}
 				else
+				{
 					agent->build(unitType);
-						//unitCount--;
+					//unitCount--;
+				}
 			}
 			return;
 		}
@@ -188,13 +190,13 @@ void CreateUnit::update() //x2 redundant in res tech
 	if (complete)
 		return;
 
-	if (unitType.isRefinery() && BWAPI::Broodwar->self()->allUnitCount(BWAPI::Broodwar->self()->getRace().getRefinery()) >= AgentHelper::getResourceDepots().size())
+	if (unitType.isRefinery() && util::getSelf()->allUnitCount(util::getSelf()->getRace().getRefinery()) >= (int)AgentHelper::getResourceDepots().size())
 	{
 		succeed();
 		return;
 	}
 
-	if (!EconHelper::haveSupply(unitType) && BWAPI::Broodwar->self()->supplyTotal() >= 400)
+	if (!EconHelper::haveSupply(unitType) && util::getSelf()->supplyTotal() >= 400)
 	{
 		succeed();
 		return;

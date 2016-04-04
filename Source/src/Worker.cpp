@@ -68,14 +68,14 @@ void Worker::act()
 {
 	if (free)
 	{
-		if (BWAPI::Broodwar->self()->getRace() != BWAPI::Races::Zerg
+		if (util::getSelf()->getRace() != BWAPI::Races::Zerg
 			&& DesireHelper::getSupplyDesire() >= 0.6
-			&& EconHelper::haveMoney(BWAPI::Broodwar->self()->getRace().getSupplyProvider()))
+			&& EconHelper::haveMoney(util::getSelf()->getRace().getSupplyProvider()))
 		{
 			//int amount = DesireHelper::getSupplyDesire() / 0.6;
-			if (build(BWAPI::Broodwar->self()->getRace().getSupplyProvider()))
+			if (build(util::getSelf()->getRace().getSupplyProvider()))
 				//for (int i = 0; i < amount; i++)
-				DesireHelper::updateSupplyDesire(BWAPI::Broodwar->self()->getRace().getSupplyProvider());
+				DesireHelper::updateSupplyDesire(util::getSelf()->getRace().getSupplyProvider());
 		}
 		//temp contents
 		if (unit->isIdle())
@@ -132,7 +132,7 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 			buildLocation = *desiredPosition;
 		if (unit->build(building, buildLocation))
 		{		
-			if (building == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
+			if (building == util::getSelf()->getRace().getSupplyProvider())
 				DesireHelper::updateSupplyDesire(building);
 			unsetMiningBase();
 			BWAPI::Broodwar->registerEvent([this, building](BWAPI::Game*)
@@ -141,7 +141,7 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 				if (this->getUnit()->getOrder() != BWAPI::Orders::ConstructingBuilding
 					|| !this->getUnit()->exists())
 				{
-					if (building == BWAPI::Broodwar->self()->getRace().getSupplyProvider())
+					if (building == util::getSelf()->getRace().getSupplyProvider())
 						DesireHelper::updateSupplyDesire(building, true);
 					if (task)
 					{
@@ -173,7 +173,7 @@ bool Worker::expand()
 		task->fail();
 		return false;
 	}
-	return build(BWAPI::Broodwar->self()->getRace().getCenter(), &bestLocation->getTilePosition());			
+	return build(util::getSelf()->getRace().getCenter(), &bestLocation->getTilePosition());
 }
 
 void Worker::reserveResources(int minerals, int gas)

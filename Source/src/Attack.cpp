@@ -35,7 +35,7 @@ void Attack::assign()
 void Attack::act()
 {	
 	printDebugInfo("Acting");			
-	if (coalition->isActive() || BWAPI::Broodwar->self()->supplyUsed() >= 400)
+	if (coalition->isActive() || util::getSelf()->supplyUsed() >= 400)
 	{
 		coalition->getUnitSet().attack(target->getRegion()->getCenter());
 		acting = true;

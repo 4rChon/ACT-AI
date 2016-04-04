@@ -12,7 +12,8 @@ ResourceDepot::ResourceDepot()
 	workers.clear();
 	mineralMiners = 0;
 	gasMiners = 0;
-	expandDesire = 1.0;
+	mineralSaturation = 0;
+	gasSaturation = 0;
 	refineryCount = 0;
 }
 
@@ -24,7 +25,8 @@ ResourceDepot::ResourceDepot(BWAPI::Unit unit)
 	workers.clear();
 	mineralMiners = 0;
 	gasMiners = 0;
-	expandDesire = 0;
+	mineralSaturation = 0;
+	gasSaturation = 0;
 	refineryCount = 0;
 }
 
@@ -67,7 +69,7 @@ int ResourceDepot::getRefineryCount()
 
 void ResourceDepot::act()
 {		
-	updateExpandDesire();
+	updateSaturation();
 	updateRefineryCount();
 	//temp contents
 	if (free)
@@ -93,30 +95,37 @@ void ResourceDepot::updateRefineryCount()
 	}
 }
 
-void ResourceDepot::updateExpandDesire()
+void ResourceDepot::updateSaturation()
 {
 	if (baseLocation->getMinerals().size() > 0)
-	{
-		if ((double)(mineralMiners) / (2.0 * baseLocation->getMinerals().size()) >= 1)
-			expandDesire = 1;
-	}
+		mineralSaturation = (double)mineralMiners / (2.0 * baseLocation->getMinerals().size());
 	else
-		expandDesire = 1;
+		mineralSaturation = 1;
+
+	if (refineryCount > 0)
+		gasSaturation = (double)gasMiners / (3.0 * refineryCount);
+	else
+		gasSaturation = 1;
 }
 
-double ResourceDepot::getExpandDesire()
+double ResourceDepot::getMineralSaturation()
 {
-	return expandDesire;
+	return mineralSaturation;
+}
+
+double ResourceDepot::getGasSaturation()
+{
+	return gasSaturation;
 }
 
 bool ResourceDepot::isMineralSaturated()
 {
-	return mineralMiners >= 2.5 * baseLocation->getMinerals().size();
+	return mineralSaturation >= 1;
 }
 
 bool ResourceDepot::isGasSaturated()
 {	
-	return gasMiners >= 3.0 * refineryCount;
+	return gasSaturation >= 1;
 }
 
 void ResourceDepot::addMineralWorker(Worker* worker)
@@ -150,7 +159,7 @@ bool ResourceDepot::addGeyser(Worker* worker)
 	for each (auto &geyser in baseLocation->getGeysers())
 	{
 		if (!geyser->getType().isRefinery())
-			return worker->build(BWAPI::Broodwar->self()->getRace().getRefinery(), &geyser->getTilePosition());
+			return worker->build(util::getSelf()->getRace().getRefinery(), &geyser->getTilePosition());
 	}
 	return false;
 }

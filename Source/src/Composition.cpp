@@ -27,17 +27,28 @@ Composition::Composition(UnitMap unitMap)
 
 bool Composition::operator==(const Composition& rhs) const
 {
-	if (unitMap.size() != rhs.getUnitMap().size())
+	if (cost != rhs.cost)
 		return false;
 
+	/*if (unitMap.size() != rhs.getUnitMap().size())
+		return false;*/
+
 	for each(auto &unitType in unitMap)
+	{
 		if (unitType.second != rhs.getUnitMap()[unitType.first])
 			return false;
+	}
+
+	for each(auto &unitType in rhs.getUnitMap())
+	{
+		if (unitType.second != getUnitMap()[unitType.first])
+			return false;
+	}
 	return true;
 }
 
 bool Composition::operator>=(const Composition& rhs) const
-{
+{	
 	if (unitMap.size() < rhs.getUnitMap().size())
 		return false;
 
@@ -49,6 +60,12 @@ bool Composition::operator>=(const Composition& rhs) const
 
 int Composition::operator[](const BWAPI::UnitType& b)
 {
+	if (unitMap[b] == 0)
+	{		
+		unitMap.erase(b);
+		return 0;
+	}
+
 	return unitMap[b];
 }
 
@@ -60,6 +77,18 @@ Composition Composition::operator-(const Composition& b)
 		composition.removeType(unit.first, unit.second);
 
 	return composition;
+}
+
+Composition Composition::getIntersection(const Composition& b)
+{
+	Composition c;
+	for each(auto unitType in b.getTypes())
+	{
+		if (unitMap[unitType] > 0)
+			c.addType(unitType);
+	}
+
+	return c;
 }
 
 std::vector<BWAPI::UnitType> Composition::getTypes() const
@@ -102,10 +131,10 @@ Composition::Attributes& Composition::getAttributes()
 	return attributes;
 }
 
-Composition::Parameters& Composition::getParameters()
-{
-	return parameters;
-}
+//Composition::Parameters& Composition::getParameters()
+//{
+//	return parameters;
+//}
 
 void Composition::updateMaxRange()
 {
@@ -161,16 +190,16 @@ void Composition::updateAttributes(const BWAPI::UnitType& unitType, int unitCoun
 	{				
 		if (unitType.airWeapon() != BWAPI::WeaponTypes::None)
 		{
-			auto airDPS = BWAPI::Broodwar->self()->damage(unitType.airWeapon()) * unitType.maxAirHits() * (24 / (double)BWAPI::Broodwar->self()->weaponDamageCooldown(unitType));
-			auto maxAirRange = BWAPI::Broodwar->self()->weaponMaxRange(unitType.airWeapon()) / 32;
+			auto airDPS = util::getSelf()->damage(unitType.airWeapon()) * unitType.maxAirHits() * (24 / (double)util::getSelf()->weaponDamageCooldown(unitType));
+			auto maxAirRange = util::getSelf()->weaponMaxRange(unitType.airWeapon()) / 32;
 			attributes.totalAirRange += unitCount * maxAirRange;
 			attributes.airDPS += unitCount * airDPS;
 		}
 
 		if (unitType.groundWeapon() != BWAPI::WeaponTypes::None)
 		{
-			auto groundDPS = BWAPI::Broodwar->self()->damage(unitType.groundWeapon()) * unitType.maxGroundHits() * (24 / (double)BWAPI::Broodwar->self()->weaponDamageCooldown(unitType));
-			auto maxGroundRange = BWAPI::Broodwar->self()->weaponMaxRange(unitType.groundWeapon()) / 32;
+			auto groundDPS = util::getSelf()->damage(unitType.groundWeapon()) * unitType.maxGroundHits() * (24 / (double)util::getSelf()->weaponDamageCooldown(unitType));
+			auto maxGroundRange = util::getSelf()->weaponMaxRange(unitType.groundWeapon()) / 32;
 			attributes.totalGroundRange += unitCount * maxGroundRange;
 			attributes.groundDPS += unitCount * groundDPS;
 			/*std::cout << "Damage After: " << attributes.groundDPS << "\n";*/
@@ -178,7 +207,7 @@ void Composition::updateAttributes(const BWAPI::UnitType& unitType, int unitCoun
 	}
 	
 	if (unitType.canMove())
-		attributes.totalSpeed += unitCount * (BWAPI::Broodwar->self()->topSpeed(unitType));
+		attributes.totalSpeed += unitCount * (util::getSelf()->topSpeed(unitType));
 	
 	if (attributes.groundDPS < 1)
 		attributes.groundDPS = 0;
@@ -212,7 +241,10 @@ void Composition::outAttributes()
 void Composition::debugInfo() const
 {
 	for (auto &unit : unitMap)
-		std::cout << unit.first.c_str() << " : " << unit.second << "\n";
+	{
+		if(unit.second > 0)
+			std::cout << unit.first.c_str() << " : " << unit.second << "\n";
+	}
 	std::cout << "Cost: " << cost << "\n";
 }
 
@@ -221,6 +253,9 @@ std::string Composition::toString() const
 	std::ostringstream oss;
 	oss << cost << "\n";
 	for (auto &unit : unitMap)
-		oss << unit.first.c_str() << ", " << unit.second << "\n";
+	{
+		if (unit.second > 0)
+			oss << unit.first.c_str() << ", " << unit.second << "\n";
+	}
 	return oss.str();
 }

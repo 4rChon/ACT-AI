@@ -8,17 +8,13 @@
 
 typedef BWAPI::SetContainer < Agent*, std::hash<void*>> Agentset;
 typedef BWAPI::SetContainer < ResourceDepot*, std::hash<void*>> Baseset;
-typedef std::map<BWAPI::UnitType, int> TypeCountMap;
 
 namespace AgentHelper
 {
 	void initialiseHelper();
 
-	bool updateLastError();
-
-	int getLastErrorFrame();
-
-	//setters
+	///setters
+	//
 	void setLastServiced(Agentset::iterator lastServiced);
 
 	//getters
@@ -26,11 +22,10 @@ namespace AgentHelper
 	const Agentset& getAgentset();
 	const Baseset& getResourceDepots();
 	const Agentset & getComsatStations();
-	int getTypeCount(BWAPI::UnitType unitType);
 	Agentset::iterator getLastServiced();
 
 	//-
-	void resetLastServiced();	
+	void resetLastServiced();
 	void createAgent(BWAPI::Unit unit);
 	void removeAgent(Agent* agent);
 	void removeAgent(int id);

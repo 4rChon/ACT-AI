@@ -71,6 +71,7 @@ namespace std
 			return lhs.getID() == rhs.getID();
 		}
 	};
+
 	//template<> struct hash < BWTA::BaseLocation* >
 	//{
 	//	size_t operator()(const BWAPI::TechType &a) const
@@ -92,11 +93,27 @@ namespace util
 {
 	namespace fs = ::boost::filesystem;
 
+	void initialiseUtil();
+
 	//Normalises an array of values after weighing them with coefficients
 	double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr);
 
 	//Get all files in root path with ext extension and places them in ret
 	void getFiles(const fs::path& root, const std::string& ext, std::vector<fs::path>& ret);
-	//void serialise();
-	//void deserialise();
+	
+	void setSelf();
+
+	void setEnemy();
+
+	//Returns all enemies
+	BWAPI::Playerset &getEnemies();
+
+	//Returns first enemy
+	BWAPI::Player getEnemy();
+
+	//Returns player
+	BWAPI::Player getSelf();
+
+	//Returns player name
+	std::string getSelfName();
 }

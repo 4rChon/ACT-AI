@@ -1,6 +1,7 @@
 #include "BWTA.h"
 #include "BWAPI.h"
 #include "MapHelper.h"
+#include "UtilHelper.h"
 
 namespace MapHelper
 {	
@@ -97,9 +98,9 @@ namespace MapHelper
 
 		for each (auto unit in this->region->getUnits())
 		{
-			if (unit->getPlayer() == BWAPI::Broodwar->enemy())
+			if (unit->getPlayer() == util::getEnemy())
 				this->enemyScore += unit->getType().buildScore() + unit->getType().destroyScore();
-			if (unit->getPlayer() == BWAPI::Broodwar->self())
+			if (unit->getPlayer() == util::getSelf())
 				this->friendScore += unit->getType().buildScore() + unit->getType().destroyScore();
 			if (unit->getType().isResourceContainer())
 				this->resourceScore += unit->getResources();

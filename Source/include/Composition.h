@@ -27,11 +27,11 @@ private:
 		int unitCount;
 		bool detection;
 	} attributes;
-	struct Parameters
-	{
-		double coverage;
-		BWAPI::Position position;
-	} parameters;
+	//struct Parameters
+	//{
+	//	double coverage;
+	//	BWAPI::Position position;
+	//} parameters;
 
 	void initAttributes();
 	void updateMaxRange();
@@ -46,6 +46,7 @@ public:
 	bool operator==(const Composition& rhs) const;
 	bool operator>=(const Composition & rhs) const;	
 	Composition operator-(const Composition& b);
+	Composition getIntersection(const Composition & b);
 	int operator[](const BWAPI::UnitType& b);
 
 	///getters
@@ -53,7 +54,7 @@ public:
 	UnitMap getUnitMap() const;
 	double getCost() const;
 	Attributes &getAttributes();
-	Parameters &getParameters();
+	/*Parameters &getParameters();*/
 
 	///helpers		
 	void removeType(const BWAPI::UnitType& unitType, int count = 1);

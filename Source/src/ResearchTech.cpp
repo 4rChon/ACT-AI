@@ -28,8 +28,8 @@ void ResearchTech::createCoalition()
 
 void ResearchTech::satisfyRequirements()
 {	
-	if (!BWAPI::Broodwar->self()->hasUnitTypeRequirement(techType.requiredUnit())
-		&& !BWAPI::Broodwar->self()->hasUnitTypeRequirement(techType.whatResearches()))
+	if (!util::getSelf()->hasUnitTypeRequirement(techType.requiredUnit())
+		&& !util::getSelf()->hasUnitTypeRequirement(techType.whatResearches()))
 	{					
 		satisfied = false;
 		if (!satisfying)
@@ -59,9 +59,9 @@ void ResearchTech::assign()
 
 void ResearchTech::act()
 {
-	if (!BWAPI::Broodwar->self()->hasResearched(techType))
+	if (!util::getSelf()->hasResearched(techType))
 	{
-		if (!BWAPI::Broodwar->self()->isResearching(techType))
+		if (!util::getSelf()->isResearching(techType))
 		{
 			if (!EconHelper::haveMoney(techType))
 				return;

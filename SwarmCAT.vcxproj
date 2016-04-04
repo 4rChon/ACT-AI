@@ -34,6 +34,7 @@
     <ClInclude Include="Source\include\EconHelper.h" />
     <ClInclude Include="Source\include\Expand.h" />
     <ClInclude Include="Source\include\MapHelper.h" />
+    <ClInclude Include="Source\include\ReplayHelper.h" />
     <ClInclude Include="Source\include\ResearchTech.h" />
     <ClInclude Include="Source\include\ResourceDepot.h" />
     <ClInclude Include="Source\include\SatisfyTechRequirement.h" />
@@ -63,6 +64,7 @@
     <ClCompile Include="Source\src\EconHelper.cpp" />
     <ClCompile Include="Source\src\Expand.cpp" />
     <ClCompile Include="Source\src\MapHelper.cpp" />
+    <ClCompile Include="Source\src\ReplayHelper.cpp" />
     <ClCompile Include="Source\src\ResearchTech.cpp" />
     <ClCompile Include="Source\src\ResourceDepot.cpp" />
     <ClCompile Include="Source\src\SatisfyTechRequirement.cpp" />
@@ -181,7 +183,7 @@
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
-  <ImportGroup Label="ExtensionTargets">    
+  <ImportGroup Label="ExtensionTargets">
     <Import Project="packages\boost.1.56.0.0\build\native\boost.targets" Condition="Exists('packages\boost.1.56.0.0\build\native\boost.targets')" />
   </ImportGroup>
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">

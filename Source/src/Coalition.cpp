@@ -218,9 +218,9 @@ void Coalition::logCoalition()
 {
 	std::cout << "Logging Performance...\n";
 	std::ofstream composition;
-	auto race = BWAPI::Broodwar->self()->getRace().toString();
-	//composition.open("compositions\\" + BWAPI::Broodwar->mapName() + "\\" + BWAPI::Broodwar->enemy()->getRace().getName() + "\\" + race + "_" + task->getName() + ".txt");
-	composition.open("compositions\\" + BWAPI::Broodwar->enemy()->getRace().getName() + "\\" + race + "_" + task->getName() + ".txt");
+	auto race = util::getSelf()->getRace().toString();
+	//composition.open("compositions\\" + BWAPI::Broodwar->mapName() + "\\" + util::getEnemy()->getRace().getName() + "\\" + race + "_" + task->getName() + ".txt");
+	composition.open("compositions\\" + util::getEnemy()->getRace().getName() + "\\" + race + "_" + task->getName() + ".txt");
 	composition << "Map Name: " << BWAPI::Broodwar->mapName() << " : " << BWAPI::Broodwar->mapFileName() << "\n";
 	composition << "EngageDuration: " << engageDuration << "\n";
 	composition << "KillCount: " << killCount << "\n";

@@ -15,14 +15,6 @@ namespace CoalitionHelper
 		nextID = 0;
 	}
 
-	Coalition* getCoalition(int coalitionID)
-	{
-		for (auto &coalition : coalitionSet)
-			if (coalition->getID() == coalitionID)
-				return coalition;
-		return nullptr;
-	}
-
 	const Coalitionset& getCoalitionset()
 	{
 		return coalitionSet;

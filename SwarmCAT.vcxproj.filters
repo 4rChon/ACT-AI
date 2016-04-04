@@ -105,6 +105,9 @@
     <ClInclude Include="Source\include\CompositionHelper.h">
       <Filter>include\Coalitions</Filter>
     </ClInclude>
+    <ClInclude Include="Source\include\ReplayHelper.h">
+      <Filter>include</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\src\DesireHelper.cpp">
@@ -187,6 +190,9 @@
     </ClCompile>
     <ClCompile Include="Source\src\CompositionHelper.cpp">
       <Filter>src\Coalitions</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\ReplayHelper.cpp">
+      <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
