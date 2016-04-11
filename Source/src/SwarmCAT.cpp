@@ -85,8 +85,7 @@ void SwarmCAT::onStart()
 
 		/* just for testing */
 
-		CreateUnit* createUnit = new CreateUnit(BWAPI::UnitTypes::Terran_Comsat_Station, 1);
-		TaskHelper::addTask(createUnit, true);
+
 	}
 }
 
@@ -104,7 +103,7 @@ void SwarmCAT::onFrame()
 		drawDebugText();
 		//Cancel unfinished structures if not being constructed by an scv.
 		if (util::getSelf()->incompleteUnitCount(BWAPI::UnitTypes::Buildings))
-		{
+		{			
 			auto unfinishedUnits = BWAPI::Broodwar->getUnitsInRectangle(Position(0, 0), Position(BWAPI::Broodwar->mapWidth() * TILE_SIZE, BWAPI::Broodwar->mapHeight() * TILE_SIZE), BWAPI::Filter::IsBuilding && !BWAPI::Filter::IsBeingConstructed && !BWAPI::Filter::IsCompleted);
 			unfinishedUnits.cancelConstruction();
 		}
@@ -151,13 +150,7 @@ void SwarmCAT::onFrame()
 				continue;
 			}
 
-			(*a)->act();
-			if ((*a)->isFree())
-			{
-				(*a)->pollCoalitions();
-				AgentHelper::setLastServiced(++a);
-				continue;
-			}
+			(*a)->act();			
 
 			AgentHelper::setLastServiced(++a);
 
@@ -186,6 +179,19 @@ void SwarmCAT::onFrame()
 void SwarmCAT::onSendText(std::string text)
 {
 	Broodwar->sendText("%s", text.c_str());
+	if (text.compare(0, 7, "Terran_") == 0)
+	{
+		for each(auto unitType in BWAPI::UnitTypes::allUnitTypes())
+		{
+			if (unitType.getName().compare(text) == 0)
+			{
+				CreateUnit* createUnit = new CreateUnit(unitType, 1);
+				//createUnit->setDebug(true);
+				TaskHelper::addTask(createUnit, true);
+				break;
+			}
+		}
+	}
 }
 
 void SwarmCAT::onReceiveText(BWAPI::Player player, std::string text)
@@ -357,14 +363,13 @@ void SwarmCAT::drawDebugText()
 		for (auto &unitType : coalition->getTargetComp().getUnitMap())
 			Broodwar->drawTextScreen(10, 100 + (10 * i++), "%s : %d/%d", unitType.first.c_str(), coalition->getCurrentComp().getUnitMap()[unitType.first], unitType.second);
 		if(coalition->isActive() && coalition->getTask()->getType() == ATT)
-			Broodwar->drawCircleMap(coalition->getUnitSet().getPosition(), coalition->getUnitSet().size() * 5, BWAPI::Colors::Red);
+			Broodwar->drawCircleMap(coalition->getUnitSet().getPosition(), 10 + (coalition->getUnitSet().size() * 5), BWAPI::Colors::Red);		
 	}
 
 	auto scoutedUnits = ArmyHelper::getScoutedUnits();
 	i = 1;
 	for (auto type : scoutedUnits.getTypes())
-		Broodwar->drawTextScreen(400, 250 + (10 * i++), "%s : %d", type.c_str(), scoutedUnits[type]);
-	
+		Broodwar->drawTextScreen(400, 250 + (10 * i++), "%s : %d", type.c_str(), scoutedUnits[type]);	
 
 	/*auto bestUnit = DesireHelper::getMostDesirableUnit();
 	auto bestRaxUnit = DesireHelper::getMostDesirableUnit(BWAPI::UnitTypes::Terran_Barracks);
@@ -428,16 +433,19 @@ void SwarmCAT::drawDebugText()
 	Broodwar->drawTextScreen(10, 10, "Worker Count: %d", util::getSelf()->allUnitCount(util::getSelf()->getRace().getWorker()));
 	Broodwar->drawTextScreen(10, 20, "Expand Desire: %.2f", DesireHelper::getExpandDesire());
 	Broodwar->drawTextScreen(10, 30, "Supply Desire: %.2f", DesireHelper::getSupplyDesire());
-	Broodwar->drawTextScreen(10, 40, "Unit Multiplier: %.2f", EconHelper::getUnitMultiplier());
 
-	/*draw zones
+	/*draw zones*/
 	for (auto &zone : MapHelper::getRegionField())
 	{
 		Broodwar->drawTextMap(zone->getRegion()->getCenter(), "ZoneID : %d", zone->getID());
-		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 10, "FriendScore : %d", zone->getFriendScore());
+		if(zone->isDefending())
+			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 10, Colors::Red, true);
+		else
+			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 10, Colors::Green, true);
+		/*Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 10, "FriendScore : %d", zone->getFriendScore());
 		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 20, "EnemyScore: %d", zone->getEnemyScore());
-		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 30, "Time Since Last : %d", BWAPI::Broodwar->getFrameCount() - zone->getLastVisited());
-	}*/
+		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 30, "Time Since Last : %d", BWAPI::Broodwar->getFrameCount() - zone->getLastVisited());*/
+	}
 }
 
 void SwarmCAT::drawTerrainData()

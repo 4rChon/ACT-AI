@@ -54,13 +54,13 @@ public:
 	UnitMap getUnitMap() const;
 	double getCost() const;
 	Attributes &getAttributes();
-	/*Parameters &getParameters();*/
+	/*Parameters &getParameters();*/	
 
 	///helpers		
 	void removeType(const BWAPI::UnitType& unitType, int count = 1);
 	void addType(const BWAPI::UnitType& unitType, int count = 1);
 	void updateAttributes(const BWAPI::UnitType& unitType, int unitCount = 1);
-	void outAttributes();
-	void debugInfo() const;
+	void printAttributes();
+	void printDebugInfo() const;
 	std::string toString() const;
 };

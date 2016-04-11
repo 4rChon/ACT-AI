@@ -14,11 +14,9 @@ public:
 	//constructors
 	CreateUnit(BWAPI::UnitType unitType, int unitCount = 1);
 
-	BWAPI::UnitType getUnitType();
-
 	//-
-	void satisfyRequirements();
 	void createCoalition();
+	void satisfyRequirements();
 	void decrementUnitCount();
 	void assign();	
 	void act();

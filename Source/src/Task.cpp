@@ -1,8 +1,10 @@
 #include "Task.h"
 #include "CoalitionHelper.h"
+#include "CompositionHelper.h"
 #include "TaskHelper.h"
 #include "ArmyHelper.h"
 #include "EconHelper.h"
+#include "CreateCoalition.h"
 
 Task::Task()
 {
@@ -40,35 +42,20 @@ Task::~Task()
 	superTasks.clear();
 }
 
+void Task::setDebug(bool debug)
+{
+	this->debug = debug;
+}
+
 void Task::setCoalition(Coalition* coalition)
 {
 	this->coalition = coalition;
 	coalitionID = coalition->getID();
 }
 
-void Task::setUnitSatisfied(bool unitSatisfied)
-{
-	this->unitSatisfied = unitSatisfied;
-}
-
-void Task::setTechSatisfied(bool techSatisfied)
-{
-	this->techSatisfied = techSatisfied;
-}
-
 MapHelper::Zone* Task::getTarget()
 {
 	return target;
-}
-
-bool Task::isUnitSatisfied() const
-{
-	return unitSatisfied;
-}
-
-bool Task::isTechSatisfied() const
-{
-	return techSatisfied;
 }
 
 bool Task::isComplete() const
@@ -115,7 +102,7 @@ double Task::getCost()
 	if (coalitionID != -1)
 		cost += coalition->getCost();
 
-	return this->cost;
+	return cost;
 }
 
 double Task::getProfit()
@@ -161,6 +148,13 @@ void Task::updateTaskTree()
 	update();
 }
 
+void Task::createCoalition()
+{
+	Composition c = CompositionHelper::getComposition(this);
+	CreateCoalition *createCoalition = new CreateCoalition(c, this);
+	addSubTask(createCoalition);
+}
+
 void Task::succeed()
 {
 	complete = true;
@@ -179,6 +173,11 @@ void Task::fail()
 	if (taskType == ATT)
 	{
 		ArmyHelper::defend();
+	}
+
+	if (taskType == DEF)
+	{
+		target->setDefending(false);
 	}
 
 	if (taskType == SCO)

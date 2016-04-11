@@ -15,13 +15,6 @@ Attack::Attack(MapHelper::Zone* target)
 	//debug = true;
 }
 
-void Attack::createCoalition()
-{
-	Composition c = CompositionHelper::getComposition(taskType);
-	CreateCoalition *createCoalition = new CreateCoalition(c, this);
-	addSubTask(createCoalition);
-}
-
 // assign an attacking coalition
 void Attack::assign()
 {

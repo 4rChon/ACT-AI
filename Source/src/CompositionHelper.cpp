@@ -3,6 +3,7 @@
 #define BOOST_FILESYSTEM_NO_DEPRECATED
 
 #include "CompositionHelper.h"
+#include "CoalitionHelper.h"
 #include "UtilHelper.h"
 #include "ArmyHelper.h"
 #include <sstream>
@@ -10,6 +11,8 @@
 #include <iostream>
 #include <istream>
 #include <fstream>
+#include <stdio.h> //ceil
+#include <math.h> //ceil
 #include <boost/filesystem.hpp>
 
 namespace fs = ::boost::filesystem;
@@ -28,20 +31,25 @@ namespace CompositionHelper
 	}
 
 
-	Composition getComposition(TaskType taskType)
-	{
+	Composition getComposition(Task* task)
+	{ 
+		TaskType taskType = task->getType();
+		//TO DO: consider time proximity
 		//return best composition for tasktype
 		std::vector<UsedComposition> candidateSet;
 		for each(auto usedComposition in compositionSet)
 		{
 			if (usedComposition.taskType == taskType)
-				candidateSet.push_back(usedComposition);
+			{
+				if(util::getFrameBracket(usedComposition.activationFrame, 7200) == util::getFrameBracket(BWAPI::Broodwar->getFrameCount(), 7200))
+					candidateSet.push_back(usedComposition);
+			}
 		}				
 
 		if (candidateSet.size() > 0)
 		{
 			auto scoutedUnits = ArmyHelper::getScoutedUnits();
-			scoutedUnits.debugInfo();
+			//scoutedUnits.debugInfo();
 			for each(auto unitType in scoutedUnits.getTypes())
 			{
 				auto counters = getCounters(unitType);
@@ -80,6 +88,15 @@ namespace CompositionHelper
 				c.addType(BWAPI::UnitTypes::Terran_Medic);
 				return c;
 			}
+			case DEF:
+			{
+				for (auto& agent : AgentHelper::getAgentset())
+				{
+					if (agent->getUnit()->exists() && agent->isFree())
+						c.addType(agent->getUnit()->getType());
+				}
+				return c;
+			}
 			case EXP:
 			{
 				c.addType(util::getSelf()->getRace().getWorker(), 1);
@@ -100,11 +117,12 @@ namespace CompositionHelper
 			if (candidate.fitness > bestComposition.fitness)
 				bestComposition = candidate;
 		}
-		if (taskType == ATT)
-		{
-			std::cout << "Countering with...\n";
-			bestComposition.composition.debugInfo();
-		}
+
+		//if (taskType == ATT)
+		//{
+		//	/*std::cout << "Countering with...\n";
+		//	bestComposition.composition.debugInfo();*/
+		//}
 		return bestComposition.composition;
 	}
 
@@ -121,13 +139,7 @@ namespace CompositionHelper
 
 		for each (auto unitType in allUnitTypes)
 		{	
-			if (unitType.getRace() != util::getSelf()->getRace() 
-				|| unitType.isHero() 
-				|| unitType.isBuilding() 
-				|| unitType.isWorker() 
-				|| unitType.supplyProvided() > 0
-				|| unitType == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine
-				|| unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode)
+			if (unitType.getRace() != util::getSelf()->getRace() || unitType.isHero() || unitType.isBuilding() || unitType.isWorker())
 				continue;
 
 			//if enemy unit flies and friendly unit can damage it...
@@ -200,7 +212,16 @@ namespace CompositionHelper
 		/*std::cout << "Counters: \n";*/
 		Composition counterComposition;
 		for (auto unitType = unitTypeCounterAmount.begin(); unitType != unitTypeCounterAmount.end(); unitType++)
-			counterComposition.addType(unitType->first, unitType->second);
+		{
+			if (unitType->first == BWAPI::UnitTypes::Spell_Scanner_Sweep)
+				counterComposition.addType(BWAPI::UnitTypes::Terran_Comsat_Station, unitType->second);
+			else if (unitType->first == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode)
+				counterComposition.addType(BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode, unitType->second);
+			else if(unitType->first == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine)
+				counterComposition.addType(BWAPI::UnitTypes::Terran_Vulture, unitType->second);
+			else
+				counterComposition.addType(unitType->first, unitType->second);
+		}
 		/*counterComposition.debugInfo();*/
 		return counterComposition;
 	}
@@ -211,11 +232,6 @@ namespace CompositionHelper
 		return compositionSet;
 	}
 
-	//const std::vector<UsedComposition>& getWorkingSet()
-	//{
-	//	return workingSet;
-	//}
-
 	void loadCompositions()
 	{
 		auto enemy = util::getEnemy();// util::getEnemy();
@@ -223,63 +239,35 @@ namespace CompositionHelper
 		auto directory = "compositions\\" + enemy->getRace().getName() + "\\";
 		fs::path path = fs::path(directory);
 		std::vector<fs::path> compFiles;
-		util::getFiles(path, ".comp", compFiles);
+		util::data::getFiles(path, ".comp", compFiles);
 		
 		std::cout << "Loading Compositions...  (" << compFiles.size() << ")\n";
+
 		for each(auto compPath in compFiles)
 		{
-			std::ifstream compStream;
-
-			Composition c;
-			
-			//std::cout << "path: " << compPath.string() << "\n";
-			compStream.open(directory + compPath.string(), std::ios::binary | std::ios::in);
-
-			int taskType;
-			int activationFrame;
-			double fitness;
-
-			compStream.read((char*)&taskType, sizeof(taskType));
-			compStream.read((char*)&activationFrame, sizeof(activationFrame));
-			compStream.read((char*)&fitness, sizeof(fitness));			
-
-			int typeCount;
-			compStream.read((char*)&typeCount, sizeof(typeCount));
-
-			for (int i = 0; i < typeCount; i++)
-			{				
-				int unitType;
-				int typeCount;
-				compStream.read((char*)&unitType, sizeof(unitType));
-				compStream.read((char*)&typeCount, sizeof(typeCount));
-				c.addType(unitType, typeCount);
-			}
-			
-			compStream.close();
-
-			/*std::cout << "TaskType: " << taskType << "\n";
-			std::cout << "Average Activation Time: " << activationFrame << "\n";
-			std::cout << "Average Fitness: " << fitness << "\n";
-			c.debugInfo();*/
-
-			UsedComposition usedComposition{
-				c,
-				TaskType(taskType),
-				activationFrame,
-				fitness,
-				1
-			};
+			UsedComposition usedComposition = util::data::deserialize(directory + compPath.string());			
 			compositionSet.push_back(usedComposition);
 		}
+
 		std::cout << "Compositions Loaded...\n";
 	}
 
 	void saveComposition(Coalition* coalition)
 	{
+		if (coalition->getTask()->getType() != ATT)
+			return;
+
 		Composition composition;
 
+		//TO DO: fix unit multiplier
 		for each(auto& unit in coalition->getTargetComp().getUnitMap())
-			composition.addType(unit.first, (int)((double)unit.second / coalition->getUnitMultiplier()));
+		{
+			if(unit.second > 0)
+				composition.addType(unit.first, (int)std::ceil((double)unit.second / coalition->getUnitMultiplier()));
+		}
+
+		if (composition.getTypes().size() == 0)
+			return;
 
 		UsedComposition usedComposition{
 			composition,
@@ -302,74 +290,26 @@ namespace CompositionHelper
 		std::vector<UsedComposition> uniqueCompositions;
 		for each(auto usedComposition in workingSet)
 		{
-			/*std::cout << "Saving...\n";
-			usedComposition.composition.debugInfo();*/
 			bool unique = true;
-			for each(auto uniqueComposition in uniqueCompositions)
+			for (auto& uniqueComposition : uniqueCompositions)
 			{
-				/*std::cout << "\tComparing...\n";*/
-				uniqueComposition.composition.debugInfo();
-				if (usedComposition.composition == uniqueComposition.composition)
+				if (usedComposition.composition == uniqueComposition.composition && util::getFrameBracket(usedComposition.activationFrame, 7200) == util::getFrameBracket(uniqueComposition.activationFrame, 7200))
 				{
-					/*std::cout << "\tComposition is not unique.\n";*/
 					unique = false;
 					uniqueComposition.fitness += usedComposition.fitness;
 					uniqueComposition.activationFrame += usedComposition.activationFrame;
 					uniqueComposition.useCount += usedComposition.useCount;
 					break;
 				}
-			}
+			}			
 
 			if (unique)
-			{
-				/*std::cout << "\tComposition is unique.\n";*/
 				uniqueCompositions.push_back(usedComposition);
-			}
 		}
 
 		for each(auto uniqueComposition in uniqueCompositions)
-		{
-			std::ofstream compStream;
-			
-			auto directory = "compositions\\" + util::getEnemy()->getRace().getName() + "\\";
-			auto fileName = std::to_string(uniqueComposition.activationFrame) + "_" + std::to_string(uniqueComposition.taskType);
+			util::data::serialize(uniqueComposition);
 
-			compStream.open(directory + fileName + ".comp", std::ios::binary | std::ios::out);
-			
-			int taskType = uniqueComposition.taskType;
-			int activationFrame = uniqueComposition.activationFrame / uniqueComposition.useCount;			
-			double fitness = uniqueComposition.fitness / uniqueComposition.useCount;
 
-			compStream.write((char*)&taskType, sizeof(taskType));
-			compStream.write((char*)&activationFrame, sizeof(activationFrame));
-			compStream.write((char*)&fitness, sizeof(fitness));
-
-			int typeCount = uniqueComposition.composition.getTypes().size();
-			compStream.write((char*)&typeCount, sizeof(typeCount));
-
-			for each(auto unitType in uniqueComposition.composition.getTypes())
-			{
-				int typeID = unitType.getID();				
-				int typeCount = (int)((double)(uniqueComposition.composition[unitType]));
-				compStream.write((char*)&typeID, sizeof(typeID));
-				compStream.write((char*)&typeCount, sizeof(typeCount));
-			}
-			compStream.close();
-
-			std::ofstream readableStream;
-
-			readableStream.open(directory + "\\human\\" + fileName + ".hcomp", std::ios::out);
-
-			readableStream << "TaskType: " << taskType << "\n";
-			readableStream << "Average Activation Time: " << activationFrame << "\n";
-			readableStream << "Average Fitness: " << fitness << "\n";
-
-			for each(auto unitType in uniqueComposition.composition.getTypes())
-			{
-				int typeCount = (int)((double)(uniqueComposition.composition[unitType]));
-				readableStream << unitType.c_str() << " : " << typeCount << "\n";
-			}
-			readableStream.close();
-		}
 	}
 };

@@ -22,13 +22,13 @@ void SatisfyUnitRequirement::assign()
 
 void SatisfyUnitRequirement::act()
 {
-	//create units to satisfy requirements
-	printDebugInfo("Acting");
+	printDebugInfo("Acting");	
+
 	for (auto &requirement : unitType.requiredUnits())
 	{
 		printDebugInfo("Require : " + requirement.first.getName());
 		if (!util::getSelf()->hasUnitTypeRequirement(requirement.first, requirement.second)
-			&& util::getSelf()->incompleteUnitCount(requirement.first) < requirement.second)
+			&& util::getSelf()->incompleteUnitCount(requirement.first) < (requirement.second - util::getSelf()->completedUnitCount(requirement.first)))
 		{
 			CreateUnit* createUnit = new CreateUnit(requirement.first, requirement.second - util::getSelf()->allUnitCount(requirement.first));
 			printDebugInfo(" Creating : " + requirement.first.getName() + " : " + std::to_string(requirement.second));
@@ -66,17 +66,8 @@ void SatisfyUnitRequirement::update()
 
 	if (acting)
 	{
-		for each (auto &requirement in unitType.requiredUnits())
-		{
-			if (!util::getSelf()->hasUnitTypeRequirement(requirement.first, requirement.second))
-				return;
-		}
-		if (unitType.requiredTech() != BWAPI::TechTypes::None)
-		{
-			if (!util::getSelf()->hasResearched(unitType.requiredTech()))
-				return;
-		}
-		succeed();
+		if (util::canMakeUnit(unitType))
+			succeed();
 	}
 	printDebugInfo("Update End");
 }

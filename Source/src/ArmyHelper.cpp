@@ -163,9 +163,27 @@ namespace ArmyHelper
 
 	bool scan(BWAPI::Position target)
 	{		
+		std::cout << "---- Scanning ----\n";
+		auto targetUnitSet = BWAPI::Broodwar->getUnitsInRadius(target, BWAPI::UnitTypes::Spell_Scanner_Sweep.sightRange());
+		for (auto& unit : targetUnitSet)
+		{
+			if (unit->getType() == BWAPI::UnitTypes::Spell_Scanner_Sweep && unit->getPlayer() == util::getSelf())
+			{
+				std::cout << " --- Found a Previous Scan ---\n";
+				return false;
+			}
+		}
+
 		for (auto &comsatStation : AgentHelper::getComsatStations())
+		{
 			if (comsatStation->useAbility(BWAPI::TechTypes::Scanner_Sweep, target))
+			{
+				std::cout << " --- Scan Successful ---\n";
 				return true;
+			}
+		}
+
+		std::cout << " --- Scan Failed ---\n";
 		return false;
 	}
 

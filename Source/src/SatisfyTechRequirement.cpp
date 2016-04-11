@@ -19,15 +19,21 @@ void SatisfyTechRequirement::assign()
 
 void SatisfyTechRequirement::act()
 {
-	//create units to satisfy requirements
-	printDebugInfo("Acting");
-	if (util::getSelf()->allUnitCount(techType.requiredUnit()) < 1
-		&& util::getSelf()->incompleteUnitCount(techType.requiredUnit()) < 1)
+	printDebugInfo("Acting");	
+	printDebugInfo(techType.c_str());
+
+	if (util::getSelf()->allUnitCount(techType.requiredUnit()) < 1)
 	{
-		printDebugInfo(techType.c_str());
 		CreateUnit* createUnit = new CreateUnit(techType.requiredUnit());
 		addSubTask(createUnit);
 	}
+
+	if (util::getSelf()->allUnitCount(techType.whatResearches()) < 1)
+	{
+		CreateUnit* createUnit = new CreateUnit(techType.whatResearches());
+		addSubTask(createUnit);
+	}
+
 	acting = true;
 	printDebugInfo("Acting End");
 }
@@ -52,7 +58,7 @@ void SatisfyTechRequirement::update()
 
 	if (acting)
 	{
-		if (util::getSelf()->isResearchAvailable(techType))
+		if (util::canResearch(techType))
 			succeed();
 	}
 	printDebugInfo("Update End");

@@ -12,26 +12,25 @@ Composition::Composition()
 Composition::Composition(BWAPI::Unitset unitSet)
 {
 	cost = 0;
+	initAttributes();
 	for (auto unit : unitSet)
 		addType(unit->getType());
-	initAttributes();
+	
 }
 
 Composition::Composition(UnitMap unitMap)
 {	
 	cost = 0;
+	initAttributes();
 	for (auto &unitType : unitMap)
 		addType(unitType.first, unitType.second);
-	initAttributes();
+	
 }
 
 bool Composition::operator==(const Composition& rhs) const
 {
 	if (cost != rhs.cost)
 		return false;
-
-	/*if (unitMap.size() != rhs.getUnitMap().size())
-		return false;*/
 
 	for each(auto &unitType in unitMap)
 	{
@@ -94,8 +93,11 @@ Composition Composition::getIntersection(const Composition& b)
 std::vector<BWAPI::UnitType> Composition::getTypes() const
 {
 	std::vector<BWAPI::UnitType> unitTypes;
-	for each (auto &unitType in unitMap)
-		unitTypes.push_back(unitType.first);
+	for (auto &unit : unitMap)
+	{
+		if(unit.second > 0)
+			unitTypes.push_back(unit.first);
+	}
 
 	return unitTypes;
 }
@@ -140,6 +142,7 @@ void Composition::updateMaxRange()
 {
 	attributes.maxAirRange = 0.0;
 	attributes.maxGroundRange = 0.0;
+
 	for each(auto &unitType in getTypes())
 	{		
 		attributes.maxAirRange = unitType.airWeapon().maxRange() > attributes.maxAirRange ? unitType.airWeapon().maxRange() : attributes.maxAirRange;
@@ -182,10 +185,6 @@ void Composition::initAttributes()
 
 void Composition::updateAttributes(const BWAPI::UnitType& unitType, int unitCount)
 {
-	/*std::cout << "Before update-----------\n";
-	std::cout << "UnitCount: " << unitCount << "\n";
-	std::cout << "Damage Before: " << attributes.groundDPS << "\n";*/
-	
 	if (unitType.canAttack())
 	{				
 		if (unitType.airWeapon() != BWAPI::WeaponTypes::None)
@@ -202,7 +201,6 @@ void Composition::updateAttributes(const BWAPI::UnitType& unitType, int unitCoun
 			auto maxGroundRange = util::getSelf()->weaponMaxRange(unitType.groundWeapon()) / 32;
 			attributes.totalGroundRange += unitCount * maxGroundRange;
 			attributes.groundDPS += unitCount * groundDPS;
-			/*std::cout << "Damage After: " << attributes.groundDPS << "\n";*/
 		}
 	}
 	
@@ -225,7 +223,7 @@ void Composition::updateAttributes(const BWAPI::UnitType& unitType, int unitCoun
 	updateDetection();
 }
 
-void Composition::outAttributes()
+void Composition::printAttributes()
 {
 	std::cout << "\tairDPS: " << attributes.airDPS << "\n";
 	std::cout << "\tgroundDPS: " << attributes.groundDPS << "\n";
@@ -238,7 +236,7 @@ void Composition::outAttributes()
 	std::cout << "\ttotalHealth: " << attributes.totalHealth << "\n";
 }
 
-void Composition::debugInfo() const
+void Composition::printDebugInfo() const
 {
 	for (auto &unit : unitMap)
 	{

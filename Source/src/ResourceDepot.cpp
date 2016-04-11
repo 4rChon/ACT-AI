@@ -67,22 +67,27 @@ int ResourceDepot::getRefineryCount()
 	return refineryCount;
 }
 
+void ResourceDepot::updateFreeActions()
+{
+	pollCoalitions();
+	if (unit->isIdle())
+	{
+		//TO DO: DesireHelper::getMostDesirableAddon(unit->getType())
+		if (unit->canBuildAddon())
+			unit->buildAddon(BWAPI::UnitTypes::Terran_Comsat_Station);
+		train(DesireHelper::getMostDesirableUnit(unit->getType()));
+	}
+}
+
 void ResourceDepot::act()
 {		
 	updateSaturation();
 	updateRefineryCount();
-	//temp contents
+	
 	if (free)
-	{
-		if (unit->isIdle())
-		{
-			if (unit->canBuildAddon())
-				unit->buildAddon(BWAPI::UnitTypes::Terran_Comsat_Station);
-			train(DesireHelper::getMostDesirableUnit(unit->getType()));
-		}
-	}
+		updateFreeActions();
 	else
-		updateCoalitionStatus();
+		updateBoundActions();
 }
 
 void ResourceDepot::updateRefineryCount()
@@ -120,11 +125,15 @@ double ResourceDepot::getGasSaturation()
 
 bool ResourceDepot::isMineralSaturated()
 {
+	if (baseLocation->getMinerals().size() == 0)
+		return true;
 	return mineralSaturation >= 1;
 }
 
 bool ResourceDepot::isGasSaturated()
 {	
+	if (refineryCount == 0)
+		return true;
 	return gasSaturation >= 1;
 }
 

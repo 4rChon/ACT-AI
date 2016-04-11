@@ -18,7 +18,7 @@ namespace CompositionHelper
 	void initialiseHelper();
 
 	//getters
-	Composition getComposition(TaskType taskType);
+	Composition getComposition(Task* task);
 	Composition getCounters(BWAPI::UnitType enemyUnitType);
 	//UsedComposition filterByCounter(BWAPI::SetContainer<BWAPI::UnitType> unitTypes);
 	const std::vector<UsedComposition>& getCompositionSet();

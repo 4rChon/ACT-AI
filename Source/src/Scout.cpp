@@ -12,13 +12,6 @@ Scout::Scout(MapHelper::Zone* target)
 	//debug = true;
 }
 
-void Scout::createCoalition()
-{
-	Composition c = CompositionHelper::getComposition(taskType);
-	CreateCoalition *createCoalition = new CreateCoalition(c, this);
-	addSubTask(createCoalition);
-}
-
 void Scout::assign()
 {
 	printDebugInfo("Assign");

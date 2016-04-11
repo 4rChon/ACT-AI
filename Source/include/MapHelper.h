@@ -13,15 +13,25 @@ namespace MapHelper
 		int enemyScore;
 		int friendScore;
 		int resourceScore;
+		bool defending;
 
 	public:
+		///constructor
 		Zone(BWAPI::Region region, int id);
+
+		///getters
 		BWAPI::Region getRegion() const;
 		int getID() const;
 		int getLastVisited() const;
 		int getEnemyScore() const;
 		int getFriendScore() const;
 		int getResourceScore() const;
+		bool isDefending() const;
+
+		///setters
+		void setDefending(bool defending);
+
+		///helpers
 		void updateLastVisited();
 		void resetScores();
 		void updateZone();

@@ -119,7 +119,7 @@ public:
 	void addKillCount(int killCount = 1);
 
 	//Output coalition attributes.
-	void outAttributes();
+	void printAttributes();
 
 	//Write human readable information about the coalition to a file.
 	void logCoalition();

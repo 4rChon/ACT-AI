@@ -9,53 +9,57 @@ SCV::SCV(BWAPI::Unit unit)
 	unitID = unit->getID();
 }
 
+void SCV::updateFreeActions()
+{
+	pollCoalitions();
+
+	if (repair())
+		return;
+
+	if (DesireHelper::getSupplyDesire() > 0.6
+		&& EconHelper::haveMoney(BWAPI::UnitTypes::Terran_Supply_Depot))
+	{
+		if (miningBase)
+			build(util::getSelf()->getRace().getSupplyProvider(), &miningBase->getBaseLocation()->getTilePosition());
+		else
+			build(util::getSelf()->getRace().getSupplyProvider());
+	}
+
+	if (unit->isIdle())
+	{
+		bool mining = false;
+		auto resourceDepots = AgentHelper::getResourceDepots();
+		for (auto &base : resourceDepots)
+		{
+			if (!base->isGasSaturated())
+			{
+				setMiningBase(base, true);
+				mining = true;
+				return;
+			}
+		}
+
+		for (auto &base : resourceDepots)
+		{
+			if (!base->isMineralSaturated())
+			{
+				setMiningBase(base, false);
+				mining = true;
+				return;
+			}
+		}
+	}
+
+	if (defend(BWAPI::Position(util::getSelf()->getStartLocation())))
+		return;
+}
+
 void SCV::act()
 {	
 	if (free)
-	{
-		//temp contents
-		if (repair())
-			return;
-
-		if (DesireHelper::getSupplyDesire() > 0.6
-			&& EconHelper::haveMoney(BWAPI::UnitTypes::Terran_Supply_Depot))
-		{
-			if(miningBase)
-				build(util::getSelf()->getRace().getSupplyProvider(), &miningBase->getBaseLocation()->getTilePosition());
-			else
-				build(util::getSelf()->getRace().getSupplyProvider());
-		}
-
-		if (unit->isIdle())
-		{
-			bool mining = false;
-			auto resourceDepots = AgentHelper::getResourceDepots();
-			for (auto &base : resourceDepots)
-			{
-				if (!base->isGasSaturated())
-				{
-					setMiningBase(base, true);
-					mining = true;
-					return;
-				}
-			}
-
-			for (auto &base : resourceDepots)
-			{
-				if (!base->isMineralSaturated())
-				{
-					setMiningBase(base, false);
-					mining = true;
-					return;
-				}
-			}
-		}
-
-		if (defend(BWAPI::Position(util::getSelf()->getStartLocation())))
-			return;
-	}
+		updateFreeActions();		
 	else
-		updateCoalitionStatus();
+		updateBoundActions();
 }
 
 bool SCV::repair(BWAPI::Unit damagedUnit)

@@ -17,10 +17,8 @@ ResearchTech::ResearchTech(BWAPI::TechType techType)
 
 void ResearchTech::createCoalition()
 {
-
 	printDebugInfo("Tech requirements satisfied");
 	Composition producer;
-
 	producer.addType(techType.whatResearches(), 1);
 	CreateCoalition* createCoalition = new CreateCoalition(producer, this);
 	addSubTask(createCoalition);
@@ -59,24 +57,22 @@ void ResearchTech::assign()
 
 void ResearchTech::act()
 {
-	if (!util::getSelf()->hasResearched(techType))
+	if (!util::getSelf()->isResearching(techType))
 	{
-		if (!util::getSelf()->isResearching(techType))
-		{
-			if (!EconHelper::haveMoney(techType))
-				return;
-			(*coalition->getAgentSet().begin())->research(techType);
-		}
+		if (!EconHelper::haveMoney(techType))
+			return;
+		(*coalition->getAgentSet().begin())->research(techType);
 	}
-	else
-		succeed();
 }
 
-void ResearchTech::update() //x2 redundant in create unit
+void ResearchTech::update()
 {
 	printDebugInfo("Update");
 	if (complete)
 		return;
+
+	if (util::getSelf()->hasResearched(techType))
+		succeed();
 
 	if (!assigned)
 	{
@@ -85,7 +81,7 @@ void ResearchTech::update() //x2 redundant in create unit
 	}
 
 	if (coalition->isActive())
-		act();
+		act();	
 	
 	printDebugInfo("Update End");
 }

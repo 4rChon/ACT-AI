@@ -18,6 +18,16 @@ protected:
 
 	//Gas reserved for construction
 	int reservedGas;
+
+	///Private Helpers
+	//Reserve minerals and gas for construction
+	void reserveResources(int minerals, int gas);
+
+	//Release minerals and gas
+	void releaseResources();
+
+	void updateFreeActions();
+
 public:
 	///constructors and desctructors
 	Worker();
@@ -49,13 +59,7 @@ public:
 	//Specific expand command for worker - expand.
 	bool expand();	
 	
-	///helpers
-	//Reserve minerals and gas for construction
-	void reserveResources(int minerals, int gas);
-
-	//Release minerals and gas
-	void releaseResources();
-
+	///Public Helpers
 	//Print unitID and unitType to console
 	void debugInfo() const;
 };

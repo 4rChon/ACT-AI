@@ -1,6 +1,7 @@
 #pragma once
 #include "BWAPI.h"
 #include "UtilHelper.h"
+#include "Composition.h"
 
 namespace EconHelper
 {
@@ -16,7 +17,7 @@ namespace EconHelper
 	int getGas();	
 	double getMineralIncome();
 	double getGasIncome();
-	double getUnitMultiplier();
+	double getUnitMultiplier(Composition composition);
 	void doneExpanding();
 	void updateEconomy();
 	void expand();

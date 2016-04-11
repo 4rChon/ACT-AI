@@ -67,10 +67,10 @@ namespace DesireHelper
 
 		for (auto& unit : unitDesireMap)
 			unitDesireMap[unit.first] = comp[unit.first];
-	}
+	}	
 
 	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType producer)
-	{
+	{		
 		if (util::getSelf()->allUnitCount(util::getSelf()->getRace().getWorker()) >= 70)
 			unitDesireMap[util::getSelf()->getRace().getWorker()] = 0.0;
 		else
@@ -80,7 +80,7 @@ namespace DesireHelper
 		for each(auto &unit in unitDesireMap)
 		{
 			if (producer != BWAPI::UnitTypes::None)
-				if (unit.first.whatBuilds().first != producer || !util::getSelf()->isUnitAvailable(unit.first))
+				if (unit.first.whatBuilds().first != producer || !util::canMakeUnit(unit.first))
 					continue;
 			if (unit.second > bestUnit.second)
 				bestUnit = unit;

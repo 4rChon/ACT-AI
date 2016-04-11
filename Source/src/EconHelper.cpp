@@ -2,6 +2,7 @@
 #include "TaskHelper.h"
 #include "DesireHelper.h"
 #include "Expand.h"
+#include <algorithm>
 
 namespace EconHelper
 {
@@ -18,8 +19,6 @@ namespace EconHelper
 		static int lastCheckMinerals;
 		static int lastCheckGas;
 
-		static double unitMultiplier;
-
 		static bool expanding;
 	}
 
@@ -33,7 +32,6 @@ namespace EconHelper
 		gasDebt = 0;
 		mineralIncome = 0.0;
 		gasIncome = 0.0;
-		unitMultiplier = 0.0;
 	}
 
 	int haveMoney(BWAPI::UnitType unitType)
@@ -82,6 +80,7 @@ namespace EconHelper
 		mineralDebt -= minerals;
 		gasDebt -= gas;
 	}
+
 	double getMineralIncome()
 	{
 		int framesSinceLastCheck = BWAPI::Broodwar->getFrameCount() - lastCheckMineralsFrame;
@@ -106,14 +105,22 @@ namespace EconHelper
 		return gasIncome;
 	}
 
-	double getUnitMultiplier()
+	double getUnitMultiplier(Composition composition)
 	{
-		return unitMultiplier;
-	}
+		double gasCostPerMinute = 0;
+		double minCostPerMinute = 0;
+		for each(auto &unitType in composition.getTypes())
+		{
+			double minCost = unitType.mineralPrice();
+			double gasCost = unitType.gasPrice();
+			double buildTimeInMinutes = (double)unitType.buildTime() / (24 * 60);
+			minCostPerMinute += (minCost / buildTimeInMinutes);
+			gasCostPerMinute += (gasCost / buildTimeInMinutes);
+		}
 
-	void updateUnitMultiplier()
-	{
-		unitMultiplier = mineralIncome / 50;
+		std::cout << "Mineral Ratio: " << (double)getMineralIncome() / minCostPerMinute  << "\n";
+		std::cout << "Gas Ratio: " << (double)getGasIncome() / gasCostPerMinute  << "\n";
+		return std::max(getMineralIncome() / minCostPerMinute, getGasIncome() / gasCostPerMinute);
 	}
 
 	void doneExpanding()
@@ -124,7 +131,6 @@ namespace EconHelper
 	void updateEconomy()
 	{
 		DesireHelper::updateExpandDesire();
-		updateUnitMultiplier();
 		if (DesireHelper::getExpandDesire() >= 1 && !expanding)
 			expand();
 	}

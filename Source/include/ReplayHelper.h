@@ -5,8 +5,8 @@
 namespace ReplayHelper
 {
 	void initialiseHelper();
-	void getEnemyUnitsAtFrame(int frame);
 	void loadFlaggedCompositions();
 	void evolveFlaggedCompositions();
 	void evolveComposition(CompositionHelper::UsedComposition composition);
+	Composition mutateComposition(Composition usedComp);
 }

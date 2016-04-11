@@ -6,6 +6,8 @@
 #include "Task.h"
 #include "CreateUnit.h"
 #include "ArmyHelper.h"
+#include "TaskHelper.h"
+#include "Defend.h"
 
 Agent::Agent()
 {
@@ -20,8 +22,6 @@ Agent::Agent()
 	free = true;
 
 	target = nullptr;
-
-	isAttacking = false;
 
 	engageDuration = 0;
 	lastEngaged = 0;
@@ -44,8 +44,6 @@ Agent::Agent(BWAPI::Unit unit)
 	coalition = nullptr;
 
 	target = nullptr;
-
-	isAttacking = false;
 
 	engageDuration = 0;
 	lastEngaged = 0;
@@ -142,35 +140,30 @@ bool Agent::isFree() const
 	return free;
 }
 
-void Agent::updateCoalitionStatus()
+void Agent::micro()
 {
-	if (!task)
-	{
-		unbind();
-		return;
-	}
+	BWAPI::Position coalitionCenter = coalition->getUnitSet().getPosition();
+	BWAPI::Position targetCenter = target->getRegion()->getCenter();
+	int coalitionSize = coalition->getUnitSet().size();
 
-	if (unit->isStuck())
-	{
-		coalition->removeAgent(this);
-		return;
-	}
+	static bool centering = false;
+	static bool attacking = false;	
 
-	if (task->getType() == ATT)
-	{
-		BWAPI::Position coalitionCenter = coalition->getUnitSet().getPosition();
-		int coalitionSize = coalition->getUnitSet().size();
-
-		if (unit->getDistance(coalitionCenter) > (coalitionSize * 5 * (unit->getType().width() / 8)))
+	if (unit->getDistance(coalitionCenter) > (10 + (coalitionSize * 5) * (unit->getType().width() / 8)))
+	{		
+		if (!centering && unit->hasPath(coalitionCenter) && BWAPI::Broodwar->getUnitsOnTile(BWAPI::TilePosition(coalitionCenter), BWAPI::Filter::IsBuilding).size() == 0)
 		{
-			if (unit->hasPath(coalitionCenter))
-			{
-				if (!attack(coalitionCenter))
-					move(coalitionCenter);
-				isAttacking = false;
-			}
+			centering = true;
+			attacking = false;
+			if (!attack(coalitionCenter))
+				move(coalitionCenter);
 		}
-		else if (unit->getType() == BWAPI::UnitTypes::Terran_Medic)
+	}	
+	else if(!attacking)
+	{
+		attacking = true;
+		centering = false;
+		if (unit->getType() == BWAPI::UnitTypes::Terran_Medic)
 		{
 			auto injuredUnit = unit->getClosestUnit(
 				!BWAPI::Filter::IsBeingHealed
@@ -181,15 +174,18 @@ void Agent::updateCoalitionStatus()
 				);
 
 			if (!useAbility(BWAPI::TechTypes::Healing, injuredUnit))
-				attack(target->getRegion()->getCenter());
+				move(targetCenter);
 		}
-		else if (!isAttacking)
-		{
-			attack(target->getRegion()->getCenter());
-			isAttacking = true;
-		}
+		else
+			attack(targetCenter);
 	}
 
+	if (unit->isIdle())
+		attack(targetCenter);
+}
+
+void Agent::updateEngagement()
+{
 	int framesSinceLastEngage = BWAPI::Broodwar->getFrameCount() - lastEngaged;
 
 	if (framesSinceLastEngage > 24 * 10)
@@ -204,10 +200,67 @@ void Agent::updateCoalitionStatus()
 		coalition->addEngagement();
 		isEngaged = true;
 	}
+}
 
+void Agent::updateKillCount()
+{
 	if (unit->canAttack())
 		coalition->addKillCount(unit->getKillCount() - lastKillCount);
 	lastKillCount = unit->getKillCount();
+}
+
+void Agent::updateBoundActions()
+{
+	if (!task)
+	{
+		unbind();
+		return;
+	}
+
+	if (unit->isStuck())
+	{
+		coalition->removeAgent(this);
+		return;
+	}
+
+	if (task->getType() == ATT)
+		micro();
+
+	updateEngagement();
+	updateKillCount();
+}
+
+void Agent::updateFreeActions()
+{
+	pollCoalitions();
+	
+	if (unit->getType().canProduce())
+	{
+		train(DesireHelper::getMostDesirableUnit(unit->getType()));
+		return;
+	}
+
+	//if (unit->canUpgrade())
+	//{
+	//	//TO DO: upgrade(DesireHelper::getMostDesirableUpgrade(unit->getType()));
+	//	for (auto upgradeType : unit->getType().upgradesWhat())
+	//	{
+	//		if (upgrade(upgradeType))
+	//			return;
+	//	}
+	//}
+
+	//if (unit->canResearch())
+	//{
+	//	//TO DO: research(DesireHelper::getMostDesirableResearch(unit->getType()));
+	//	for (auto researchType : unit->getType().researchesWhat())
+	//	{
+	//		if (research(researchType))
+	//			return;
+	//	}
+	//}
+	
+	defend(BWAPI::Position(util::getSelf()->getStartLocation()));
 }
 
 void Agent::act()
@@ -215,48 +268,32 @@ void Agent::act()
 	if (unit->getID() == 0)
 		return;
 
+	if (!unit->exists())
+		return;
+
 	if (unit->isUnderAttack())
 	{
+		if (unit->getType().isBuilding())
+		{
+			Defend* defend = new Defend(unit);
+			TaskHelper::addTask(defend, true);
+		}
+		//TO DO: optimise scan usage
 		auto allBullets = BWAPI::Broodwar->getBullets();
 		for (auto bullet : allBullets)
 		{
 			if (bullet->getType() == BWAPI::BulletTypes::Subterranean_Spines)
 				ArmyHelper::scan(bullet->getPosition());
 		}
-	}
-
+	}	
+		
 	if (free)
-	{
-		if (unit->getType().canProduce())
-		{
-			train(DesireHelper::getMostDesirableUnit(unit->getType()));
-			return;
-		}
-
-		if (unit->canUpgrade())
-		{
-			for (auto upgradeType : unit->getType().upgradesWhat())
-			{
-				if (upgrade(upgradeType))
-					return;
-			}
-		}
-		if (unit->canResearch())
-		{
-			for (auto researchType : unit->getType().researchesWhat())
-			{
-				if (research(researchType))
-					return;
-			}
-		}
-
-		defend(BWAPI::Position(util::getSelf()->getStartLocation()));
-	}
+		updateFreeActions();
 	else
-		updateCoalitionStatus();
+		updateBoundActions();
 }
 
-//add swarm equation
+//TO DO: add swarm equation
 bool Agent::pollCoalitions()
 {
 	for (auto &coalition : CoalitionHelper::getCoalitionset())

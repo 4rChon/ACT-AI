@@ -9,10 +9,10 @@ private:
 	bool satisfied;
 public:
 	//constructors
-	ResearchTech(BWAPI::TechType techType);
-	void createCoalition();
+	ResearchTech(BWAPI::TechType techType);	
 
 	//-
+	void createCoalition();
 	void assign(); //obtain a coalition capable of researching tech
 	void satisfyRequirements();
 	void act(); //order coalition to research tech

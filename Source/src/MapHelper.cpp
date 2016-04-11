@@ -48,6 +48,7 @@ namespace MapHelper
 		enemyScore = 0;
 		friendScore = 0;
 		resourceScore = 0;
+		defending = false;
 	}
 
 	BWAPI::Region Zone::getRegion() const
@@ -78,6 +79,16 @@ namespace MapHelper
 	int Zone::getResourceScore() const
 	{
 		return resourceScore;
+	}
+
+	bool Zone::isDefending() const
+	{
+		return defending;
+	}
+
+	void Zone::setDefending(bool defending)
+	{
+		this->defending = defending;
 	}
 
 	void Zone::updateLastVisited()

@@ -3,19 +3,27 @@
 #include "TaskHelper.h"
 #include "EconHelper.h"
 #include "CreateUnit.h"
+#include <stdio.h> //ceil
+#include <math.h> //ceil
 
 CreateCoalition::CreateCoalition(Composition composition, Task* task)
 {
 	taskName = "CreateCoalition(Composition, " + task->getName() + ")";
+	Composition adjustedComposition;
 	if (task->getType() == ATT)
 	{
 		for (auto& unit : composition.getUnitMap())
 		{
-			if (!unit.first.isBuilding())
-				composition.addType(unit.first, (int)((double)unit.second * EconHelper::getUnitMultiplier()));
-		}		
+			if (!unit.first.isBuilding() && unit.second > 0)
+				adjustedComposition.addType(unit.first, (int)std::ceil(((double)unit.second * EconHelper::getUnitMultiplier(composition))));
+		}
+		composition = adjustedComposition;
+		std::cout << "Composition\n";
+		composition.printDebugInfo();
+		std::cout << "Composition Multiplier : " << EconHelper::getUnitMultiplier(composition) << "\n";
 	}
-	taskCoalition = CoalitionHelper::addCoalition(composition, task);	
+	
+	taskCoalition = CoalitionHelper::addCoalition(composition, task);
 	task->setCoalition(taskCoalition);
 	cost = composition.getCost();
 	taskType = CRC;

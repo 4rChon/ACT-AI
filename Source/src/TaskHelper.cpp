@@ -34,6 +34,17 @@ namespace TaskHelper
 
 	Task* addTask(Task* newTask, bool root)
 	{
+		if (newTask->getType() == DEF)
+		{
+			if (newTask->getTarget()->isDefending())
+			{
+				delete newTask;
+				return nullptr;
+			}
+			else
+				newTask->getTarget()->setDefending(true);
+		}
+			
 		//check whether similar task has been added
 		if (root)
 			rootTaskSet.insert(newTask);
@@ -62,14 +73,8 @@ namespace TaskHelper
 
 	void removeTask(Task* task)
 	{
-		//if (rootTaskSet.count(task) > 0)
-		//{
-		//	std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from root taskset\n";
-		//	rootTaskSet.erase(task);
-		//}
 		if (fullTaskSet.count(task) > 0)
 		{
-			/*std::cout << "Removing " << task->getName().c_str() << " : " << task->getID() << " from full taskset\n";*/
 			fullTaskSet.erase(task);
 			delete task;
 		}		

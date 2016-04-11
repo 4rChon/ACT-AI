@@ -35,8 +35,6 @@ protected:
 	int taskID;
 	double cost;
 	double profit;
-	bool techSatisfied;
-	bool unitSatisfied;
 	Coalition* coalition;
 	int coalitionID;
 	TaskType taskType;
@@ -44,18 +42,14 @@ protected:
 public:
 	//constructors and destructors
 	Task();
-	virtual ~Task();
+	virtual ~Task();	
 
 	//setters
+	void setDebug(bool debug);
 	void setCoalition(Coalition* coalition);
-	void setUnitSatisfied(bool unitSatisfied);
-	void setTechSatisfied(bool techSatisfied);
-	
 
 	//getters
 	MapHelper::Zone* getTarget();
-	bool isUnitSatisfied() const;
-	bool isTechSatisfied() const;
 	virtual bool Task::isComplete() const;
 	TaskType getType() const;
 	int getID() const;
@@ -69,12 +63,14 @@ public:
 	void addSuperTask(Task* task);
 
 	//-
+	virtual void createCoalition();
 	virtual void assign() = 0;
 	virtual void act() = 0;
 	virtual void update() = 0;
+
 	void cleanSubTasks();
 	void updateTaskTree();
-
+	
 	virtual void succeed();
 	virtual void fail();
 

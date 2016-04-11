@@ -19,13 +19,6 @@ Expand::~Expand()
 	builder = nullptr;
 }
 
-void Expand::createCoalition()
-{
-	Composition c = CompositionHelper::getComposition(taskType);	
-	CreateCoalition *createCoalition = new CreateCoalition(c, this);
-	addSubTask(createCoalition);
-}
-
 void Expand::assign()
 {
 	printDebugInfo("Assign");

@@ -4,7 +4,18 @@
 
 #include "BWAPI.h"
 #include "BWTA.h"
+#include <iostream>
+#include <istream>
+#include <fstream>
 #include "boost\filesystem.hpp"
+
+
+namespace CompositionHelper
+{
+	struct UsedComposition;
+}
+
+class Composition;
 
 namespace std
 {
@@ -90,16 +101,12 @@ namespace std
 }
 
 namespace util
-{
-	namespace fs = ::boost::filesystem;
+{	
 
 	void initialiseUtil();
 
 	//Normalises an array of values after weighing them with coefficients
 	double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr);
-
-	//Get all files in root path with ext extension and places them in ret
-	void getFiles(const fs::path& root, const std::string& ext, std::vector<fs::path>& ret);
 	
 	void setSelf();
 
@@ -116,4 +123,20 @@ namespace util
 
 	//Returns player name
 	std::string getSelfName();
+	bool canMakeUnit(BWAPI::UnitType unitType);
+	bool canResearch(BWAPI::TechType techType);
+
+	int getFrameBracket(int frame, int bracket);
+
+	BWAPI::UnitType getRandomType(Composition composition);
+	BWAPI::UnitType getRandomType(BWAPI::UnitType macroType);
+
+	//Get all files in root path with ext extension and places them in ret
+	namespace data
+	{
+		namespace fs = ::boost::filesystem;
+		void getFiles(const fs::path& root, const std::string& ext, std::vector<fs::path>& ret);
+		void serialize(CompositionHelper::UsedComposition usedComposition);
+		CompositionHelper::UsedComposition deserialize(std::string target);
+	}
 }

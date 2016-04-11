@@ -36,7 +36,7 @@ Coalition::Coalition(Composition targetComp, Task* task)
 
 	this->targetComp = targetComp;
 	if (task->getType() == ATT)
-		unitMultiplier = EconHelper::getUnitMultiplier();
+		unitMultiplier = EconHelper::getUnitMultiplier(targetComp);
 	else
 		unitMultiplier = 1;
 	coalitionID = CoalitionHelper::getNextID();
@@ -208,10 +208,10 @@ void Coalition::removeUnit(BWAPI::Unit unit)
 	/*std::cout << "A " << unit->getType() << " has left a coalition\n";*/
 }
 
-void Coalition::outAttributes()
+void Coalition::printAttributes()
 {
 	std::cout << "Coalition " << coalitionID << "\n";
-	currentComp.outAttributes();
+	currentComp.printAttributes();
 }
 
 void Coalition::logCoalition()

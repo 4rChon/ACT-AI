@@ -38,9 +38,6 @@ protected:
 	//agent's current target zone - nullptr if no target
 	MapHelper::Zone* target;
 
-	//True if agent is currently attacking, false otherwise. Used to keep agent in formation
-	bool isAttacking;
-
 	//number of frames that the agent has been engaged in combat
 	int engageDuration;
 
@@ -55,6 +52,19 @@ protected:
 
 	/*CommandMap commandMap;
 	void initialiseCommandMap();*/
+
+	///Private Helpers
+	//Update Engagement Time for coalition
+	void updateEngagement();
+
+	//Update Kill Count for coalition
+	void updateKillCount();
+
+	//Update Actions when not bound to a coalition
+	virtual void updateFreeActions();
+
+	//Update Coalition relevant information and micro if available
+	void updateBoundActions();
 
 public:
 	///constructors	and destructors
@@ -95,6 +105,8 @@ public:
 
 	//True if agent is bound to a coalition and coalition is active
 	bool isFree() const;
+	
+	virtual void micro();	
 
 	///-	
 	//Compute agent actions
@@ -140,10 +152,7 @@ public:
 	//Generic useAbility - use ability on target if available
 	virtual bool useAbility(BWAPI::TechType ability, BWAPI::PositionOrUnit target = nullptr);
 
-	///helpers
-	//Update Coalition relevant information and micro if available
-	void updateCoalitionStatus();
-
+	///Public Helpers
 	//Set free to false if agent is currently assigned to a coalition. Does nothing if no coalition assigned.
 	void bind();
 

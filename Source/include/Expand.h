@@ -12,8 +12,6 @@ public:
 	Expand();
 	~Expand();
 
-	void createCoalition();
-
 	//-
 	void assign();
 	void act();

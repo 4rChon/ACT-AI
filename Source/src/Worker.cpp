@@ -64,44 +64,48 @@ ResourceDepot* Worker::getMiningBase() const
 	return miningBase;
 }
 
-void Worker::act()
+void Worker::updateFreeActions()
 {
-	if (free)
+	pollCoalitions();
+	if (util::getSelf()->getRace() != BWAPI::Races::Zerg
+		&& DesireHelper::getSupplyDesire() >= 0.6
+		&& EconHelper::haveMoney(util::getSelf()->getRace().getSupplyProvider()))
 	{
-		if (util::getSelf()->getRace() != BWAPI::Races::Zerg
-			&& DesireHelper::getSupplyDesire() >= 0.6
-			&& EconHelper::haveMoney(util::getSelf()->getRace().getSupplyProvider()))
+		//int amount = DesireHelper::getSupplyDesire() / 0.6;
+		if (build(util::getSelf()->getRace().getSupplyProvider()))
+			//for (int i = 0; i < amount; i++)
+			DesireHelper::updateSupplyDesire(util::getSelf()->getRace().getSupplyProvider());
+	}
+	//temp contents
+	if (unit->isIdle())
+	{
+		bool mining = false;
+		auto resourceDepots = AgentHelper::getResourceDepots();
+		for (auto &base : resourceDepots)
 		{
-			//int amount = DesireHelper::getSupplyDesire() / 0.6;
-			if (build(util::getSelf()->getRace().getSupplyProvider()))
-				//for (int i = 0; i < amount; i++)
-				DesireHelper::updateSupplyDesire(util::getSelf()->getRace().getSupplyProvider());
-		}
-		//temp contents
-		if (unit->isIdle())
-		{
-			bool mining = false;
-			auto resourceDepots = AgentHelper::getResourceDepots();
-			for (auto &base : resourceDepots)
+			if (!base->isGasSaturated())
 			{
-				if (!base->isGasSaturated())
-				{
-					setMiningBase(base, true);
-					mining = true;
-					return;
-				}
+				setMiningBase(base, true);
+				mining = true;
+				return;
+			}
 
-				if (!base->isMineralSaturated())
-				{
-					setMiningBase(base, false);
-					mining = true;
-					return;
-				}
+			if (!base->isMineralSaturated())
+			{
+				setMiningBase(base, false);
+				mining = true;
+				return;
 			}
 		}
 	}
+}
+
+void Worker::act()
+{
+	if (free)
+		updateFreeActions();
 	else
-		updateCoalitionStatus();
+		updateBoundActions();
 }
 
 bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPosition)
@@ -117,7 +121,11 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 		if (!desiredPosition)
 		{
 			if (miningBase != nullptr)
+			{
 				desiredPosition = &miningBase->getBaseLocation()->getTilePosition();
+				if(!desiredPosition)
+					&unit->getTilePosition();
+			}
 			else
 				desiredPosition = &unit->getTilePosition();
 		}
@@ -130,6 +138,7 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 			buildLocation = BWAPI::Broodwar->getBuildLocation(building, *desiredPosition);
 		else
 			buildLocation = *desiredPosition;
+
 		if (unit->build(building, buildLocation))
 		{		
 			if (building == util::getSelf()->getRace().getSupplyProvider())

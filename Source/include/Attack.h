@@ -9,7 +9,6 @@ public:
 	Attack(MapHelper::Zone* target);
 
 	//-
-	void createCoalition();
 	void assign();
 	void act();
 	void update();

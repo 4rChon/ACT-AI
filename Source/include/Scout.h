@@ -6,7 +6,6 @@ class Scout : public Task
 {
 public:
 	Scout(MapHelper::Zone* target);
-	void createCoalition();
 	void assign();
 	void act();
 	void update();

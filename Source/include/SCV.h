@@ -4,9 +4,12 @@
 
 class SCV : public Worker
 {	
+private:
+	///Private Helpers
+	void updateFreeActions();
 public:
 	///constructor
-	SCV(BWAPI::Unit unit);
+	SCV(BWAPI::Unit unit);	
 			
 	///-
 	//Compute actions

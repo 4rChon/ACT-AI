@@ -16,12 +16,6 @@ namespace ReplayHelper
 		loadFlaggedCompositions();
 	}
 
-	void getEnemyUnitsAtFrame(int frame)
-	{
-		if (BWAPI::Broodwar->getFrameCount() == frame)
-			enemyComposition = Composition(util::getEnemy()->getUnits());
-	}
-
 	void loadFlaggedCompositions()
 	{
 		auto compositions = CompositionHelper::getCompositionSet();
@@ -41,77 +35,88 @@ namespace ReplayHelper
 		}
 	}
 
-	void evolveComposition(CompositionHelper::UsedComposition composition)
+	void evolveComposition(CompositionHelper::UsedComposition usedComp)
 	{
 		std::cout << "\n==Evolving a composition==\n\n";
 		std::cout << "Composition Before Evolution\n";
-		composition.composition.debugInfo();
+		usedComp.composition.printDebugInfo();
 		enemyComposition = Composition(util::getEnemy()->getUnits());
 		std::cout << "Loaded Enemy Composition\n";
 		//respond to units with counters
-		for each(auto unitType in enemyComposition.getTypes())
+		if (usedComp.useCount > 1)
 		{
-			if (unitType.isBuilding() || unitType == BWAPI::UnitTypes::Zerg_Larva)
-				continue;
-			//std::cout << "Responding to unit: " << unitType.c_str() << "\n";
-			auto counters = CompositionHelper::getCounters(unitType);
-			auto counterTypes = counters.getTypes();
-			bool canCounter = false;
-			for each(auto counterType in counterTypes)
+			for each(auto unitType in enemyComposition.getTypes())
 			{
-				if (composition.composition[counterType] > 0)
-					canCounter = true;
-			}
-
-			if (canCounter == false)
-			{
-				int randomIndex = rand() % counterTypes.size();
-				composition.composition.addType(counterTypes[randomIndex]);
-			}
-			else
-			{
-				int evolveType = rand() % 100;
-				if (evolveType <= 25)
-				{
-					auto intersection = composition.composition.getIntersection(counters).getTypes();
-					int randomIndex = rand() % intersection.size();
-					composition.composition.addType(intersection[randomIndex]);					
-				}
-				else if (evolveType > 25 && evolveType <= 50)
-				{
-					int randomIndex = rand() % counterTypes.size();
-					composition.composition.addType(counterTypes[randomIndex]);
-				}
-			}
-		}
-		std::cout << "\n==Composition Evolved==\n\n";
-		std::cout << "Composition After Evolution\n";
-		composition.composition.debugInfo();
-		//possible mutation
-		int mutateProbability = rand() % 100;
-		if (mutateProbability < 10)
-		{
-			std::cout << "\n==Mutating Composition==\n\n";
-			std::vector<BWAPI::UnitType> possibleTypes;
-			for each(auto unitType in BWAPI::UnitTypes::allUnitTypes())
-			{
-				if (unitType.getRace() != util::getSelf()->getRace()
-					|| unitType.isHero()
-					|| unitType.isBuilding()
-					|| unitType.isWorker()
-					|| unitType.supplyProvided() > 0
-					|| unitType == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine
-					|| unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode)
+				if (unitType.isBuilding() || unitType == BWAPI::UnitTypes::Zerg_Larva)
 					continue;
-				possibleTypes.push_back(unitType);
+				//std::cout << "Responding to unit: " << unitType.c_str() << "\n";
+				auto counters = CompositionHelper::getCounters(unitType);
+				
+				if (usedComp.composition.getIntersection(counters).getTypes().size() > 0)
+				{
+					//add random unit type from counter list
+					BWAPI::UnitType randomType = util::getRandomType(counters);
+					usedComp.composition.addType(randomType);
+				}
+				else
+				{
+					int evolveType = rand() % 100;
+
+					//increase amount for existing unit type
+					if (evolveType <= 33)
+					{
+						auto intersection = usedComp.composition.getIntersection(counters).getUnitMap();
+						BWAPI::UnitType randomType = util::getRandomType(intersection);
+						usedComp.composition.addType(randomType);
+					}
+
+					//add a new counter unit type
+					else if (evolveType > 33 && evolveType <= 66)
+					{
+						BWAPI::UnitType randomType = util::getRandomType(counters);
+						usedComp.composition.addType(randomType);
+					}
+				}
 			}
 
-			int randomIndex = rand() % possibleTypes.size();
-			composition.composition.addType(possibleTypes[randomIndex]);
-			std::cout << "Composition After Mutation\n";
-			composition.composition.debugInfo();
+			std::cout << "\n==Composition Evolved==\n\n";
+			std::cout << "Composition After Evolution\n";
+			usedComp.composition.printDebugInfo();
+
+			////possible mutation
+			//int mutateProbability = rand() % 100;
+			//if (mutateProbability < 5)
+			//	composition = mutateComposition(composition);
+		}
+		else
+		{			
+			std::cout << "Removing Unit\n";
+			BWAPI::UnitType randomType = util::getRandomType(usedComp.composition);
+			usedComp.composition.removeType(randomType);
+
+			std::cout << "\n==Composition Evolved==\n\n";
+			std::cout << "Composition After Evolution\n";
+			usedComp.composition.printDebugInfo();
+
+			if (usedComp.composition.getCost() == 0)
+				usedComp.composition = mutateComposition(usedComp.composition);
 		}
 
-		CompositionHelper::saveComposition(composition);
-	}	
+		usedComp.useCount = 1;
+
+		CompositionHelper::saveComposition(usedComp);
+	}
+
+	Composition mutateComposition(Composition composition)
+	{
+		std::cout << "\n==Mutating Composition==\n\n";
+		std::vector<BWAPI::UnitType> possibleTypes;
+
+		BWAPI::UnitType randomUnit = util::getRandomType(BWAPI::UnitTypes::Men);
+		composition.addType(randomUnit);
+		std::cout << "\n\n==Composition After Mutation==\n";
+		composition.printDebugInfo();
+
+		return composition;
+	}
 }

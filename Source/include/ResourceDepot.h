@@ -49,6 +49,8 @@ public:
 	//Get number of refineries built on vespene geysers
 	int getRefineryCount();
 
+	void updateFreeActions();
+
 	//Get saturation
 	double getMineralSaturation();	
 	double getGasSaturation();
