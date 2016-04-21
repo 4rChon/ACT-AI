@@ -26,8 +26,8 @@ void ResearchTech::createCoalition()
 
 void ResearchTech::satisfyRequirements()
 {	
-	if (!util::getSelf()->hasUnitTypeRequirement(techType.requiredUnit())
-		&& !util::getSelf()->hasUnitTypeRequirement(techType.whatResearches()))
+	if (!util::game::getSelf()->hasUnitTypeRequirement(techType.requiredUnit())
+		&& !util::game::getSelf()->hasUnitTypeRequirement(techType.whatResearches()))
 	{					
 		satisfied = false;
 		if (!satisfying)
@@ -57,7 +57,7 @@ void ResearchTech::assign()
 
 void ResearchTech::act()
 {
-	if (!util::getSelf()->isResearching(techType))
+	if (!util::game::getSelf()->isResearching(techType))
 	{
 		if (!EconHelper::haveMoney(techType))
 			return;
@@ -71,7 +71,7 @@ void ResearchTech::update()
 	if (complete)
 		return;
 
-	if (util::getSelf()->hasResearched(techType))
+	if (util::game::getSelf()->hasResearched(techType))
 		succeed();
 
 	if (!assigned)

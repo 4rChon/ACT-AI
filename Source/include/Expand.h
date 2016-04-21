@@ -17,4 +17,5 @@ public:
 	void act();
 	void update();
 	void succeed();
+	void fail();
 };

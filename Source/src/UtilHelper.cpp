@@ -16,53 +16,11 @@ namespace util
 
 	void initialiseUtil()
 	{
-		setSelf();
-		setEnemy();
+		game::setSelf();
+		game::setEnemy();
 		std::cout << selfName << " (" << self->getRace().getName() << ") vs " << enemy->getName() << " (" << enemy->getRace().getName() << ")\n";
-	}
-
-	void setSelf()
-	{
-		if (!BWAPI::Broodwar->isReplay())
-		{
-			self = BWAPI::Broodwar->self();
-			selfName = self->getName();
-		}
-		else
-		{			
-			self = nullptr;
-			selfName = getSelfName();
-			auto playerSet = BWAPI::Broodwar->getPlayers();
-			for each(auto player in playerSet)
-			{
-				if (player->getName().compare(selfName) == 0)
-				{
-					self = player;
-					break;
-				}
-			}			
-		}
-	}
-
-	void setEnemy()
-	{
-		if (!BWAPI::Broodwar->isReplay())
-		{
-			enemy = BWAPI::Broodwar->enemy();
-		}
-		else
-		{
-			auto playerSet = BWAPI::Broodwar->getPlayers();
-			enemySet.clear();
-			for each(auto player in playerSet)
-			{
-				if (player->getName().compare(selfName) != 0 && !player->isNeutral())
-					enemySet.insert(player);
-			}
-			
-			enemy = (*enemySet.begin());
-		}
-	}
+		data::loadMapData();
+	}	
 
 	double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr)
 	{
@@ -71,61 +29,6 @@ namespace util
 			total += 1 / (1 + std::exp(-coeffArr[i] * valueArr[i]));
 
 		return ((2 / valueArr.size()) * total) - 1;
-	}
-
-	BWAPI::Playerset& getEnemies()
-	{	
-		return enemySet;
-	}
-
-	BWAPI::Player getEnemy()
-	{
-		return enemy;
-	}
-
-	BWAPI::Player getSelf()
-	{				
-		return self;
-	}
-
-	std::string getSelfName()
-	{
-		std::ifstream nameFile;
-		nameFile.open("compositions\\Player.txt");
-		std::string selfName;
-		getline(nameFile, selfName);
-		nameFile.close();
-
-		return selfName;
-	}
-
-	bool canMakeUnit(BWAPI::UnitType unitType)
-	{
-		bool hasUnitTypeRequirement = true;
-		bool hasResearched = !self->hasResearched(unitType.requiredTech());
-		bool hasCreator = self->hasUnitTypeRequirement(unitType.whatBuilds().first, unitType.whatBuilds().second);
-
-		for each(auto& requirement in unitType.requiredUnits())
-		{
-			if (!self->hasUnitTypeRequirement(requirement.first, requirement.second))
-				hasUnitTypeRequirement = false;
-		}
-		
-
-		return hasUnitTypeRequirement && hasResearched && hasCreator;
-	}
-
-	bool canResearch(BWAPI::TechType techType)
-	{
-		bool hasRequiredUnit = self->hasUnitTypeRequirement(techType.requiredUnit());
-		bool hasResearcher = self->hasUnitTypeRequirement(techType.whatResearches());
-
-		return hasRequiredUnit && hasResearcher;
-	}
-
-	int getFrameBracket(int frame, int bracket)
-	{
-		return int(std::floor((frame) / bracket) * bracket);
 	}
 
 	BWAPI::UnitType getRandomType(Composition composition)
@@ -143,7 +46,7 @@ namespace util
 
 		for each(auto unitType in BWAPI::UnitTypes::allUnitTypes())
 		{
-			if (unitType.getRace() != util::getSelf()->getRace()
+			if (unitType.getRace() != util::game::getSelf()->getRace()
 				|| unitType.isHero()
 				|| unitType == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine
 				|| unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode
@@ -163,6 +66,107 @@ namespace util
 		return unitTypeBag[randomIndex];
 	}
 
+	namespace game
+	{
+		void setSelf()
+		{
+			if (!BWAPI::Broodwar->isReplay())
+			{
+				self = BWAPI::Broodwar->self();
+				selfName = self->getName();
+			}
+			else
+			{
+				self = nullptr;
+				selfName = getSelfName();
+				auto playerSet = BWAPI::Broodwar->getPlayers();
+				for each(auto player in playerSet)
+				{
+					if (player->getName().compare(selfName) == 0)
+					{
+						self = player;
+						break;
+					}
+				}
+			}
+		}
+
+		void setEnemy()
+		{
+			if (!BWAPI::Broodwar->isReplay())
+			{
+				enemy = BWAPI::Broodwar->enemy();
+			}
+			else
+			{
+				auto playerSet = BWAPI::Broodwar->getPlayers();
+				enemySet.clear();
+				for each(auto player in playerSet)
+				{
+					if (player->getName().compare(selfName) != 0 && !player->isNeutral())
+						enemySet.insert(player);
+				}
+
+				enemy = (*enemySet.begin());
+			}
+		}		
+
+		BWAPI::Playerset& getEnemies()
+		{
+			return enemySet;
+		}
+
+		BWAPI::Player getEnemy()
+		{
+			return enemy;
+		}
+
+		BWAPI::Player getSelf()
+		{
+			return self;
+		}
+
+		std::string getSelfName()
+		{
+			std::ifstream nameFile;
+			nameFile.open("compositions\\Player.txt");
+			std::string selfName;
+			getline(nameFile, selfName);
+			nameFile.close();
+
+			return selfName;
+		}
+
+		bool canMakeUnit(BWAPI::UnitType unitType)
+		{
+			bool hasUnitTypeRequirement = true;
+			bool hasResearched = !self->hasResearched(unitType.requiredTech());
+			bool hasCreator = self->hasUnitTypeRequirement(unitType.whatBuilds().first, unitType.whatBuilds().second);
+
+			for each(auto& requirement in unitType.requiredUnits())
+			{
+				if (!self->hasUnitTypeRequirement(requirement.first, requirement.second))
+					hasUnitTypeRequirement = false;
+			}
+
+
+			return hasUnitTypeRequirement && hasResearched && hasCreator;
+		}
+
+		bool canResearch(BWAPI::TechType techType)
+		{
+			bool hasRequiredUnit = self->hasUnitTypeRequirement(techType.requiredUnit());
+			bool hasResearcher = self->hasUnitTypeRequirement(techType.whatResearches());
+
+			return hasRequiredUnit && hasResearcher;
+		}
+
+		int getFrameBracket(int frame, int bracket)
+		{
+			return int(std::floor((frame) / bracket) * bracket);
+		}		
+	}
+
 	namespace data
 	{
 		void getFiles(const fs::path& root, const std::string& ext, std::vector<fs::path>& ret)
@@ -180,13 +184,13 @@ namespace util
 			}
 		}
 
-		void serialize(CompositionHelper::UsedComposition usedComposition)
+		void serializeComposition(CompositionHelper::UsedComposition usedComposition)
 		{
 			std::ofstream compStream;
 
-			auto directory = "compositions\\" + util::getEnemy()->getRace().getName() + "\\";
+			auto directory = "compositions\\" + game::getEnemy()->getRace().getName() + "\\";
 			int avgActivationFrame = (int)((double)usedComposition.activationFrame / usedComposition.useCount);
-			int frameBracket = getFrameBracket(avgActivationFrame, 7200);
+			int frameBracket = game::getFrameBracket(avgActivationFrame, 7200);
 			auto fileName = std::to_string(frameBracket) + "_" + std::to_string(usedComposition.taskType);
 
 			compStream.open(directory + fileName + ".comp", std::ios::binary | std::ios::out);
@@ -241,7 +245,7 @@ namespace util
 			readableStream.close();
 		}
 
-		CompositionHelper::UsedComposition deserialize(std::string target)
+		CompositionHelper::UsedComposition deserializeComposition(std::string target)
 		{
 			std::ifstream compStream;
 			compStream.open(target, std::ios::binary | std::ios::in);
@@ -282,5 +286,10 @@ namespace util
 
 			return usedComposition;
 		}		
+
+		void loadMapData()
+		{
+			BWAPI::Broodwar->mapHash();
+		}
 	}
 }

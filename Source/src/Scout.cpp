@@ -22,8 +22,8 @@ void Scout::assign()
 
 void Scout::act()
 {
-	printDebugInfo("Acting");
-	acting = ((*coalition->getAgentSet().begin())->move(target->getRegion()->getCenter()));
+	printDebugInfo("Acting");	
+	acting = coalition->getUnitSet().move(target->getRegion()->getCenter());
 	printDebugInfo("Acting End");
 }
 

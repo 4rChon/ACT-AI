@@ -22,13 +22,13 @@ void SatisfyTechRequirement::act()
 	printDebugInfo("Acting");	
 	printDebugInfo(techType.c_str());
 
-	if (util::getSelf()->allUnitCount(techType.requiredUnit()) < 1)
+	if (util::game::getSelf()->allUnitCount(techType.requiredUnit()) < 1)
 	{
 		CreateUnit* createUnit = new CreateUnit(techType.requiredUnit());
 		addSubTask(createUnit);
 	}
 
-	if (util::getSelf()->allUnitCount(techType.whatResearches()) < 1)
+	if (util::game::getSelf()->allUnitCount(techType.whatResearches()) < 1)
 	{
 		CreateUnit* createUnit = new CreateUnit(techType.whatResearches());
 		addSubTask(createUnit);
@@ -58,7 +58,7 @@ void SatisfyTechRequirement::update()
 
 	if (acting)
 	{
-		if (util::canResearch(techType))
+		if (util::game::canResearch(techType))
 			succeed();
 	}
 	printDebugInfo("Update End");

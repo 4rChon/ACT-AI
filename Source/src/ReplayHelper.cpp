@@ -40,7 +40,7 @@ namespace ReplayHelper
 		std::cout << "\n==Evolving a composition==\n\n";
 		std::cout << "Composition Before Evolution\n";
 		usedComp.composition.printDebugInfo();
-		enemyComposition = Composition(util::getEnemy()->getUnits());
+		enemyComposition = Composition(util::game::getEnemy()->getUnits());
 		std::cout << "Loaded Enemy Composition\n";
 		//respond to units with counters
 		if (usedComp.useCount > 1)

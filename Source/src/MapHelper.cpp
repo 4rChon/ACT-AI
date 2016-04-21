@@ -1,6 +1,7 @@
 #include "BWTA.h"
 #include "BWAPI.h"
 #include "MapHelper.h"
+#include "DesireHelper.h"
 #include "UtilHelper.h"
 
 namespace MapHelper
@@ -38,7 +39,7 @@ namespace MapHelper
 	const Field& getRegionField()
 	{
 		return regionField;
-	}
+	}	
 
 	Zone::Zone(BWAPI::Region region, int id)
 	{
@@ -48,6 +49,7 @@ namespace MapHelper
 		enemyScore = 0;
 		friendScore = 0;
 		resourceScore = 0;
+		timesDefended = 0;
 		defending = false;
 	}
 
@@ -81,6 +83,11 @@ namespace MapHelper
 		return resourceScore;
 	}
 
+	int Zone::getTimesDefended() const
+	{
+		return timesDefended;
+	}
+
 	bool Zone::isDefending() const
 	{
 		return defending;
@@ -89,6 +96,12 @@ namespace MapHelper
 	void Zone::setDefending(bool defending)
 	{
 		this->defending = defending;
+		timesDefended++;
+		auto defendDesireMap = DesireHelper::getDefendDesireMap();
+		if(defending)
+			DesireHelper::updateDefendDesire(this, getEnemyScore());
+		else
+			DesireHelper::updateDefendDesire(this, 0.0);
 	}
 
 	void Zone::updateLastVisited()
@@ -107,14 +120,14 @@ namespace MapHelper
 	{
 		resetScores();
 
-		for each (auto unit in this->region->getUnits())
+		for (auto& unit : this->region->getUnits())
 		{
-			if (unit->getPlayer() == util::getEnemy())
-				this->enemyScore += unit->getType().buildScore() + unit->getType().destroyScore();
-			if (unit->getPlayer() == util::getSelf())
-				this->friendScore += unit->getType().buildScore() + unit->getType().destroyScore();
+			if (unit->getPlayer() == util::game::getEnemy())
+				enemyScore += unit->getType().buildScore() + unit->getType().destroyScore();
+			if (unit->getPlayer() == util::game::getSelf())
+				friendScore += unit->getType().buildScore() + unit->getType().destroyScore();
 			if (unit->getType().isResourceContainer())
-				this->resourceScore += unit->getResources();
+				resourceScore += unit->getResources();
 		}
 
 		updateLastVisited();

@@ -189,23 +189,23 @@ void Composition::updateAttributes(const BWAPI::UnitType& unitType, int unitCoun
 	{				
 		if (unitType.airWeapon() != BWAPI::WeaponTypes::None)
 		{
-			auto airDPS = util::getSelf()->damage(unitType.airWeapon()) * unitType.maxAirHits() * (24 / (double)util::getSelf()->weaponDamageCooldown(unitType));
-			auto maxAirRange = util::getSelf()->weaponMaxRange(unitType.airWeapon()) / 32;
+			auto airDPS = util::game::getSelf()->damage(unitType.airWeapon()) * unitType.maxAirHits() * (24 / (double)util::game::getSelf()->weaponDamageCooldown(unitType));
+			auto maxAirRange = util::game::getSelf()->weaponMaxRange(unitType.airWeapon()) / 32;
 			attributes.totalAirRange += unitCount * maxAirRange;
 			attributes.airDPS += unitCount * airDPS;
 		}
 
 		if (unitType.groundWeapon() != BWAPI::WeaponTypes::None)
 		{
-			auto groundDPS = util::getSelf()->damage(unitType.groundWeapon()) * unitType.maxGroundHits() * (24 / (double)util::getSelf()->weaponDamageCooldown(unitType));
-			auto maxGroundRange = util::getSelf()->weaponMaxRange(unitType.groundWeapon()) / 32;
+			auto groundDPS = util::game::getSelf()->damage(unitType.groundWeapon()) * unitType.maxGroundHits() * (24 / (double)util::game::getSelf()->weaponDamageCooldown(unitType));
+			auto maxGroundRange = util::game::getSelf()->weaponMaxRange(unitType.groundWeapon()) / 32;
 			attributes.totalGroundRange += unitCount * maxGroundRange;
 			attributes.groundDPS += unitCount * groundDPS;
 		}
 	}
 	
 	if (unitType.canMove())
-		attributes.totalSpeed += unitCount * (util::getSelf()->topSpeed(unitType));
+		attributes.totalSpeed += unitCount * (util::game::getSelf()->topSpeed(unitType));
 	
 	if (attributes.groundDPS < 1)
 		attributes.groundDPS = 0;

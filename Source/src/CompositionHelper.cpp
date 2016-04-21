@@ -41,7 +41,7 @@ namespace CompositionHelper
 		{
 			if (usedComposition.taskType == taskType)
 			{
-				if(util::getFrameBracket(usedComposition.activationFrame, 7200) == util::getFrameBracket(BWAPI::Broodwar->getFrameCount(), 7200))
+				if(util::game::getFrameBracket(usedComposition.activationFrame, 7200) == util::game::getFrameBracket(BWAPI::Broodwar->getFrameCount(), 7200))
 					candidateSet.push_back(usedComposition);
 			}
 		}				
@@ -92,19 +92,19 @@ namespace CompositionHelper
 			{
 				for (auto& agent : AgentHelper::getAgentset())
 				{
-					if (agent->getUnit()->exists() && agent->isFree())
+					if (agent->getUnit()->exists() && agent->isFree() && !agent->getUnit()->getType().isBuilding() && !agent->getUnit()->getType().isSpell() && !agent->getUnit()->getType().isWorker())
 						c.addType(agent->getUnit()->getType());
 				}
 				return c;
 			}
 			case EXP:
 			{
-				c.addType(util::getSelf()->getRace().getWorker(), 1);
+				c.addType(util::game::getSelf()->getRace().getWorker(), 1);
 				return c;
 			}
 			case SCO:
 			{
-				c.addType(util::getSelf()->getRace().getWorker(), 1);
+				c.addType(util::game::getSelf()->getRace().getWorker(), 1);
 				return c;
 			}
 			default:
@@ -139,7 +139,7 @@ namespace CompositionHelper
 
 		for each (auto unitType in allUnitTypes)
 		{	
-			if (unitType.getRace() != util::getSelf()->getRace() || unitType.isHero() || unitType.isBuilding() || unitType.isWorker())
+			if (unitType.getRace() != util::game::getSelf()->getRace() || unitType.isHero() || unitType.isBuilding() || unitType.isWorker())
 				continue;
 
 			//if enemy unit flies and friendly unit can damage it...
@@ -234,7 +234,7 @@ namespace CompositionHelper
 
 	void loadCompositions()
 	{
-		auto enemy = util::getEnemy();// util::getEnemy();
+		auto enemy = util::game::getEnemy();// util::getEnemy();
 
 		auto directory = "compositions\\" + enemy->getRace().getName() + "\\";
 		fs::path path = fs::path(directory);
@@ -245,7 +245,7 @@ namespace CompositionHelper
 
 		for each(auto compPath in compFiles)
 		{
-			UsedComposition usedComposition = util::data::deserialize(directory + compPath.string());			
+			UsedComposition usedComposition = util::data::deserializeComposition(directory + compPath.string());			
 			compositionSet.push_back(usedComposition);
 		}
 
@@ -293,7 +293,7 @@ namespace CompositionHelper
 			bool unique = true;
 			for (auto& uniqueComposition : uniqueCompositions)
 			{
-				if (usedComposition.composition == uniqueComposition.composition && util::getFrameBracket(usedComposition.activationFrame, 7200) == util::getFrameBracket(uniqueComposition.activationFrame, 7200))
+				if (usedComposition.composition == uniqueComposition.composition && util::game::getFrameBracket(usedComposition.activationFrame, 7200) == util::game::getFrameBracket(uniqueComposition.activationFrame, 7200))
 				{
 					unique = false;
 					uniqueComposition.fitness += usedComposition.fitness;
@@ -308,7 +308,7 @@ namespace CompositionHelper
 		}
 
 		for each(auto uniqueComposition in uniqueCompositions)
-			util::data::serialize(uniqueComposition);
+			util::data::serializeComposition(uniqueComposition);
 
 
 	}

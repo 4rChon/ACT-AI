@@ -27,9 +27,13 @@ void Attack::assign()
 // attack with coalition
 void Attack::act()
 {	
-	printDebugInfo("Acting");			
-	if (coalition->isActive() || util::getSelf()->supplyUsed() >= 400)
-	{
+	printDebugInfo("Acting");
+
+	if (util::game::getSelf()->supplyUsed() >= 400)
+		coalition->activate();
+
+	if (coalition->isActive())
+	{		
 		coalition->getUnitSet().attack(target->getRegion()->getCenter());
 		acting = true;
 	}
@@ -47,7 +51,7 @@ void Attack::update()
 	{
 		succeed();
 		return;
-	}
+	}	
 
 	if (!assigned)
 	{

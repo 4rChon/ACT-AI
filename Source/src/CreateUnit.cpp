@@ -58,7 +58,7 @@ void CreateUnit::satisfyRequirements()
 		addSubTask(satisfyUnitRequirement);
 		if (requiresGas)
 		{
-			CreateUnit* createGas = new CreateUnit(util::getSelf()->getRace().getRefinery());
+			CreateUnit* createGas = new CreateUnit(util::game::getSelf()->getRace().getRefinery());
 			addSubTask(createGas);
 		}
 		satisfying = true;
@@ -96,7 +96,7 @@ void CreateUnit::act()
 		return;
 
 	printDebugInfo("UnitCount: " + std::to_string(unitCount));
-	if (unitType == util::getSelf()->getRace().getRefinery())
+	if (unitType == util::game::getSelf()->getRace().getRefinery())
 	{
 		for each (auto &agent in coalition->getAgentSet())
 		{
@@ -191,14 +191,14 @@ void CreateUnit::update()
 		succeed();
 
 	//if the unitType is a refinery and all bases already have a refinery, then succeed
-	if (unitType.isRefinery() && util::getSelf()->allUnitCount(util::getSelf()->getRace().getRefinery()) >= (int)AgentHelper::getResourceDepots().size())
+	if (unitType.isRefinery() && util::game::getSelf()->allUnitCount(util::game::getSelf()->getRace().getRefinery()) >= (int)AgentHelper::getResourceDepots().size())
 	{
 		succeed();
 		return;
 	}
 
 	//if maxed, then succeed
-	if (util::getSelf()->supplyTotal() >= 400)
+	if (util::game::getSelf()->supplyTotal() >= 400)
 	{
 		succeed();
 		return;

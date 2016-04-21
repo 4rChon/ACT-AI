@@ -9,8 +9,15 @@ namespace DesireHelper
 {
 	void initialiseHelper();
 
+	MapHelper::Zone* getMostDesirableAttackZone();
+	MapHelper::Zone* getMostDesirableDefenseZone();
+	void updateDefendDesire(MapHelper::Zone * target, double desireMod);
+	void updateAttackDesire(MapHelper::Zone * target, double desireMod);
+	
 	void updateUnitDesireMap();
-	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType producer = BWAPI::UnitTypes::None);
+	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType producer);
+	BWAPI::UnitType getMostDesirableUnit();
+	BWAPI::UnitType getMostDesirableAddon(BWAPI::UnitType building);
 	void updateUpgradeDesireMap();
 	void updateTechDesireMap();
 	void updateExpansionDesireMap();

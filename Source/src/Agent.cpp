@@ -50,13 +50,16 @@ Agent::Agent(BWAPI::Unit unit)
 	isEngaged = false;
 	lastKillCount = 0;
 
-	/*initialiseCommandMap();*/
+	/*initialiseCommandMap();*/	
 }
 
 Agent::~Agent()
 {
-	//std::cout << "~Agent\n";
-	/*AgentHelper::removeAgent(this);*/
+	coalitionID = -1;
+	taskID = -1;
+	coalition = nullptr;
+	target = nullptr;
+	task = nullptr;
 }
 
 //void Agent::initialiseCommandMap()
@@ -234,10 +237,16 @@ void Agent::updateFreeActions()
 {
 	pollCoalitions();
 	
+	if (unit->getType().canBuildAddon())
+	{
+		if(buildAddon(DesireHelper::getMostDesirableAddon(unit->getType())))
+			return;
+	}
+
 	if (unit->getType().canProduce())
 	{
-		train(DesireHelper::getMostDesirableUnit(unit->getType()));
-		return;
+		if(train(DesireHelper::getMostDesirableUnit(unit->getType())))
+			return;
 	}
 
 	//if (unit->canUpgrade())
@@ -258,35 +267,51 @@ void Agent::updateFreeActions()
 	//		if (research(researchType))
 	//			return;
 	//	}
-	//}
-	
-	defend(BWAPI::Position(util::getSelf()->getStartLocation()));
+	//}	
+	if(unit->isIdle())
+		defend();	
 }
 
-void Agent::act()
+bool Agent::exists()
 {
 	if (unit->getID() == 0)
-		return;
+		return false;
 
 	if (!unit->exists())
-		return;
+		return false;
 
+	return true;
+}
+
+void Agent::updateActions()
+{
+	if (unit->getType().isBuilding())
+		unit->setRallyPoint(unit->getClosestUnit(BWAPI::Filter::IsResourceDepot && BWAPI::Filter::IsOwned));
+	
 	if (unit->isUnderAttack())
 	{
-		if (unit->getType().isBuilding())
+		if ((unit->getType().isBuilding() || unit->isGatheringMinerals() || unit->isGatheringGas() || unit->isConstructing()) && !MapHelper::getZone(unit->getRegion())->isDefending())
 		{
 			Defend* defend = new Defend(unit);
 			TaskHelper::addTask(defend, true);
 		}
-		//TO DO: optimise scan usage
+
 		auto allBullets = BWAPI::Broodwar->getBullets();
 		for (auto bullet : allBullets)
 		{
 			if (bullet->getType() == BWAPI::BulletTypes::Subterranean_Spines)
 				ArmyHelper::scan(bullet->getPosition());
 		}
-	}	
-		
+	}
+}
+
+void Agent::act()
+{
+	if (!exists())
+		return;
+
+	updateActions();
+
 	if (free)
 		updateFreeActions();
 	else
@@ -297,9 +322,11 @@ void Agent::act()
 bool Agent::pollCoalitions()
 {
 	for (auto &coalition : CoalitionHelper::getCoalitionset())
+	{
 		if (!coalition->isActive())
 			if (coalition->addAgent(this))
 				return true;
+	}
 	return false;
 }
 
@@ -317,8 +344,13 @@ bool Agent::attack(BWAPI::PositionOrUnit target)
 	return false;
 }
 
-bool Agent::defend(BWAPI::Position target)
+bool Agent::defend()
 {
+	MapHelper::Zone *targetZone = DesireHelper::getMostDesirableDefenseZone();
+	BWAPI::Position targetPosition = BWAPI::Position(unit->getClosestUnit(BWAPI::Filter::IsResourceDepot && BWAPI::Filter::IsOwned)->getPosition());;
+	if (targetZone != nullptr)
+		targetPosition = targetZone->getRegion()->getCenter();
+
 	if (unit->getType() == BWAPI::UnitTypes::Terran_Bunker)
 	{
 		int spaceRemaining = unit->getSpaceRemaining();
@@ -341,12 +373,14 @@ bool Agent::defend(BWAPI::Position target)
 	}
 	else if (unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode)
 	{
-		if (move(target))
-			return useAbility(BWAPI::TechTypes::Tank_Siege_Mode, target);
+		if (move(targetPosition))
+			return useAbility(BWAPI::TechTypes::Tank_Siege_Mode, targetPosition);
 	}
 
-	if (unit->isIdle())
-		return attack(target);
+	
+
+	if(MapHelper::getZone(unit->getRegion()) != MapHelper::getZone(BWAPI::Broodwar->getRegionAt(targetPosition)))
+		return attack(targetPosition);
 	else
 		return false;
 }

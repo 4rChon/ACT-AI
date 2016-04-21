@@ -19,6 +19,8 @@ Coalition::Coalition()
 	task = nullptr;
 	taskID = -1;
 	active = false;	
+
+	focusFire = true;
 		
 	coalitionID = CoalitionHelper::getNextID();	
 	engageDuration = 0;
@@ -33,6 +35,8 @@ Coalition::Coalition(Composition targetComp, Task* task)
 	this->task = task;
 	taskID = task->getID();
 	active = false;
+
+	focusFire = true;
 
 	this->targetComp = targetComp;
 	if (task->getType() == ATT)
@@ -112,7 +116,11 @@ double Coalition::getProfit()
 
 double Coalition::getFitness()
 {
-	return profit / cost;
+	std::vector<double> valueArr;
+	std::vector<double> coeffArr;
+	valueArr.push_back(profit/cost);
+	coeffArr.push_back(0.1);
+	return util::normaliseValues(valueArr, coeffArr);
 }
 
 double Coalition::getUnitMultiplier()
@@ -145,23 +153,34 @@ bool Coalition::isActive() const
 	return active;
 }
 
-bool Coalition::addAgent(Agent* agent)
+void Coalition::activate()
 {
-	if (!agentSet.count(agent))
+	active = true;
+	targetComp = currentComp;
+	for (auto &agent : agentSet)
+		agent->bind();
+}
+
+bool Coalition::addAgent(Agent* agent)
+{	
+	if (agent->getCoalition() == this)
+		return false;
+
+	/*if (agent->getCoalitionID() != -1)
+		agent->getCoalition()->removeAgent(agent);*/
+
+	auto unitType = agent->getUnit()->getType();
+
+	if (targetComp[unitType] > currentComp[unitType])
 	{
-		for (auto type : targetComp.getTypes())
-		{
-			if (agent->getUnit()->getType() == type && targetComp[type] > currentComp[type])
-			{
-				/*std::cout << agent->getUnit()->getType().c_str() << " is joining a coalition\n";*/
-				agentSet.insert(agentSet.begin(), agent);
-				addUnit(agent->getUnit());
-				agent->setCoalition(this);
-				agent->setTask(task);				
-				return true;
-			}
-		}
+		/*std::cout << agent->getUnit()->getType().c_str() << " is joining a coalition\n";*/
+		agentSet.insert(agent);
+		addUnit(agent->getUnit());
+		agent->setCoalition(this);
+		agent->setTask(task);				
+		return true;
 	}
+
 	return false;
 }
 
@@ -170,35 +189,26 @@ void Coalition::addUnit(BWAPI::Unit unit)
 	unitSet.insert(unitSet.begin(), unit);
 	currentComp.addType(unit->getType());
 
-	if (!active && currentComp >= targetComp)
-	{
-		/*std::cout << "Coalition " << coalitionID << " Activated!\n";*/
-		active = true;
-		for (auto &agent : agentSet)
-			agent->bind();
-	}
+	if (!active && currentComp >= targetComp)	
+		activate();	
 }
 
 void Coalition::removeAgent(Agent* agent)
-{
-	agentSet.erase(agent);
-	removeUnit(agent->getUnit());
+{	
 
-	if (active)
-	{
-		agent->unbind();		
-		//if all agents die while coalition is activated, the task is a failure
-		if (agentSet.size() == 0)
-			task->fail();
-		//if no agents can deal damage ni an attack coalition, the task is a failure
-		if (task->getType() == ATT)
-		{
-			std::cout << "GroundDPS: " << currentComp.getAttributes().groundDPS << "\n";
-			std::cout << "AirDPS: " << currentComp.getAttributes().airDPS << "\n";
-			if (currentComp.getAttributes().groundDPS == 0 && currentComp.getAttributes().airDPS == 0)
-				task->fail();
-		}
-	}
+	agentSet.erase(agent);
+	removeUnit(agent->getUnit());	
+
+	//if all agents die while coalition is activated, the task is a failure
+	//or
+	//if no agents can deal damage in an attack coalition, the task is a failure
+	if (active && (agentSet.size() == 0 || (task->getType() == ATT && currentComp.getAttributes().groundDPS == 0 && currentComp.getAttributes().airDPS == 0)))
+		task->fail();
+
+	if (agent->getCoalition() != this)
+		return;
+
+	agent->unbind();
 }
 
 void Coalition::removeUnit(BWAPI::Unit unit)
@@ -218,9 +228,9 @@ void Coalition::logCoalition()
 {
 	std::cout << "Logging Performance...\n";
 	std::ofstream composition;
-	auto race = util::getSelf()->getRace().toString();
+	auto race = util::game::getSelf()->getRace().toString();
 	//composition.open("compositions\\" + BWAPI::Broodwar->mapName() + "\\" + util::getEnemy()->getRace().getName() + "\\" + race + "_" + task->getName() + ".txt");
-	composition.open("compositions\\" + util::getEnemy()->getRace().getName() + "\\" + race + "_" + task->getName() + ".txt");
+	composition.open("compositions\\" + util::game::getEnemy()->getRace().getName() + "\\" + race + "_" + task->getName() + ".txt");
 	composition << "Map Name: " << BWAPI::Broodwar->mapName() << " : " << BWAPI::Broodwar->mapFileName() << "\n";
 	composition << "EngageDuration: " << engageDuration << "\n";
 	composition << "KillCount: " << killCount << "\n";

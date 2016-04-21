@@ -56,17 +56,17 @@ namespace EconHelper
 
 	int haveSupply(BWAPI::UnitType unitType)
 	{
-		return util::getSelf()->supplyTotal() - util::getSelf()->supplyUsed() >= unitType.supplyRequired();
+		return util::game::getSelf()->supplyTotal() - util::game::getSelf()->supplyUsed() >= unitType.supplyRequired();
 	}
 
 	int getMinerals()
 	{
-		return util::getSelf()->minerals() - mineralDebt;
+		return util::game::getSelf()->minerals() - mineralDebt;
 	}
 
 	int getGas()
 	{
-		return util::getSelf()->gas() - gasDebt;
+		return util::game::getSelf()->gas() - gasDebt;
 	}
 
 	void addDebt(int minerals, int gas)
@@ -86,8 +86,8 @@ namespace EconHelper
 		int framesSinceLastCheck = BWAPI::Broodwar->getFrameCount() - lastCheckMineralsFrame;
 		if (framesSinceLastCheck > 24 * 5 || lastCheckMineralsFrame == 0)
 		{
-			mineralIncome = ((util::getSelf()->gatheredMinerals() - 50) - lastCheckMinerals) * 12;
-			lastCheckMinerals = (util::getSelf()->gatheredMinerals() - 50);
+			mineralIncome = ((util::game::getSelf()->gatheredMinerals() - 50) - lastCheckMinerals) * 12;
+			lastCheckMinerals = (util::game::getSelf()->gatheredMinerals() - 50);
 			lastCheckMineralsFrame = BWAPI::Broodwar->getFrameCount();
 		}
 		return mineralIncome;
@@ -98,8 +98,8 @@ namespace EconHelper
 		int framesSinceLastCheck = BWAPI::Broodwar->getFrameCount() - lastCheckGasFrame;
 		if (framesSinceLastCheck > 24 * 5 || lastCheckGasFrame == 0)
 		{
-			gasIncome = (util::getSelf()->gatheredGas() - lastCheckGas) * 12;
-			lastCheckGas = util::getSelf()->gatheredGas();
+			gasIncome = (util::game::getSelf()->gatheredGas() - lastCheckGas) * 12;
+			lastCheckGas = util::game::getSelf()->gatheredGas();
 			lastCheckGasFrame = BWAPI::Broodwar->getFrameCount();
 		}
 		return gasIncome;
@@ -120,7 +120,7 @@ namespace EconHelper
 
 		std::cout << "Mineral Ratio: " << (double)getMineralIncome() / minCostPerMinute  << "\n";
 		std::cout << "Gas Ratio: " << (double)getGasIncome() / gasCostPerMinute  << "\n";
-		return std::max(getMineralIncome() / minCostPerMinute, getGasIncome() / gasCostPerMinute);
+		return std::max((getMineralIncome() + getMinerals()) / minCostPerMinute, (getGasIncome() + getGas()) / gasCostPerMinute);
 	}
 
 	void doneExpanding()
@@ -133,6 +133,31 @@ namespace EconHelper
 		DesireHelper::updateExpandDesire();
 		if (DesireHelper::getExpandDesire() >= 1 && !expanding)
 			expand();
+	}
+
+	ResourceDepot* getLeastSaturatedBase()
+	{
+		
+		auto bases = AgentHelper::getResourceDepots();
+
+		ResourceDepot* b = *bases.begin();
+		for (auto &base : bases)
+		{
+			if (b->getGasSaturation() > base->getGasSaturation())
+				b = base;
+		}
+
+		if (b->getGasSaturation() < 1)
+			return b;
+
+		b = *bases.begin();
+		for (auto &base : bases)
+		{
+			if (b->getMineralSaturation() > base->getMineralSaturation())
+				b = base;
+		}
+
+		return b;
 	}
 
 	void expand()

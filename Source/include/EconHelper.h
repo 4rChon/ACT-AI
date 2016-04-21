@@ -2,6 +2,7 @@
 #include "BWAPI.h"
 #include "UtilHelper.h"
 #include "Composition.h"
+#include "ResourceDepot.h"
 
 namespace EconHelper
 {
@@ -20,5 +21,6 @@ namespace EconHelper
 	double getUnitMultiplier(Composition composition);
 	void doneExpanding();
 	void updateEconomy();
+	ResourceDepot* getLeastSaturatedBase();
 	void expand();
 }

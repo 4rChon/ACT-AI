@@ -13,6 +13,7 @@ namespace MapHelper
 		int enemyScore;
 		int friendScore;
 		int resourceScore;
+		int timesDefended;
 		bool defending;
 
 	public:
@@ -26,6 +27,7 @@ namespace MapHelper
 		int getEnemyScore() const;
 		int getFriendScore() const;
 		int getResourceScore() const;
+		int getTimesDefended() const;
 		bool isDefending() const;
 
 		///setters

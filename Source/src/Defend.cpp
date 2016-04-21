@@ -8,25 +8,21 @@ Defend::Defend(BWAPI::Unit unit)
 {
 	taskName = "Defend(" + unit->getType().getName() + ", " + std::to_string(unit->getRegion()->getID()) + ")";
 	this->unit = unit;
-	this->target = MapHelper::getZone(unit->getRegion());	
+	target = MapHelper::getZone(unit->getRegion());	
 	taskType = DEF;
+	target->setDefending(true);
 }
 
 void Defend::assign()
 {
-	//ArmyHelper::addDefendZone(target);
-	createCoalition();
+	//createCoalition();
 	assigned = true;
 }
 
 void Defend::act()
 {
 	printDebugInfo("Acting");
-	if (coalition->isActive() || util::getSelf()->supplyUsed() >= 400)
-	{
-		coalition->getUnitSet().attack(target->getRegion()->getCenter());
-		acting = true;		
-	}
+	acting = true;		
 	printDebugInfo("Acting End");
 }
 
@@ -37,15 +33,14 @@ void Defend::update()
 	if (complete)
 		return;
 
-	if (BWAPI::Broodwar->getFrameCount() - target->getLastVisited() < 5 && target->getEnemyScore() == 0)
+	if (BWAPI::Broodwar->getFrameCount() - target->getLastVisited() < 5 && target->getEnemyScore() <= 0)
 	{		
 		succeed();
 		return;
 	}
 
-	if (unit->getHitPoints() == 0)
+	if (target->getFriendScore() == 0)
 	{
-		
 		fail();
 		return;
 	}
@@ -66,8 +61,18 @@ void Defend::succeed()
 {
 	target->setDefending(false);
 	complete = true;
-	profit = coalition->getProfit();
+	profit = 1.0;// coalition->getProfit();
 	printDebugInfo("Success!", true);
+
+	cleanSubTasks();
+}
+
+void Defend::fail()
+{
+	target->setDefending(false);
+	complete = true;
+	profit = 0.0;// coalition->getProfit();
+	printDebugInfo("Failure!", true);
 
 	cleanSubTasks();
 }

@@ -4,6 +4,7 @@
 #include "TaskHelper.h"
 #include "MapHelper.h"
 #include "EconHelper.h"
+#include "CoalitionHelper.h"
 #include "Scout.h"
 #include <BWAPI.h>
 #include <BWTA.h>
@@ -42,11 +43,11 @@ namespace ArmyHelper
 		scouting = false;
 		defending = true;		
 		attackTarget = nullptr;
-		defendTarget = MapHelper::getZone(BWAPI::Broodwar->getRegionAt(BWTA::getNearestChokepoint(BWTA::getStartLocation(util::getSelf())->getPosition())->getCenter()));
+		defendTarget = MapHelper::getZone(BWAPI::Broodwar->getRegionAt(BWTA::getNearestChokepoint(BWTA::getStartLocation(util::game::getSelf())->getPosition())->getCenter()));
 		scoutTarget = nullptr;
 		if (BWTA::getStartLocations().size() == 2)
 		{
-			if ((*BWTA::getStartLocations().begin()) == BWTA::getStartLocation(util::getSelf()))
+			if ((*BWTA::getStartLocations().begin()) == BWTA::getStartLocation(util::game::getSelf()))
 				enemyStart = MapHelper::getZone(BWAPI::Broodwar->getRegionAt((*(BWTA::getStartLocations().begin()++))->getPosition()));
 			else
 				enemyStart = MapHelper::getZone(BWAPI::Broodwar->getRegionAt((*BWTA::getStartLocations().begin())->getPosition()));
@@ -57,8 +58,10 @@ namespace ArmyHelper
 
 	void updateArmyMovement()
 	{
-		scout();
-		attack();		
+		if(!scouting)
+			scout();
+		if(!attacking)
+			attack();		
 	}
 
 	void scout()
@@ -94,12 +97,23 @@ namespace ArmyHelper
 
 	void attack()
 	{
-		if (targetPriorityList.size() > 0 && !attacking)
+		if (targetPriorityList.size() > 0)
 		{
 			attacking = true;
-			defending = false;
+			/*int i = 0;
+			for (auto &target = targetPriorityList.begin(); target != targetPriorityList.end(); target++)
+			{					
+				Attack* attack = new Attack((*target).second);
+				TaskHelper::addTask(attack, true);					
+
+				if (i++ == 3 || i == targetPriorityList.size())
+					break;
+			}*/
 			Attack* attack = new Attack(attackTarget);
 			TaskHelper::addTask(attack, true);
+			defending = false;
+			
+			
 		}
 	}
 
@@ -163,27 +177,20 @@ namespace ArmyHelper
 
 	bool scan(BWAPI::Position target)
 	{		
-		std::cout << "---- Scanning ----\n";
-		auto targetUnitSet = BWAPI::Broodwar->getUnitsInRadius(target, BWAPI::UnitTypes::Spell_Scanner_Sweep.sightRange());
-		for (auto& unit : targetUnitSet)
+		static int lastScanFrame = 0;
+
+		if (BWAPI::Broodwar->getFrameCount() - lastScanFrame > 10 * 24)
 		{
-			if (unit->getType() == BWAPI::UnitTypes::Spell_Scanner_Sweep && unit->getPlayer() == util::getSelf())
+			for (auto &comsatStation : AgentHelper::getComsatStations())
 			{
-				std::cout << " --- Found a Previous Scan ---\n";
-				return false;
+				if (comsatStation->useAbility(BWAPI::TechTypes::Scanner_Sweep, target))
+				{
+					lastScanFrame = BWAPI::Broodwar->getFrameCount();
+					return true;
+				}
 			}
 		}
 
-		for (auto &comsatStation : AgentHelper::getComsatStations())
-		{
-			if (comsatStation->useAbility(BWAPI::TechTypes::Scanner_Sweep, target))
-			{
-				std::cout << " --- Scan Successful ---\n";
-				return true;
-			}
-		}
-
-		std::cout << " --- Scan Failed ---\n";
 		return false;
 	}
 

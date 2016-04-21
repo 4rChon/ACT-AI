@@ -20,15 +20,15 @@ namespace DesireHelper
 	void initialiseHelper()
 	{
 		for (auto &unitType : BWAPI::UnitTypes::allUnitTypes())
-			if(unitType.getRace() == util::getSelf()->getRace())
+			if(unitType.getRace() == util::game::getSelf()->getRace())
 				unitDesireMap.insert(std::pair<BWAPI::UnitType, double>(unitType, 0.0));
 
 		for (auto &upgradeType : BWAPI::UpgradeTypes::allUpgradeTypes())
-			if(upgradeType.getRace() == util::getSelf()->getRace())
+			if(upgradeType.getRace() == util::game::getSelf()->getRace())
 				upgradeDesireMap.insert(std::pair<BWAPI::UpgradeType, double>(upgradeType, 0.0));
 
 		for (auto &techType : BWAPI::TechTypes::allTechTypes())
-			if (techType.getRace() == util::getSelf()->getRace())
+			if (techType.getRace() == util::game::getSelf()->getRace())
 				techDesireMap.insert(std::pair<BWAPI::TechType, double>(techType, 0.0));
 
 		for (auto &expansion : BWTA::getBaseLocations())
@@ -38,7 +38,7 @@ namespace DesireHelper
 			{
 				std::vector<double> valueArr;
 				std::vector<double> coeffArr;
-				valueArr.push_back(1/expansion->getGroundDistance(BWTA::getStartLocation(util::getSelf())));
+				valueArr.push_back(1/expansion->getGroundDistance(BWTA::getStartLocation(util::game::getSelf())));
 				coeffArr.push_back(1);
 				desire = util::normaliseValues(valueArr, coeffArr);
 			}
@@ -55,37 +55,107 @@ namespace DesireHelper
 		expandDesire = 0.0;
 	}
 
-	void updateUnitDesireMap()
+	MapHelper::Zone* getMostDesirableAttackZone()
 	{
-		Composition comp = Composition();
-		for (auto& coalition : CoalitionHelper::getCoalitionset())
+		std::pair<MapHelper::Zone*, double> bestZone = std::pair<MapHelper::Zone*, double>(nullptr, 0.0);
+		for (auto& zone : attackDesireMap)
 		{
-			Composition differenceComposition = coalition->getTargetComp() - coalition->getCurrentComp();
-			for (auto& unit : differenceComposition.getUnitMap())
-				comp.addType(unit.first, unit.second);
+			if (zone.second > bestZone.second)
+				bestZone = zone;
 		}
 
+		return bestZone.first;
+	}
+
+	MapHelper::Zone* getMostDesirableDefenseZone()
+	{
+		std::pair<MapHelper::Zone*, double> bestZone = std::pair<MapHelper::Zone*, double>(nullptr, 0.0);
+		for (auto& zone : defendDesireMap)
+		{
+			if (zone.second > bestZone.second)
+				bestZone = zone;
+		}
+
+		return bestZone.first;
+	}
+
+	void updateDefendDesire(MapHelper::Zone* target, double desireMod)
+	{
+		defendDesireMap[target] = desireMod;
+	}
+
+	void updateAttackDesire(MapHelper::Zone* target, double desireMod)
+	{
+		attackDesireMap[target] = desireMod;
+	}
+
+	void updateUnitDesireMap()
+	{
 		for (auto& unit : unitDesireMap)
-			unitDesireMap[unit.first] = comp[unit.first];
+			unitDesireMap[unit.first] = 0.0;
+
+		for (auto& coalition : CoalitionHelper::getCoalitionset())
+		{
+			auto targetUnitMap = coalition->getTargetComp().getUnitMap();
+			auto currentUnitMap = coalition->getCurrentComp().getUnitMap();
+		
+			for (auto& unit : targetUnitMap)
+				unitDesireMap[unit.first] += (double)(unit.second - currentUnitMap[unit.first]) / (double)unit.second;
+		}
+
+		if (util::game::getSelf()->allUnitCount(util::game::getSelf()->getRace().getWorker()) >= 70)
+			unitDesireMap[util::game::getSelf()->getRace().getWorker()] = 0.0;
+		else
+			unitDesireMap[util::game::getSelf()->getRace().getWorker()] = 1.0;
 	}	
 
 	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType producer)
-	{		
-		if (util::getSelf()->allUnitCount(util::getSelf()->getRace().getWorker()) >= 70)
-			unitDesireMap[util::getSelf()->getRace().getWorker()] = 0.0;
-		else
-			unitDesireMap[util::getSelf()->getRace().getWorker()] = 1.0;
+	{				
+		updateUnitDesireMap();
+
+		if (producer == BWAPI::UnitTypes::None)
+			return BWAPI::UnitTypes::None;
+
+		auto bestUnit = std::pair<BWAPI::UnitType, double>(BWAPI::UnitTypes::None, 0.0);		
+
+		for each(auto &unit in producer.buildsWhat())
+		{
+			if (util::game::canMakeUnit(unit) && (unitDesireMap[unit] > bestUnit.second || (unitDesireMap[unit] == bestUnit.second && unit.buildScore() > bestUnit.first.buildScore())))
+				bestUnit = std::pair<BWAPI::UnitType, double>(unit, unitDesireMap[unit]);
+		}
+
+		return bestUnit.first;
+	}
+
+	BWAPI::UnitType getMostDesirableUnit()
+	{
 
 		auto bestUnit = std::pair<BWAPI::UnitType, double>(BWAPI::UnitTypes::None, 0.0);
 		for each(auto &unit in unitDesireMap)
 		{
-			if (producer != BWAPI::UnitTypes::None)
-				if (unit.first.whatBuilds().first != producer || !util::canMakeUnit(unit.first))
-					continue;
-			if (unit.second > bestUnit.second)
+			if (util::game::canMakeUnit(unit.first) && unit.second > bestUnit.second)
 				bestUnit = unit;
 		}
+
 		return bestUnit.first;
+	}
+
+	BWAPI::UnitType getMostDesirableAddon(BWAPI::UnitType building)
+	{
+		if (!building.canBuildAddon() || building == BWAPI::UnitTypes::None)
+			return BWAPI::UnitTypes::None;
+
+		auto bestAddon = std::pair<BWAPI::UnitType, double>(BWAPI::UnitTypes::None, 0.0);
+		for each(auto &unit in building.buildsWhat())
+		{	
+			if (!unit.isAddon())
+				continue;
+
+			if (util::game::canMakeUnit(unit) && (unitDesireMap[unit] > bestAddon.second || (unitDesireMap[unit] == bestAddon.second && unit.buildScore() > bestAddon.first.buildScore())))
+				bestAddon = std::pair<BWAPI::UnitType, double>(unit, unitDesireMap[unit]);
+		}
+			
+		return bestAddon.first;
 	}
 
 	void updateUpgradeDesireMap()
@@ -106,7 +176,7 @@ namespace DesireHelper
 			{
 				std::vector<double> valueArr;
 				std::vector<double> coeffArr;
-				valueArr.push_back(1/expansion->getGroundDistance(BWTA::getStartLocation(util::getSelf())));
+				valueArr.push_back(1/expansion->getGroundDistance(BWTA::getStartLocation(util::game::getSelf())));
 				coeffArr.push_back(1.0);
 				expansionDesireMap[expansion] = util::normaliseValues(valueArr, coeffArr);
 			}
@@ -142,18 +212,18 @@ namespace DesireHelper
 		int unitSupply = unitType.supplyProvided() - unitType.supplyRequired();
 		if (justDied)
 			unitSupply *= -1;
-		supplyDesire -= (double)unitSupply / util::getSelf()->getRace().getCenter().supplyProvided();
+		supplyDesire -= (double)unitSupply / util::game::getSelf()->getRace().getCenter().supplyProvided();
 	}
 
 	void updateSupplyDesire()
 	{
-		if (util::getSelf()->supplyTotal() >= 400)
+		if (util::game::getSelf()->supplyTotal() >= 400)
 		{
 			supplyDesire = 0.0;
 			return;
 		}
 
-		supplyDesire = 1 - ((double)(util::getSelf()->supplyTotal() - util::getSelf()->supplyUsed())/ util::getSelf()->getRace().getCenter().supplyProvided());
+		supplyDesire = 1 - ((double)(util::game::getSelf()->supplyTotal() - util::game::getSelf()->supplyUsed())/ util::game::getSelf()->getRace().getCenter().supplyProvided());
 	}
 
 	void updateExpandDesire()
@@ -171,7 +241,7 @@ namespace DesireHelper
 		auto resourceDepots = AgentHelper::getResourceDepots();
 		for each(auto &resourceDepot in resourceDepots)
 			expandDesire += resourceDepot->getMineralSaturation();
-		expandDesire /= util::getSelf()->allUnitCount(util::getSelf()->getRace().getCenter());
+		expandDesire /= util::game::getSelf()->allUnitCount(util::game::getSelf()->getRace().getCenter());
 	}
 
 	const std::unordered_map<BWAPI::UnitType, double>& getUnitDesireMap()

@@ -79,46 +79,25 @@ namespace AgentHelper
 		if (unit->getType().isResourceDepot())
 		{
 			agent = new ResourceDepot(unit);
-			//std::cout << "Added new Resource Depot : " << unit->getID() << "\n";
 			resourceDepots.insert((ResourceDepot*)agent);
 		}
 		else if (unit->getType().isWorker())
 		{
 			if (unit->getType() == BWAPI::UnitTypes::Terran_SCV)
-			{
 				agent = new SCV(unit);
-				//std::cout << "Added new SCV : " << unit->getType() << " : " << unit->getID() << "\n";
-			}
 			else
-			{
 				agent = new Worker(unit);
-				//std::cout << "Added new Worker : " << unit->getType() << " : " << unit->getID() << "\n";
-			}
 		}
 		else
-		{
 			agent = new Agent(unit);
-			/*std::cout << "Added new Unit : " << unit->getType() << " : " << unit->getID() << "\n";*/
-		}
 
 		agentSet.insert(agent);
 		if (unit->getType() == BWAPI::UnitTypes::Terran_Comsat_Station)
 			comsatStations.insert(agent);
 	}
 
-	void removeAgent(Agent* agent)
-	{
-		agent->unbind();
-		agentSet.erase(agent);
-		if (resourceDepots.count((ResourceDepot*)agent))
-			resourceDepots.erase((ResourceDepot*)agent);
-		if (comsatStations.count(agent))
-			comsatStations.erase(agent);
-	}
-
 	void removeAgent(int id)
 	{
-		//std::cout << "Removing Agent : " << id << "\n";
 		Agent* agent = getAgent(id);
 		if (!agent)
 			std::cout << "\tAgent not found\n";
@@ -127,15 +106,16 @@ namespace AgentHelper
 			if (agent->getCoalitionID() != -1)
 				agent->getCoalition()->removeAgent(agent);
 
-			removeAgent(agent);
+			agent->unbind();
+			agentSet.erase(agent);
+			if (resourceDepots.count((ResourceDepot*)agent))
+				resourceDepots.erase((ResourceDepot*)agent);
+			if (comsatStations.count(agent))
+				comsatStations.erase(agent);
+
 			delete agent;
 		}
-		resetLastServiced();
-	}
 
-	Agentset::iterator removeAgent(Agentset::iterator agent)
-	{
-		(*agent)->unbind();
-		return agentSet.erase(agent);
+		resetLastServiced();
 	}
 }

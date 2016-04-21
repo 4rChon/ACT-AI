@@ -67,41 +67,42 @@ ResourceDepot* Worker::getMiningBase() const
 void Worker::updateFreeActions()
 {
 	pollCoalitions();
-	if (util::getSelf()->getRace() != BWAPI::Races::Zerg
+	if (util::game::getSelf()->getRace() != BWAPI::Races::Zerg
 		&& DesireHelper::getSupplyDesire() >= 0.6
-		&& EconHelper::haveMoney(util::getSelf()->getRace().getSupplyProvider()))
+		&& EconHelper::haveMoney(util::game::getSelf()->getRace().getSupplyProvider()))
 	{
-		//int amount = DesireHelper::getSupplyDesire() / 0.6;
-		if (build(util::getSelf()->getRace().getSupplyProvider()))
-			//for (int i = 0; i < amount; i++)
-			DesireHelper::updateSupplyDesire(util::getSelf()->getRace().getSupplyProvider());
+		if (build(util::game::getSelf()->getRace().getSupplyProvider()))
+			DesireHelper::updateSupplyDesire(util::game::getSelf()->getRace().getSupplyProvider());
 	}
-	//temp contents
+
 	if (unit->isIdle())
 	{
 		bool mining = false;
 		auto resourceDepots = AgentHelper::getResourceDepots();
-		for (auto &base : resourceDepots)
-		{
-			if (!base->isGasSaturated())
-			{
-				setMiningBase(base, true);
-				mining = true;
-				return;
-			}
+		auto base = EconHelper::getLeastSaturatedBase();
 
-			if (!base->isMineralSaturated())
-			{
-				setMiningBase(base, false);
-				mining = true;
-				return;
-			}
+		if (!base->isGasSaturated())
+		{
+			setMiningBase(base, true);
+			mining = true;
+			return;
+		}
+		else
+		{
+			setMiningBase(base, false);
+			mining = true;
+			return;
 		}
 	}
 }
 
 void Worker::act()
 {
+	if (!exists())
+		return;
+
+	updateActions();
+
 	if (free)
 		updateFreeActions();
 	else
@@ -141,7 +142,7 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 
 		if (unit->build(building, buildLocation))
 		{		
-			if (building == util::getSelf()->getRace().getSupplyProvider())
+			if (building == util::game::getSelf()->getRace().getSupplyProvider())
 				DesireHelper::updateSupplyDesire(building);
 			unsetMiningBase();
 			BWAPI::Broodwar->registerEvent([this, building](BWAPI::Game*)
@@ -150,7 +151,7 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 				if (this->getUnit()->getOrder() != BWAPI::Orders::ConstructingBuilding
 					|| !this->getUnit()->exists())
 				{
-					if (building == util::getSelf()->getRace().getSupplyProvider())
+					if (building == util::game::getSelf()->getRace().getSupplyProvider())
 						DesireHelper::updateSupplyDesire(building, true);
 					if (task)
 					{
@@ -182,7 +183,7 @@ bool Worker::expand()
 		task->fail();
 		return false;
 	}
-	return build(util::getSelf()->getRace().getCenter(), &bestLocation->getTilePosition());
+	return build(util::game::getSelf()->getRace().getCenter(), &bestLocation->getTilePosition());
 }
 
 void Worker::reserveResources(int minerals, int gas)

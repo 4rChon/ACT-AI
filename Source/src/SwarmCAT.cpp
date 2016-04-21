@@ -63,7 +63,7 @@ void SwarmCAT::onStart()
 	else
 	{
 		if (Broodwar->enemy())
-			Broodwar << "The matchup is " << util::getSelf()->getRace() << " vs " << util::getEnemy()->getRace() << std::endl;
+			Broodwar << "The matchup is " << util::game::getSelf()->getRace() << " vs " << util::game::getEnemy()->getRace() << std::endl;
 
 		BWTA::readMap();
 		AnalyzeThread();
@@ -84,8 +84,6 @@ void SwarmCAT::onStart()
 		//CompositionHelper::getCounters(BWAPI::UnitTypes::Protoss_Carrier);
 
 		/* just for testing */
-
-
 	}
 }
 
@@ -102,7 +100,7 @@ void SwarmCAT::onFrame()
 		//std::cout << "---FrameStart---\n";	
 		drawDebugText();
 		//Cancel unfinished structures if not being constructed by an scv.
-		if (util::getSelf()->incompleteUnitCount(BWAPI::UnitTypes::Buildings))
+		if (util::game::getSelf()->incompleteUnitCount(BWAPI::UnitTypes::Buildings))
 		{			
 			auto unfinishedUnits = BWAPI::Broodwar->getUnitsInRectangle(Position(0, 0), Position(BWAPI::Broodwar->mapWidth() * TILE_SIZE, BWAPI::Broodwar->mapHeight() * TILE_SIZE), BWAPI::Filter::IsBuilding && !BWAPI::Filter::IsBeingConstructed && !BWAPI::Filter::IsCompleted);
 			unfinishedUnits.cancelConstruction();
@@ -160,10 +158,10 @@ void SwarmCAT::onFrame()
 			//	return;
 		}
 
+		DesireHelper::updateDesireMaps();
 		TaskHelper::updateRootTasks();
 		EconHelper::updateEconomy();
-		ArmyHelper::updateArmyMovement();
-		DesireHelper::updateDesireMaps();
+		ArmyHelper::updateArmyMovement();		
 
 		if (Broodwar->getFrameCount() % (24 * 120) == 0)
 			DesireHelper::updateSupplyDesire();
@@ -218,7 +216,7 @@ void SwarmCAT::onUnitDiscover(BWAPI::Unit unit)
 	if (!Broodwar->isReplay())
 	{
 		//std::cout << "UnitDiscover\n";
-		if (unit->getType().isBuilding() && unit->getPlayer() == util::getEnemy())
+		if (unit->getType().isBuilding() && unit->getPlayer() == util::game::getEnemy())
 			ArmyHelper::addTargetPriority(unit);
 	}
 }
@@ -233,7 +231,7 @@ void SwarmCAT::onUnitShow(BWAPI::Unit unit)
 	////std::cout << "UnitShow\n";
 	if (!Broodwar->isReplay())
 	{
-		if (unit->getPlayer() == util::getEnemy())
+		if (unit->getPlayer() == util::game::getEnemy())
 		{
 			ArmyHelper::addScoutedUnit(unit->getID(), unit->getType());
 			if (unit->isCloaked())
@@ -255,7 +253,7 @@ void SwarmCAT::onUnitCreate(BWAPI::Unit unit)
 	if (!Broodwar->isReplay())
 	{
 		//std::cout << unit->getID() << " : " << unit->getType().c_str() << " : Unit created!\n";
-		if (unit->getPlayer() == util::getSelf() && !(unit->getType().supplyProvided() == 16 || unit->getType().isBuilding()))
+		if (unit->getPlayer() == util::game::getSelf() && !(unit->getType().supplyProvided() == 16 || unit->getType().isBuilding()))
 			DesireHelper::updateSupplyDesire(unit->getType());
 
 		if (Broodwar->isReplay())
@@ -277,13 +275,13 @@ void SwarmCAT::onUnitDestroy(BWAPI::Unit unit)
 	if (!Broodwar->isReplay())
 	{
 		//std::cout << unit->getID() << " : " << unit->getType().c_str() << " : Unit destroyed!\n";
-		if (unit->getPlayer() == util::getSelf() && !unit->isBeingConstructed())
+		if (unit->getPlayer() == util::game::getSelf() && !unit->isBeingConstructed())
 		{
 			AgentHelper::removeAgent(unit->getID());
 			DesireHelper::updateSupplyDesire(unit->getType(), true);
 		}
 
-		if (unit->getPlayer() == util::getEnemy())
+		if (unit->getPlayer() == util::game::getEnemy())
 		{
 			if (unit->getType().isBuilding())
 				ArmyHelper::removeTargetPriority(unit);
@@ -327,7 +325,7 @@ void SwarmCAT::onUnitComplete(BWAPI::Unit unit)
 	if (!Broodwar->isReplay())
 	{
 		//std::cout << unit->getID() << " : Unit complete!\n";
-		if (unit->getPlayer() == util::getSelf())
+		if (unit->getPlayer() == util::game::getSelf())
 		{
 			if (unit->getType().isResourceDepot())
 				DesireHelper::updateSupplyDesire(unit->getType());
@@ -340,8 +338,8 @@ void SwarmCAT::drawDebugText()
 {
 	Broodwar->drawTextScreen(445, 20, "+ %.0f", EconHelper::getMineralIncome());
 	Broodwar->drawTextScreen(510, 20, "+ %.0f", EconHelper::getGasIncome());
-	Broodwar->drawTextScreen(445, 30, "%d", util::getSelf()->minerals() - EconHelper::getMinerals());
-	Broodwar->drawTextScreen(510, 30, "%d", util::getSelf()->gas() - EconHelper::getGas());
+	Broodwar->drawTextScreen(445, 30, "%d", util::game::getSelf()->minerals() - EconHelper::getMinerals());
+	Broodwar->drawTextScreen(510, 30, "%d", util::game::getSelf()->gas() - EconHelper::getGas());
 	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
 	Broodwar->drawTextScreen(200, 10, "Average FPS: %f", Broodwar->getAverageFPS());
 	//Broodwar->drawTextScreen(200, 30, "Candidate Base Count: %d", AgentHelper::getCandidateBases().size());
@@ -359,7 +357,7 @@ void SwarmCAT::drawDebugText()
 	i = 1;
 	for (auto &coalition : CoalitionHelper::getCoalitionset())
 	{
-		Broodwar->drawTextScreen(5, 100 + (10 * i++), "%d : %.2f | %.2f", coalition->getID(), coalition->getCost(), coalition->getProfit());
+		Broodwar->drawTextScreen(5, 100 + (10 * i++), "%d : %.2f | %.2f - %s", coalition->getID(), coalition->getCost(), coalition->getProfit(), coalition->getTask()->getName().c_str());
 		for (auto &unitType : coalition->getTargetComp().getUnitMap())
 			Broodwar->drawTextScreen(10, 100 + (10 * i++), "%s : %d/%d", unitType.first.c_str(), coalition->getCurrentComp().getUnitMap()[unitType.first], unitType.second);
 		if(coalition->isActive() && coalition->getTask()->getType() == ATT)
@@ -370,16 +368,6 @@ void SwarmCAT::drawDebugText()
 	i = 1;
 	for (auto type : scoutedUnits.getTypes())
 		Broodwar->drawTextScreen(400, 250 + (10 * i++), "%s : %d", type.c_str(), scoutedUnits[type]);	
-
-	/*auto bestUnit = DesireHelper::getMostDesirableUnit();
-	auto bestRaxUnit = DesireHelper::getMostDesirableUnit(BWAPI::UnitTypes::Terran_Barracks);
-	auto bestFactoryUnit = DesireHelper::getMostDesirableUnit(BWAPI::UnitTypes::Terran_Factory);
-	auto bestStarportUnit = DesireHelper::getMostDesirableUnit(BWAPI::UnitTypes::Terran_Starport);
-	auto unitDesireMap = DesireHelper::getUnitDesireMap();*/
-	/*Broodwar->drawTextScreen(325, 250, "Most Desirable Unit: %s - %.2f", bestUnit.c_str(), unitDesireMap[bestUnit]);
-	Broodwar->drawTextScreen(325, 260, "Most Desirable Unit (Barracks): %s - %.2f", bestRaxUnit.c_str(), unitDesireMap[bestRaxUnit]);
-	Broodwar->drawTextScreen(325, 270, "Most Desirable Unit (Factory): %s - %.2f", bestFactoryUnit.c_str(), unitDesireMap[bestFactoryUnit]);
-	Broodwar->drawTextScreen(325, 280, "Most Desirable Unit (Starport): %s - %.2f", bestStarportUnit.c_str(), unitDesireMap[bestStarportUnit]);*/
 
 	for (auto &a : AgentHelper::getAgentset())
 	{
@@ -430,7 +418,7 @@ void SwarmCAT::drawDebugText()
 	for (auto &expansion : DesireHelper::getExpansionDesireMap())
 		Broodwar->drawTextMap(expansion.first->getPosition(), "Expansion Desire: %f", expansion.second);
 	
-	Broodwar->drawTextScreen(10, 10, "Worker Count: %d", util::getSelf()->allUnitCount(util::getSelf()->getRace().getWorker()));
+	Broodwar->drawTextScreen(10, 10, "Worker Count: %d", util::game::getSelf()->allUnitCount(util::game::getSelf()->getRace().getWorker()));
 	Broodwar->drawTextScreen(10, 20, "Expand Desire: %.2f", DesireHelper::getExpandDesire());
 	Broodwar->drawTextScreen(10, 30, "Supply Desire: %.2f", DesireHelper::getSupplyDesire());
 

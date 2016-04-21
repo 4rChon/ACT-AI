@@ -20,9 +20,9 @@ void SCV::updateFreeActions()
 		&& EconHelper::haveMoney(BWAPI::UnitTypes::Terran_Supply_Depot))
 	{
 		if (miningBase)
-			build(util::getSelf()->getRace().getSupplyProvider(), &miningBase->getBaseLocation()->getTilePosition());
+			build(util::game::getSelf()->getRace().getSupplyProvider(), &miningBase->getBaseLocation()->getTilePosition());
 		else
-			build(util::getSelf()->getRace().getSupplyProvider());
+			build(util::game::getSelf()->getRace().getSupplyProvider());
 	}
 
 	if (unit->isIdle())
@@ -50,12 +50,17 @@ void SCV::updateFreeActions()
 		}
 	}
 
-	if (defend(BWAPI::Position(util::getSelf()->getStartLocation())))
+	if (defend(BWAPI::Position(util::game::getSelf()->getStartLocation())))
 		return;
 }
 
 void SCV::act()
 {	
+	if (!exists())
+		return;
+
+	updateActions();
+
 	if (free)
 		updateFreeActions();		
 	else

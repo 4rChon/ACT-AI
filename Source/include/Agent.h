@@ -63,6 +63,10 @@ protected:
 	//Update Actions when not bound to a coalition
 	virtual void updateFreeActions();
 
+	bool exists();
+
+	void updateActions();
+
 	//Update Coalition relevant information and micro if available
 	void updateBoundActions();
 
@@ -120,10 +124,10 @@ public:
 	virtual bool move(BWAPI::Position target);
 
 	//Generic move or attack move command to target. Returns false if API fails to pass command.
-	virtual bool attack(BWAPI::PositionOrUnit target);
+	virtual bool attack(BWAPI::PositionOrUnit target);	
 
-	//Generic attack-move to target. Returns false if API fails to pass command.
-	virtual bool defend(BWAPI::Position target);
+	//Generic attack-move to target. Returns false if API fails to pass command. ----Changed Functionality
+	virtual bool defend();
 
 	//Expand - Returns false if not a worker.
 	virtual bool expand();

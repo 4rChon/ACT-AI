@@ -175,20 +175,11 @@ void Task::fail()
 		ArmyHelper::defend();
 	}
 
-	if (taskType == DEF)
-	{
-		target->setDefending(false);
-	}
-
 	if (taskType == SCO)
 	{
 		ArmyHelper::stopScouting();
-	}
-
-	if (taskType == EXP)
-	{
-		EconHelper::doneExpanding();
-	}
+	}	
+		
 	cleanSubTasks();
 }
 

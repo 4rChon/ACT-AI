@@ -107,36 +107,40 @@ namespace util
 
 	//Normalises an array of values after weighing them with coefficients
 	double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr);
-	
-	void setSelf();
-
-	void setEnemy();
-
-	//Returns all enemies
-	BWAPI::Playerset &getEnemies();
-
-	//Returns first enemy
-	BWAPI::Player getEnemy();
-
-	//Returns player
-	BWAPI::Player getSelf();
-
-	//Returns player name
-	std::string getSelfName();
-	bool canMakeUnit(BWAPI::UnitType unitType);
-	bool canResearch(BWAPI::TechType techType);
-
-	int getFrameBracket(int frame, int bracket);
 
 	BWAPI::UnitType getRandomType(Composition composition);
 	BWAPI::UnitType getRandomType(BWAPI::UnitType macroType);
+
+	namespace game
+	{
+		void setSelf();
+
+		void setEnemy();
+
+		//Returns all enemies
+		BWAPI::Playerset &getEnemies();
+
+		//Returns first enemy
+		BWAPI::Player getEnemy();
+
+		//Returns player
+		BWAPI::Player getSelf();
+
+		//Returns player name
+		std::string getSelfName();
+		bool canMakeUnit(BWAPI::UnitType unitType);
+		bool canResearch(BWAPI::TechType techType);
+
+		int getFrameBracket(int frame, int bracket);
+	}	
 
 	//Get all files in root path with ext extension and places them in ret
 	namespace data
 	{
 		namespace fs = ::boost::filesystem;
 		void getFiles(const fs::path& root, const std::string& ext, std::vector<fs::path>& ret);
-		void serialize(CompositionHelper::UsedComposition usedComposition);
-		CompositionHelper::UsedComposition deserialize(std::string target);
+		void serializeComposition(CompositionHelper::UsedComposition usedComposition);
+		CompositionHelper::UsedComposition deserializeComposition(std::string target);
+		void loadMapData();
 	}
 }

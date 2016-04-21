@@ -72,17 +72,22 @@ void ResourceDepot::updateFreeActions()
 	pollCoalitions();
 	if (unit->isIdle())
 	{
-		//TO DO: DesireHelper::getMostDesirableAddon(unit->getType())
-		if (unit->canBuildAddon())
-			unit->buildAddon(BWAPI::UnitTypes::Terran_Comsat_Station);
+		if (buildAddon(DesireHelper::getMostDesirableAddon(unit->getType())))
+			return;
+		
 		train(DesireHelper::getMostDesirableUnit(unit->getType()));
 	}
 }
 
 void ResourceDepot::act()
-{		
+{	
+	if (!exists())
+		return;
+
+	updateActions();
 	updateSaturation();
 	updateRefineryCount();
+	
 	
 	if (free)
 		updateFreeActions();
@@ -107,6 +112,7 @@ void ResourceDepot::updateSaturation()
 	else
 		mineralSaturation = 1;
 
+	updateRefineryCount();
 	if (refineryCount > 0)
 		gasSaturation = (double)gasMiners / (3.0 * refineryCount);
 	else
@@ -168,7 +174,7 @@ bool ResourceDepot::addGeyser(Worker* worker)
 	for each (auto &geyser in baseLocation->getGeysers())
 	{
 		if (!geyser->getType().isRefinery())
-			return worker->build(util::getSelf()->getRace().getRefinery(), &geyser->getTilePosition());
+			return worker->build(util::game::getSelf()->getRace().getRefinery(), &geyser->getTilePosition());
 	}
 	return false;
 }

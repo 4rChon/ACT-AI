@@ -47,11 +47,14 @@ void Expand::update()
 		return;
 	}
 
-	if (coalition->isActive() && !builder)
-		builder = (*coalition->getAgentSet().begin());
+	if (coalition->isActive())
+	{
+		if(!builder)
+			builder = (*coalition->getAgentSet().begin());
 
-	if (builder && !complete)
-		act();
+		if ((*coalition->getUnitSet().begin())->exists() && !complete)
+			act();
+	}
 
 	printDebugInfo("Update End");
 }
@@ -61,6 +64,17 @@ void Expand::succeed()
 	complete = true;
 	profit = 1.0;
 	printDebugInfo("Success!", true);
+
+	EconHelper::doneExpanding();
+
+	cleanSubTasks();
+}
+
+void Expand::fail()
+{
+	complete = true;
+	profit = 0.0;
+	printDebugInfo("Failure!", true);
 
 	EconHelper::doneExpanding();
 

@@ -32,6 +32,8 @@ private:
 	//True if currentComp >= targetComp
 	bool active;
 
+	bool focusFire;
+
 	//Set to first frame of coalition's existence
 	int creationFrame;
 
@@ -89,6 +91,8 @@ public:
 
 	//Returns true if coalition is active.
 	bool isActive() const;
+
+	void activate();
 
 	//Get current assigned task.
 	Task * getTask() const;
