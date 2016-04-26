@@ -45,6 +45,12 @@ void Worker::setMiningBase(ResourceDepot* miningBase, bool gasMiner)
 {
 	unsetMiningBase();
 
+	if (!miningBase)
+		return;
+
+	if (!miningBase->getUnit()->exists())
+		return;
+
 	if (gasMiner)
 		miningBase->addGasWorker(this);		
 	else
@@ -67,11 +73,20 @@ ResourceDepot* Worker::getMiningBase() const
 void Worker::updateFreeActions()
 {
 	pollCoalitions();
+
+	if (repair())
+		return;
+
 	if (util::game::getSelf()->getRace() != BWAPI::Races::Zerg
 		&& DesireHelper::getSupplyDesire() >= 0.6
 		&& EconHelper::haveMoney(util::game::getSelf()->getRace().getSupplyProvider()))
 	{
-		if (build(util::game::getSelf()->getRace().getSupplyProvider()))
+		BWAPI::TilePosition* baseLocation = nullptr;
+
+		if (miningBase)
+			baseLocation = &miningBase->getBaseLocation()->getTilePosition();
+
+		if (build(util::game::getSelf()->getRace().getSupplyProvider(), baseLocation))
 			DesireHelper::updateSupplyDesire(util::game::getSelf()->getRace().getSupplyProvider());
 	}
 
@@ -81,19 +96,16 @@ void Worker::updateFreeActions()
 		auto resourceDepots = AgentHelper::getResourceDepots();
 		auto base = EconHelper::getLeastSaturatedBase();
 
-		if (!base->isGasSaturated())
+		if (base)
 		{
-			setMiningBase(base, true);
-			mining = true;
-			return;
-		}
-		else
-		{
-			setMiningBase(base, false);
+			setMiningBase(base, !base->isGasSaturated());
 			mining = true;
 			return;
 		}
 	}
+
+	if (defend(BWAPI::Position(util::game::getSelf()->getStartLocation())))
+		return;
 }
 
 void Worker::act()
@@ -200,10 +212,32 @@ void Worker::releaseResources()
 	reservedGas = 0;
 }
 
+bool Worker::repair(BWAPI::Unit damagedUnit)
+{
+	int costsGas = damagedUnit->getType().gasPrice() > 0;
+	if (EconHelper::haveMoney(1, costsGas))
+		return unit->repair(damagedUnit, true);
+	return false;
+}
+
+bool Worker::repair()
+{
+	auto repairSet = unit->getUnitsInRadius(unit->getType().sightRange(), BWAPI::Filter::IsOwned && BWAPI::Filter::HP_Percent < 100);
+	for (auto &damagedUnit : repairSet)
+		return(repair(damagedUnit));
+	return false;
+}
+
+bool Worker::defend(BWAPI::PositionOrUnit target)
+{
+	return false;/*build(BWAPI::UnitTypes::Terran_Bunker, &BWAPI::TilePosition(BWTA::getNearestChokepoint((target.getPosition()))->getCenter()));*/
+				 //build(BWAPI::UnitTypes::Terran_Missile_Turret, &BWAPI::TilePosition(target.getPosition()));
+}
+
 void Worker::debugInfo() const
 {
 	std::cout << "\tID  : " << unitID << "\n";
-	std::cout << "\tUnit: " << unit->getType() << "\n";	
+	std::cout << "\tUnit: " << unit->getType() << "\n";
 	if (gasMiner)
 		std::cout << "\tgasMiner: true\n";
 	else

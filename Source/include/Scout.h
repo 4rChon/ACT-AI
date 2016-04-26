@@ -5,7 +5,7 @@
 class Scout : public Task
 {
 public:
-	Scout(MapHelper::Zone* target);
+	Scout(Zone* target);
 	void assign();
 	void act();
 	void update();

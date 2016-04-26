@@ -141,6 +141,9 @@ namespace EconHelper
 		auto bases = AgentHelper::getResourceDepots();
 
 		ResourceDepot* b = *bases.begin();
+		if (!b)
+			return b;
+
 		for (auto &base : bases)
 		{
 			if (b->getGasSaturation() > base->getGasSaturation())

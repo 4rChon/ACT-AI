@@ -6,7 +6,7 @@ class Attack : public Task
 {
 public:
 	//constructors and destructors
-	Attack(MapHelper::Zone* target);
+	Attack(Zone* target);
 
 	//-
 	void assign();

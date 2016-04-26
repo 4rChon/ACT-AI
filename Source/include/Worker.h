@@ -26,6 +26,12 @@ protected:
 	//Release minerals and gas
 	void releaseResources();
 
+	bool repair(BWAPI::Unit damagedUnit);
+
+	bool repair();
+
+	bool defend(BWAPI::PositionOrUnit target);
+
 	void updateFreeActions();
 
 public:

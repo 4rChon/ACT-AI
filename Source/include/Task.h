@@ -3,6 +3,7 @@
 #include <list>
 #include <string>
 
+#include "Zone.h"
 #include "Coalition.h"
 
 typedef BWAPI::SetContainer < Task*, std::hash<void*>> Taskset;
@@ -38,7 +39,7 @@ protected:
 	Coalition* coalition;
 	int coalitionID;
 	TaskType taskType;
-	MapHelper::Zone* target;
+	Zone* target;
 public:
 	//constructors and destructors
 	Task();
@@ -49,7 +50,7 @@ public:
 	void setCoalition(Coalition* coalition);
 
 	//getters
-	MapHelper::Zone* getTarget();
+	Zone* getTarget();
 	virtual bool Task::isComplete() const;
 	TaskType getType() const;
 	int getID() const;

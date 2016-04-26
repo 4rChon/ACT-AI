@@ -25,15 +25,18 @@
     <Filter Include="src\Tasks">
       <UniqueIdentifier>{d2c93f21-da8b-4c1d-a763-7e555db165b5}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\Map">
+      <UniqueIdentifier>{7f642cda-a1fd-4a1c-8a7d-56b1049455f0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Map">
+      <UniqueIdentifier>{03c0d2df-cabd-44d0-b3e7-5ef4c82d712d}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\include\DesireHelper.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="Source\include\EconHelper.h">
-      <Filter>include</Filter>
-    </ClInclude>
-    <ClInclude Include="Source\include\MapHelper.h">
       <Filter>include</Filter>
     </ClInclude>
     <ClInclude Include="Source\include\SwarmCAT.h">
@@ -81,9 +84,6 @@
     <ClInclude Include="Source\include\Scout.h">
       <Filter>include\Tasks</Filter>
     </ClInclude>
-    <ClInclude Include="Source\include\SCV.h">
-      <Filter>include\Agents</Filter>
-    </ClInclude>
     <ClInclude Include="Source\include\Task.h">
       <Filter>include\Tasks</Filter>
     </ClInclude>
@@ -108,6 +108,12 @@
     <ClInclude Include="Source\include\ReplayHelper.h">
       <Filter>include</Filter>
     </ClInclude>
+    <ClInclude Include="Source\include\MapHelper.h">
+      <Filter>include\Map</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\Zone.h">
+      <Filter>include\Map</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\src\DesireHelper.cpp">
@@ -117,9 +123,6 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="Source\src\EconHelper.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\src\MapHelper.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="Source\src\SwarmCAT.cpp">
@@ -176,9 +179,6 @@
     <ClCompile Include="Source\src\ResourceDepot.cpp">
       <Filter>src\Agents</Filter>
     </ClCompile>
-    <ClCompile Include="Source\src\SCV.cpp">
-      <Filter>src\Agents</Filter>
-    </ClCompile>
     <ClCompile Include="Source\src\ArmyHelper.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -193,6 +193,12 @@
     </ClCompile>
     <ClCompile Include="Source\src\ReplayHelper.cpp">
       <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\MapHelper.cpp">
+      <Filter>src\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\Zone.cpp">
+      <Filter>src\Map</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

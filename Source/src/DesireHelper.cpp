@@ -11,8 +11,8 @@ namespace DesireHelper
 		static std::unordered_map<BWAPI::UpgradeType, double> upgradeDesireMap;
 		static std::unordered_map<BWAPI::TechType, double> techDesireMap;
 		static std::unordered_map<BWTA::BaseLocation*, double, std::hash<void*>> expansionDesireMap;
-		static std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> attackDesireMap;
-		static std::unordered_map<MapHelper::Zone*, double, std::hash<void*>> defendDesireMap;
+		static std::unordered_map<Zone*, double, std::hash<void*>> attackDesireMap;
+		static std::unordered_map<Zone*, double, std::hash<void*>> defendDesireMap;
 		static double supplyDesire;
 		static double expandDesire;
 	}
@@ -47,17 +47,17 @@ namespace DesireHelper
 
 		for (auto &region : BWAPI::Broodwar->getAllRegions())
 		{
-			attackDesireMap.insert(std::pair<MapHelper::Zone*, double>(MapHelper::getZone(region), 0.0));
-			defendDesireMap.insert(std::pair<MapHelper::Zone*, double>(MapHelper::getZone(region), 0.0));
+			attackDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));
+			defendDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));
 		}
 
 		supplyDesire = 1.0;
 		expandDesire = 0.0;
 	}
 
-	MapHelper::Zone* getMostDesirableAttackZone()
+	Zone* getMostDesirableAttackZone()
 	{
-		std::pair<MapHelper::Zone*, double> bestZone = std::pair<MapHelper::Zone*, double>(nullptr, 0.0);
+		std::pair<Zone*, double> bestZone = std::pair<Zone*, double>(nullptr, 0.0);
 		for (auto& zone : attackDesireMap)
 		{
 			if (zone.second > bestZone.second)
@@ -67,9 +67,9 @@ namespace DesireHelper
 		return bestZone.first;
 	}
 
-	MapHelper::Zone* getMostDesirableDefenseZone()
+	Zone* getMostDesirableDefenseZone()
 	{
-		std::pair<MapHelper::Zone*, double> bestZone = std::pair<MapHelper::Zone*, double>(nullptr, 0.0);
+		std::pair<Zone*, double> bestZone = std::pair<Zone*, double>(nullptr, 0.0);
 		for (auto& zone : defendDesireMap)
 		{
 			if (zone.second > bestZone.second)
@@ -79,12 +79,12 @@ namespace DesireHelper
 		return bestZone.first;
 	}
 
-	void updateDefendDesire(MapHelper::Zone* target, double desireMod)
+	void updateDefendDesire(Zone* target, double desireMod)
 	{
 		defendDesireMap[target] = desireMod;
 	}
 
-	void updateAttackDesire(MapHelper::Zone* target, double desireMod)
+	void updateAttackDesire(Zone* target, double desireMod)
 	{
 		attackDesireMap[target] = desireMod;
 	}
@@ -284,12 +284,12 @@ namespace DesireHelper
 		return expansionDesireMap[baseLocation];
 	}
 
-	const std::unordered_map<MapHelper::Zone*, double, std::hash<void*>>& getAttackDesireMap()
+	const std::unordered_map<Zone*, double, std::hash<void*>>& getAttackDesireMap()
 	{
 		return attackDesireMap;
 	}
 
-	const std::unordered_map<MapHelper::Zone*, double, std::hash<void*>>& getDefendDesireMap()
+	const std::unordered_map<Zone*, double, std::hash<void*>>& getDefendDesireMap()
 	{
 		return defendDesireMap;
 	}

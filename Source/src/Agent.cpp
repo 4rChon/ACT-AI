@@ -8,6 +8,7 @@
 #include "ArmyHelper.h"
 #include "TaskHelper.h"
 #include "Defend.h"
+#include "Zone.h"
 
 Agent::Agent()
 {
@@ -22,6 +23,7 @@ Agent::Agent()
 	free = true;
 
 	target = nullptr;
+	unitTarget = nullptr;
 
 	engageDuration = 0;
 	lastEngaged = 0;
@@ -44,6 +46,7 @@ Agent::Agent(BWAPI::Unit unit)
 	coalition = nullptr;
 
 	target = nullptr;
+	unitTarget = nullptr;
 
 	engageDuration = 0;
 	lastEngaged = 0;
@@ -144,8 +147,16 @@ bool Agent::isFree() const
 }
 
 void Agent::micro()
-{
-	BWAPI::Position coalitionCenter = coalition->getUnitSet().getPosition();
+{	
+	auto attackUnits = coalition->getUnitSet();
+	for (auto &unit : coalition->getUnitSet())
+	{
+		if (unit->getType().groundWeapon() == BWAPI::WeaponTypes::None || unit->getType().airWeapon() == BWAPI::WeaponTypes::None)
+			attackUnits.erase(unit);
+	}
+
+	BWAPI::Position coalitionCenter = attackUnits.getPosition();
+
 	BWAPI::Position targetCenter = target->getRegion()->getCenter();
 	int coalitionSize = coalition->getUnitSet().size();
 
@@ -172,15 +183,55 @@ void Agent::micro()
 				!BWAPI::Filter::IsBeingHealed
 				&& BWAPI::Filter::IsAlly
 				&& BWAPI::Filter::HP_Percent < 100
-				&& BWAPI::Filter::ArmorUpgrade == BWAPI::UpgradeTypes::Terran_Infantry_Armor,
+				&& !BWAPI::Filter::IsMechanical,
 				coalitionSize * 3
 				);
 
 			if (!useAbility(BWAPI::TechTypes::Healing, injuredUnit))
-				move(targetCenter);
+				move(coalitionCenter);
 		}
 		else
-			attack(targetCenter);
+		{
+			if (unit->getType().groundWeapon() != BWAPI::WeaponTypes::None)
+			{
+				auto inRange = unit->getUnitsInWeaponRange(unit->getType().groundWeapon(), BWAPI::Filter::IsEnemy);
+				if (inRange.size() != 0)
+				{
+					unitTarget = *inRange.begin();
+					int targetPriority = 1;
+					for (auto &enemyUnit : inRange)
+					{
+						int friendliesInRange = enemyUnit->getUnitsInRadius(enemyUnit->getType().sightRange(), BWAPI::Filter::IsOwned).size();
+						if (friendliesInRange > targetPriority)
+							unitTarget = enemyUnit;
+					}
+				}
+			}
+			else if (unit->getType().airWeapon() != BWAPI::WeaponTypes::None)
+			{
+				auto inRange = unit->getUnitsInWeaponRange(unit->getType().airWeapon(), BWAPI::Filter::IsEnemy);
+				if (inRange.size() != 0)
+				{
+					unitTarget = *inRange.begin();
+					int targetPriority = 1;
+					for (auto &enemyUnit : inRange)
+					{
+						int friendliesInRange = enemyUnit->getUnitsInRadius(enemyUnit->getType().sightRange(), BWAPI::Filter::IsOwned).size();
+						if (friendliesInRange > targetPriority)
+							unitTarget = enemyUnit;
+					}
+				}
+			}
+			if (unitTarget != nullptr)
+			{
+				if (unitTarget->exists())
+					attack(unitTarget);
+				else
+					attack(targetCenter);
+			}			
+			else
+				attack(targetCenter);
+		}
 	}
 
 	if (unit->isIdle())
@@ -207,7 +258,7 @@ void Agent::updateEngagement()
 
 void Agent::updateKillCount()
 {
-	if (unit->canAttack())
+	if (unit->getType().groundWeapon() != BWAPI::WeaponTypes::None || unit->getType().groundWeapon() != BWAPI::WeaponTypes::None)
 		coalition->addKillCount(unit->getKillCount() - lastKillCount);
 	lastKillCount = unit->getKillCount();
 }
@@ -290,7 +341,7 @@ void Agent::updateActions()
 	
 	if (unit->isUnderAttack())
 	{
-		if ((unit->getType().isBuilding() || unit->isGatheringMinerals() || unit->isGatheringGas() || unit->isConstructing()) && !MapHelper::getZone(unit->getRegion())->isDefending())
+		if ((unit->getType().isBuilding() || unit->getUnitsInRadius(unit->getType().sightRange(), (BWAPI::Filter::IsBuilding || BWAPI::Filter::IsBeingConstructed) && BWAPI::Filter::IsOwned).size() > 0) && !MapHelper::getZone(unit->getRegion())->isDefending())
 		{
 			Defend* defend = new Defend(unit);
 			TaskHelper::addTask(defend, true);
@@ -346,10 +397,20 @@ bool Agent::attack(BWAPI::PositionOrUnit target)
 
 bool Agent::defend()
 {
-	MapHelper::Zone *targetZone = DesireHelper::getMostDesirableDefenseZone();
-	BWAPI::Position targetPosition = BWAPI::Position(unit->getClosestUnit(BWAPI::Filter::IsResourceDepot && BWAPI::Filter::IsOwned)->getPosition());;
-	if (targetZone != nullptr)
+	BWAPI::Position targetPosition = unit->getPosition();
+	Zone *targetZone = DesireHelper::getMostDesirableDefenseZone();
+
+	auto closestResourceDepot = unit->getClosestUnit(BWAPI::Filter::IsResourceDepot && BWAPI::Filter::IsOwned);
+	
+	if(closestResourceDepot)
+		targetPosition = BWAPI::Position(closestResourceDepot->getPosition());
+
+	if (targetZone)
 		targetPosition = targetZone->getRegion()->getCenter();
+	
+	if (!targetPosition)
+		targetPosition = BWAPI::Position(unit->getClosestUnit(BWAPI::Filter::IsBuilding && BWAPI::Filter::IsOwned)->getPosition());
+
 
 	if (unit->getType() == BWAPI::UnitTypes::Terran_Bunker)
 	{

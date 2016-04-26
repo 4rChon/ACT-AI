@@ -53,7 +53,7 @@ void Task::setCoalition(Coalition* coalition)
 	coalitionID = coalition->getID();
 }
 
-MapHelper::Zone* Task::getTarget()
+Zone* Task::getTarget()
 {
 	return target;
 }

@@ -7,7 +7,7 @@
 #include "EconHelper.h"
 #include <string>
 
-Attack::Attack(MapHelper::Zone* target)
+Attack::Attack(Zone* target)
 {
 	taskName = "Attack(" + std::to_string(target->getID()) + ")";
 	this->target = target;

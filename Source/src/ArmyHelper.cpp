@@ -29,11 +29,11 @@ namespace ArmyHelper
 		static bool defending;
 		static bool scouting;
 		static double productionRatio;
-		static MapHelper::Zone* attackTarget;
-		static MapHelper::Zone* defendTarget;
-		static MapHelper::Zone* scoutTarget;
-		static MapHelper::Zone* enemyStart;		
-		static std::map<UnitCostPair, MapHelper::Zone*, compareUnit> targetPriorityList;
+		static Zone* attackTarget;
+		static Zone* defendTarget;
+		static Zone* scoutTarget;
+		static Zone* enemyStart;		
+		static std::map<UnitCostPair, Zone*, compareUnit> targetPriorityList;
 		static std::unordered_map<int, BWAPI::UnitType> scoutedUnits;
 	}
 
@@ -112,8 +112,6 @@ namespace ArmyHelper
 			Attack* attack = new Attack(attackTarget);
 			TaskHelper::addTask(attack, true);
 			defending = false;
-			
-			
 		}
 	}
 
@@ -140,7 +138,7 @@ namespace ArmyHelper
 
 	void addTargetPriority(BWAPI::Unit unit)
 	{
-		auto target = std::pair<UnitCostPair, MapHelper::Zone*>(UnitCostPair(unit->getID(), unit->getType()), MapHelper::getZone(unit->getRegion()));
+		auto target = std::pair<UnitCostPair, Zone*>(UnitCostPair(unit->getID(), unit->getType()), MapHelper::getZone(unit->getRegion()));
 		targetPriorityList.insert(target);
 
 		attackTarget = (*targetPriorityList.begin()).second;
@@ -166,7 +164,7 @@ namespace ArmyHelper
 		}
 	}
 
-	void clearZoneTargets(MapHelper::Zone *zone)
+	void clearZoneTargets(Zone *zone)
 	{
 		for (auto &target : targetPriorityList)
 		{

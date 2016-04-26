@@ -1,6 +1,7 @@
 #pragma once
 #include "UtilHelper.h"
 #include "MapHelper.h"
+#include "Zone.h"
 #include <BWAPI.h>
 #include <unordered_map>
 
@@ -36,8 +37,9 @@ protected:
 	bool free;
 
 	//agent's current target zone - nullptr if no target
-	MapHelper::Zone* target;
+	Zone* target;
 
+	BWAPI::Unit unitTarget;
 	//number of frames that the agent has been engaged in combat
 	int engageDuration;
 

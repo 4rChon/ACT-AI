@@ -422,6 +422,17 @@ void SwarmCAT::drawDebugText()
 	Broodwar->drawTextScreen(10, 20, "Expand Desire: %.2f", DesireHelper::getExpandDesire());
 	Broodwar->drawTextScreen(10, 30, "Supply Desire: %.2f", DesireHelper::getSupplyDesire());
 
+	//i = 0;
+	//for (auto &region : BWTA::getRegions())
+	//{
+	//	for (auto &zone : MapHelper::getRegionField())
+	//	{
+	//		if (BWTA::getRegion(zone->getRegion()->getCenter()) == region)
+	//			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 20, Color(10 * i, 100, 100), true);
+	//	}
+	//	i++;
+	//}
+
 	/*draw zones*/
 	for (auto &zone : MapHelper::getRegionField())
 	{

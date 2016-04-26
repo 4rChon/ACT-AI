@@ -40,12 +40,12 @@
     <ClInclude Include="Source\include\SatisfyTechRequirement.h" />
     <ClInclude Include="Source\include\SatisfyUnitRequirement.h" />
     <ClInclude Include="Source\include\Scout.h" />
-    <ClInclude Include="Source\include\SCV.h" />
     <ClInclude Include="Source\include\SwarmCAT.h" />
     <ClInclude Include="Source\include\Task.h" />
     <ClInclude Include="Source\include\TaskHelper.h" />
     <ClInclude Include="Source\include\UtilHelper.h" />
     <ClInclude Include="Source\include\Worker.h" />
+    <ClInclude Include="Source\include\Zone.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\src\Agent.cpp" />
@@ -70,12 +70,12 @@
     <ClCompile Include="Source\src\SatisfyTechRequirement.cpp" />
     <ClCompile Include="Source\src\SatisfyUnitRequirement.cpp" />
     <ClCompile Include="Source\src\Scout.cpp" />
-    <ClCompile Include="Source\src\SCV.cpp" />
     <ClCompile Include="Source\src\SwarmCAT.cpp" />
     <ClCompile Include="Source\src\Task.cpp" />
     <ClCompile Include="Source\src\TaskHelper.cpp" />
     <ClCompile Include="Source\src\UtilHelper.cpp" />
     <ClCompile Include="Source\src\Worker.cpp" />
+    <ClCompile Include="Source\src\Zone.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

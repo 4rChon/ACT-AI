@@ -2,6 +2,7 @@
 #include <BWAPI.h>
 #include "MapHelper.h"
 #include "Composition.h"
+#include "Zone.h"
 
 namespace ArmyHelper
 {
@@ -16,7 +17,7 @@ namespace ArmyHelper
 	void addTargetPriority(BWAPI::Unit unit);
 	void removeTargetPriority(BWAPI::Unit unit);
 	void updateTargetPriority();
-	void clearZoneTargets(MapHelper::Zone * zone);
+	void clearZoneTargets(Zone * zone);
 	bool scan(BWAPI::Position target);
 	void addScoutedUnit(int unitID, BWAPI::UnitType unitType);
 	void removeScoutedUnit(int unitID);

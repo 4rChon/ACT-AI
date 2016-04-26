@@ -2,6 +2,7 @@
 #include "BWAPI.h"
 #include "BWTA.h"
 #include "MapHelper.h"
+#include "Zone.h"
 #include "Composition.h"
 #include <unordered_map>
 
@@ -9,10 +10,10 @@ namespace DesireHelper
 {
 	void initialiseHelper();
 
-	MapHelper::Zone* getMostDesirableAttackZone();
-	MapHelper::Zone* getMostDesirableDefenseZone();
-	void updateDefendDesire(MapHelper::Zone * target, double desireMod);
-	void updateAttackDesire(MapHelper::Zone * target, double desireMod);
+	Zone* getMostDesirableAttackZone();
+	Zone* getMostDesirableDefenseZone();
+	void updateDefendDesire(Zone * target, double desireMod);
+	void updateAttackDesire(Zone * target, double desireMod);
 	
 	void updateUnitDesireMap();
 	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType producer);
@@ -33,8 +34,8 @@ namespace DesireHelper
 	double getSupplyDesire();
 	double getExpandDesire();
 	double getExpansionDesire(BWTA::BaseLocation* baseLocation);
-	const std::unordered_map<MapHelper::Zone*, double, std::hash<void*>>& getAttackDesireMap();
-	const std::unordered_map<MapHelper::Zone*, double, std::hash<void*>>& getDefendDesireMap();
+	const std::unordered_map<Zone*, double, std::hash<void*>>& getAttackDesireMap();
+	const std::unordered_map<Zone*, double, std::hash<void*>>& getDefendDesireMap();
 
 	BWTA::BaseLocation * getBestExpansionLocation();
 

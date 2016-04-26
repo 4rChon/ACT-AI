@@ -82,12 +82,7 @@ namespace AgentHelper
 			resourceDepots.insert((ResourceDepot*)agent);
 		}
 		else if (unit->getType().isWorker())
-		{
-			if (unit->getType() == BWAPI::UnitTypes::Terran_SCV)
-				agent = new SCV(unit);
-			else
-				agent = new Worker(unit);
-		}
+			agent = new Worker(unit);
 		else
 			agent = new Agent(unit);
 

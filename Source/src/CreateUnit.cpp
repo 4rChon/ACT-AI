@@ -188,7 +188,10 @@ void CreateUnit::update()
 
 	//if unitCount is <= 0, then succeed
 	if (unitCount <= 0)
+	{
 		succeed();
+		return;
+	}
 
 	//if the unitType is a refinery and all bases already have a refinery, then succeed
 	if (unitType.isRefinery() && util::game::getSelf()->allUnitCount(util::game::getSelf()->getRace().getRefinery()) >= (int)AgentHelper::getResourceDepots().size())
@@ -210,8 +213,20 @@ void CreateUnit::update()
 		return;
 	}
 
+	if (!coalition)
+	{
+		fail();
+		return;
+	}
+
 	if (coalition->isActive() && unitCount > 0)
 		act();
+
+	if (unitCount <= 0)
+	{
+		succeed();
+		return;
+	}
 
 	printDebugInfo("Update End");
 }

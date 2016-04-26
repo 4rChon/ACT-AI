@@ -10,7 +10,7 @@ Defend::Defend(BWAPI::Unit unit)
 	this->unit = unit;
 	target = MapHelper::getZone(unit->getRegion());	
 	taskType = DEF;
-	target->setDefending(true);
+	target->defend(true);
 }
 
 void Defend::assign()
@@ -33,13 +33,22 @@ void Defend::update()
 	if (complete)
 		return;
 
-	if (BWAPI::Broodwar->getFrameCount() - target->getLastVisited() < 5 && target->getEnemyScore() <= 0)
-	{		
-		succeed();
-		return;
+	int enemyScore = 0;
+	int friendScore = 0;
+
+	for (auto &zone : target->getNeighbourhood())
+	{
+		enemyScore += zone->getEnemyScore();
+		friendScore += zone->getFriendScore();
 	}
 
-	if (target->getFriendScore() == 0)
+	if (BWAPI::Broodwar->getFrameCount() - target->getLastVisited() < 5 && enemyScore <= 0 && BWAPI::Broodwar->getFrameCount() - creationFrame > 720)
+	{
+		succeed();
+		return;
+	}	
+
+	if(friendScore <= 0)
 	{
 		fail();
 		return;
@@ -59,7 +68,7 @@ void Defend::update()
 
 void Defend::succeed()
 {
-	target->setDefending(false);
+	target->defend(false);
 	complete = true;
 	profit = 1.0;// coalition->getProfit();
 	printDebugInfo("Success!", true);
@@ -69,7 +78,7 @@ void Defend::succeed()
 
 void Defend::fail()
 {
-	target->setDefending(false);
+	target->defend(false);
 	complete = true;
 	profit = 0.0;// coalition->getProfit();
 	printDebugInfo("Failure!", true);
