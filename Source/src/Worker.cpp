@@ -37,7 +37,7 @@ void Worker::unsetMiningBase()
 {	
 	if (miningBase)
 		miningBase->removeWorker(this);
-	this->miningBase = nullptr;
+	miningBase = nullptr;
 	gasMiner = false;
 }
 
@@ -86,19 +86,20 @@ void Worker::updateFreeActions()
 
 	if (unit->isIdle())
 	{
-		bool mining = false;
+		if (defend())
+			return;
+
 		auto resourceDepots = AgentHelper::getResourceDepots();
 		auto base = EconHelper::getLeastSaturatedBase();
 
 		if (base && base->getBaseLocation() && base->getUnit()->exists())
 		{
 			setMiningBase(base, !base->isGasSaturated());
-			mining = true;
 			return;
 		}
 	}
 
-	defend();
+	
 }
 
 void Worker::act()
@@ -213,9 +214,17 @@ bool Worker::repair(BWAPI::Unit damagedUnit)
 	return false;
 }
 
+bool Worker::repair(BWAPI::Region region)
+{
+	auto repairSet = region->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::HP_Percent < 100 && BWAPI::Filter::IsMechanical);
+	for (auto &damagedUnit : repairSet)
+		return(repair(damagedUnit));
+	return false;
+}
+
 bool Worker::repair()
 {
-	auto repairSet = unit->getUnitsInRadius(unit->getType().sightRange(), BWAPI::Filter::IsOwned && BWAPI::Filter::HP_Percent < 100);
+	auto repairSet = unit->getUnitsInRadius(unit->getType().sightRange(), BWAPI::Filter::IsOwned && BWAPI::Filter::HP_Percent < 100 && BWAPI::Filter::IsMechanical);
 	for (auto &damagedUnit : repairSet)
 		return(repair(damagedUnit));
 	return false;
@@ -224,14 +233,22 @@ bool Worker::repair()
 bool Worker::defend(BWAPI::PositionOrUnit target)
 {
 	if (target.isPosition())
-		return build(BWAPI::UnitTypes::Terran_Bunker, &BWAPI::TilePosition(target.getPosition()));
-	else
+	{
+		auto zone = MapHelper::getZone(BWAPI::Broodwar->getRegionAt(target.getPosition()));
+		if (!zone->hasBunkerDefense() && zone->getTimesDefended() > 0 && zone->getFriendScore() > 0 && BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::UnitTypes::Terran_Bunker) == 0)
+			return build(BWAPI::UnitTypes::Terran_Bunker, &BWAPI::TilePosition(target.getPosition()));
+		else
+			return repair(BWAPI::Broodwar->getRegionAt(target.getPosition()));
+	}
+
+	if(target.getUnit()->getType().isMechanical())
 		return repair(target.getUnit());
+	return false;
 }
 
 bool Worker::defend()
 {
-	auto defenseZone = DesireHelper::getMostDesirableDefenseZone();
+	auto defenseZone = DesireHelper::getMostDesirableDefenseZone(true);
 	if (defenseZone)
 		return defend(defenseZone->getRegion()->getCenter());
 	return false;

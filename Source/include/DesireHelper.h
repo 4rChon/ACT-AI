@@ -11,8 +11,8 @@ namespace DesireHelper
 	void initialiseHelper();
 
 	Zone* getMostDesirableAttackZone();
-	Zone* getMostDesirableDefenseZone();
-	void updateDefendDesire(Zone * target, double desireMod);
+	Zone* getMostDesirableDefenseZone(bool buildingBunker);
+	void setDefendDesire(Zone * target, double desireMod);
 	void updateAttackDesire(Zone * target, double desireMod);
 	
 	void updateUnitDesireMap();

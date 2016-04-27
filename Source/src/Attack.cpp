@@ -67,7 +67,7 @@ void Attack::update()
 
 void Attack::succeed()
 {
-	complete = true;
+	complete = true;	
 	profit = coalition->getProfit();
 	printDebugInfo("Success!", true);
 

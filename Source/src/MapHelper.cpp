@@ -59,6 +59,13 @@ namespace MapHelper
 
 	void saveMapData()
 	{
+		//diminish defence counts by 1
+		for (auto &zone : regionField)
+		{
+			if(zone->getTimesDefended() > 0)
+				zone->setTimesDefended(zone->getTimesDefended() - 1);
+		}
+
 		util::data::serializeMapData(regionField);
 	}
 }

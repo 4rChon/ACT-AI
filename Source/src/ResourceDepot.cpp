@@ -145,16 +145,22 @@ bool ResourceDepot::isGasSaturated()
 
 void ResourceDepot::addMineralWorker(Worker* worker)
 {	
-	worker->gather((*baseLocation->getMinerals().begin()));
-	workers.insert(worker);
-	mineralMiners++;
+	if (baseLocation->getMinerals().size() > 0)
+	{
+		worker->gather((*baseLocation->getMinerals().begin()));
+		workers.insert(worker);
+		mineralMiners++;
+	}
 }
 
 void ResourceDepot::addGasWorker(Worker* worker)
 {
-	worker->gather((*baseLocation->getGeysers().begin()));
-	workers.insert(worker);
-	gasMiners++;
+	if (baseLocation->getGeysers().size() > 0)
+	{
+		worker->gather((*baseLocation->getGeysers().begin()));
+		workers.insert(worker);
+		gasMiners++;
+	}
 }
 
 void ResourceDepot::removeWorker(Worker* worker)

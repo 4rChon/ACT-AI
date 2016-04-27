@@ -335,7 +335,7 @@ void SwarmCAT::onUnitComplete(BWAPI::Unit unit)
 
 			auto unitZone = MapHelper::getZone(unit->getRegion()); 			
 
-			DesireHelper::updateDefendDesire(unitZone, unitZone->getEnemyScore());
+			DesireHelper::setDefendDesire(unitZone, unitZone->getEnemyScore());
 		}
 	}
 }
@@ -383,7 +383,6 @@ void SwarmCAT::drawDebugText()
 			if (u->getType().isWorker())
 			{
 				if (((Worker*)a)->getMiningBase())
-
 				{
 					Broodwar->drawLineMap(u->getPosition(), ((Worker*)a)->getMiningBase()->getBaseLocation()->getPosition(), Colors::Red);					
 					if(u->getOrderTargetPosition() != BWAPI::Position(0, 0))
@@ -428,26 +427,28 @@ void SwarmCAT::drawDebugText()
 	Broodwar->drawTextScreen(10, 20, "Expand Desire: %.2f", DesireHelper::getExpandDesire());
 	Broodwar->drawTextScreen(10, 30, "Supply Desire: %.2f", DesireHelper::getSupplyDesire());
 
-	//i = 0;
-	//for (auto &region : BWTA::getRegions())
-	//{
-	//	for (auto &zone : MapHelper::getRegionField())
-	//	{
-	//		if (BWTA::getRegion(zone->getRegion()->getCenter()) == region)
-	//			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 20, Color(10 * i, 100, 100), true);
-	//	}
-	//	i++;
-	//}
+	i = 0;
+	/*for (auto &region : BWTA::getRegions())
+	{
+		for (auto &zone : MapHelper::getRegionField())
+		{
+			if (BWTA::getRegion(zone->getRegion()->getCenter()) == region)
+				Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 20, Color(10 * i, 100, 100), true);
+		}
+		i++;
+	}*/
 
 	/*draw zones*/
 	auto defendDesireMap = DesireHelper::getDefendDesireMap();
 	for (auto &zone : MapHelper::getRegionField())
 	{
 		Broodwar->drawTextMap(zone->getRegion()->getCenter(), "ZoneID : %d\nDefend Count : %d\nDefend Desire : %.2f", zone->getID(), zone->getTimesDefended(), defendDesireMap[zone]);
+		Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 15, Color((int)defendDesireMap[zone] * 10, 0, 0), true);
 		if(zone->isDefending())
-			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 10, Colors::Red, true);
+			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 5, Colors::Red, true);
 		else
-			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 10, Colors::Green, true);
+			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 5, Colors::Green, true);
+		
 		/*Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 10, "FriendScore : %d", zone->getFriendScore());
 		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 20, "EnemyScore: %d", zone->getEnemyScore());
 		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 30, "Time Since Last : %d", BWAPI::Broodwar->getFrameCount() - zone->getLastVisited());*/

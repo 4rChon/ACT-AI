@@ -140,12 +140,10 @@ namespace EconHelper
 		
 		auto bases = AgentHelper::getResourceDepots();
 
-		ResourceDepot* b = *bases.begin();
-		if (!b)
+		if (bases.size() == 0)
 			return nullptr;
 
-		if (!b->getUnit()->exists())
-			return nullptr;
+		ResourceDepot* b = *bases.begin();
 
 		for (auto &base : bases)
 		{

@@ -27,6 +27,7 @@ protected:
 	void releaseResources();
 
 	bool repair(BWAPI::Unit damagedUnit);
+	bool repair(BWAPI::Region region);
 
 	bool repair();
 

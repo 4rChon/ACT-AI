@@ -47,8 +47,8 @@ namespace DesireHelper
 
 		for (auto &region : BWAPI::Broodwar->getAllRegions())
 		{
-			attackDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));
-			defendDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), MapHelper::getZone(region)->getTimesDefended()));
+			attackDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));			
+			//defendDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), MapHelper::getZone(region)->getTimesDefended()));
 		}
 
 		supplyDesire = 1.0;
@@ -67,11 +67,17 @@ namespace DesireHelper
 		return bestZone.first;
 	}
 
-	Zone* getMostDesirableDefenseZone()
+	Zone* getMostDesirableDefenseZone(bool buildingBunker)
 	{
 		std::pair<Zone*, double> bestZone = std::pair<Zone*, double>(nullptr, 0.0);
 		for (auto& zone : defendDesireMap)
-		{
+		{			
+			if (zone.first->hasBunkerDefense() && buildingBunker)
+				continue;
+
+			if (!zone.first->isDefending() && !buildingBunker)
+				continue;
+
 			if (zone.second > bestZone.second)
 				bestZone = zone;
 		}
@@ -79,24 +85,25 @@ namespace DesireHelper
 		return bestZone.first;
 	}
 
-	void updateDefendDesire(Zone* target, double desireMod)
+	void setDefendDesire(Zone* target, double desireMod)
 	{
-		bool bunkerNearby = false;
+		target->setBunkerDefense(false);
 		for (auto &zone : target->getNeighbourhood())
 		{
 			if (zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::GetType == BWAPI::UnitTypes::Terran_Bunker).size() > 0)
 			{
-				bunkerNearby = true;
+				target->setBunkerDefense(true);
 				break;
 			}
 		}
 
 		for (auto &zone : target->getNeighbourhood())
 		{
-			if (bunkerNearby)
-				defendDesireMap[zone] = (desireMod);
-			else
-				defendDesireMap[zone] = (desireMod + 1) * zone->getTimesDefended();
+			int defenseMod = 0;
+			if (zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::IsBuilding).size() > 0)
+				defenseMod = 1;
+			
+			defendDesireMap[zone] = (desireMod + 1) * zone->getTimesDefended() * defenseMod;
 		}
 	}
 

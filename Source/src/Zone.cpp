@@ -13,6 +13,7 @@ Zone::Zone(BWAPI::Region region, int id)
 	friendScore = 0;
 	resourceScore = 0;
 	timesDefended = 0;
+	hasBunker = false;
 	defending = false;
 }
 
@@ -70,6 +71,11 @@ int Zone::getTimesDefended() const
 	return timesDefended;
 }
 
+bool Zone::hasBunkerDefense() const
+{
+	return hasBunker;
+}
+
 bool Zone::isDefending() const
 {
 	return defending;
@@ -79,15 +85,17 @@ void Zone::setDefending(bool defending)
 {
 	this->defending = defending;	
 
-	if (defending)
-		DesireHelper::updateDefendDesire(this, getEnemyScore());
-	else
-		DesireHelper::updateDefendDesire(this, 0.0);
+	DesireHelper::setDefendDesire(this, getEnemyScore());
 }
 
 void Zone::setTimesDefended(int timesDefended)
 {
 	this->timesDefended = timesDefended;
+}
+
+void Zone::setBunkerDefense(bool hasBunker)
+{
+	this->hasBunker = hasBunker;
 }
 
 void Zone::defend(bool defendOrder)
@@ -114,14 +122,14 @@ void Zone::updateZone()
 {
 	resetScores();
 
-	for (auto& unit : this->region->getUnits())
+	for (auto& unit : region->getUnits())
 	{
 		if (unit->getPlayer() == util::game::getEnemy())
-			enemyScore++;// unit->getType().buildScore() + unit->getType().destroyScore();
-		if (unit->getPlayer() == util::game::getSelf())
-			friendScore++;// = unit->getType().buildScore() + unit->getType().destroyScore();
+			enemyScore++;// = 100 + unit->getType().buildScore() + unit->getType().destroyScore();
+		if (unit->getPlayer() == util::game::getSelf() && (!unit->getType().isBuilding() || unit->getType() == BWAPI::UnitTypes::Terran_Bunker || unit->getType() == BWAPI::UnitTypes::Terran_Missile_Turret))
+			friendScore++;//= 100 + unit->getType().buildScore() + unit->getType().destroyScore();
 		if (unit->getType().isResourceContainer())
-			resourceScore++;// unit->getResources();
+			resourceScore += unit->getResources();
 	}
 
 	updateLastVisited();

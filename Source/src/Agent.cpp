@@ -401,7 +401,7 @@ bool Agent::attack(BWAPI::PositionOrUnit target)
 bool Agent::defend()
 {
 	BWAPI::Position targetPosition = unit->getPosition();
-	Zone *targetZone = DesireHelper::getMostDesirableDefenseZone();
+	Zone *targetZone = DesireHelper::getMostDesirableDefenseZone(false);
 
 	auto closestResourceDepot = unit->getClosestUnit(BWAPI::Filter::IsResourceDepot && BWAPI::Filter::IsOwned);
 	
@@ -427,11 +427,8 @@ bool Agent::defend()
 
 		if (closestUnit != nullptr)
 		{
-			if (AgentHelper::getAgent(closestUnit->getID())->isFree())
-			{
-				std::cout << "Found a nearby bunker\n";
+			if (AgentHelper::getAgent(closestUnit->getID())->isFree() && closestUnit->getType().groundWeapon() != BWAPI::WeaponTypes::None)
 				return unit->load(closestUnit);
-			}
 		}
 		return false;
 	}
