@@ -31,6 +31,7 @@ protected:
 	bool repair();
 
 	bool defend(BWAPI::PositionOrUnit target);
+	bool defend();
 
 	void updateFreeActions();
 

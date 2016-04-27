@@ -142,7 +142,10 @@ namespace EconHelper
 
 		ResourceDepot* b = *bases.begin();
 		if (!b)
-			return b;
+			return nullptr;
+
+		if (!b->getUnit()->exists())
+			return nullptr;
 
 		for (auto &base : bases)
 		{

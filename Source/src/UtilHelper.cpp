@@ -1,6 +1,8 @@
 #include "UtilHelper.h"
 #include "CompositionHelper.h"
 #include "Composition.h"
+#include "MapHelper.h"
+#include "Zone.h"
 #include <string>
 #include <vector>
 
@@ -19,7 +21,6 @@ namespace util
 		game::setSelf();
 		game::setEnemy();
 		std::cout << selfName << " (" << self->getRace().getName() << ") vs " << enemy->getName() << " (" << enemy->getRace().getName() << ")\n";
-		data::loadMapData();
 	}	
 
 	double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr)
@@ -188,7 +189,7 @@ namespace util
 		{
 			std::ofstream compStream;
 
-			auto directory = "compositions\\" + game::getEnemy()->getRace().getName() + "\\";
+			auto directory = "ai-data\\" + game::getEnemy()->getRace().getName() + "\\compositions\\";
 			int avgActivationFrame = (int)((double)usedComposition.activationFrame / usedComposition.useCount);
 			int frameBracket = game::getFrameBracket(avgActivationFrame, 7200);
 			auto fileName = std::to_string(frameBracket) + "_" + std::to_string(usedComposition.taskType);
@@ -287,9 +288,71 @@ namespace util
 			return usedComposition;
 		}		
 
-		void loadMapData()
+		void serializeMapData(MapHelper::Field regionField)
 		{
-			BWAPI::Broodwar->mapHash();
+			std::ofstream dataStream;
+
+			auto startLocation = BWAPI::Broodwar->self()->getStartLocation();
+			auto xStart = startLocation.x;
+			auto yStart = startLocation.y;
+
+			auto directory = "ai-data\\" + game::getEnemy()->getRace().getName() + "\\maps\\";
+			auto fileName = BWAPI::Broodwar->mapHash() + "_" + std::to_string(xStart) + "_" + std::to_string(yStart);
+			auto target = directory + fileName;
+
+			dataStream.open(target, std::ios::binary | std::ios::out);			
+
+			for (auto &zone : regionField)
+			{				
+				int zoneID = zone->getID();
+				int defenseCount = zone->getTimesDefended();
+
+				dataStream.write((char*)&zoneID, sizeof(zoneID));
+				dataStream.write((char*)&defenseCount, sizeof(defenseCount));
+
+				//std::cout << "ZoneID : " << zoneID << " | dCount : " << defenseCount << "\n";
+			}			
+
+			dataStream.close();			
+		}
+
+		std::map<int, int> deserializeMapData()
+		{	
+			auto startLocation = BWAPI::Broodwar->self()->getStartLocation();
+			auto xStart = startLocation.x;
+			auto yStart = startLocation.y;
+
+			auto directory = "ai-data\\" + game::getEnemy()->getRace().getName() + "\\maps\\";
+			auto fileName = BWAPI::Broodwar->mapHash() + "_" + std::to_string(xStart) + "_" + std::to_string(yStart);
+			auto target = directory + fileName;
+
+			std::map<int, int> zoneDefenseMap;
+
+			if (!fs::exists(target))
+				return zoneDefenseMap;
+
+			std::ifstream dataStream;
+			dataStream.open(target, std::ios::binary | std::ios::in);
+			
+			int regionCount = BWAPI::Broodwar->getAllRegions().size();
+
+			for (int i = 0; i < regionCount; i++)
+			{				
+				int zoneID;
+				int defenseCount;
+
+				dataStream.read((char*)&zoneID, sizeof(zoneID));
+				dataStream.read((char*)&defenseCount, sizeof(defenseCount));
+
+				zoneDefenseMap[zoneID] = defenseCount;
+				//std::cout << "ZoneID : " << zoneID << " -- DefenseCount : " << defenseCount << "\n";
+			}
+
+			//std::cout << "Region Count : " << regionCount << "\n";
+
+			dataStream.close();
+
+			return zoneDefenseMap;
 		}
 	}
 }

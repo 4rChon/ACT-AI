@@ -22,6 +22,8 @@ namespace MapHelper
 
 		for (auto &zone : regionField)
 			zone->initNeighbourhood();
+
+		loadMapData();
 	}
 
 	Zone* getZone(int id)
@@ -43,5 +45,20 @@ namespace MapHelper
 	const Field& getRegionField()
 	{
 		return regionField;
-	}	
+	}
+
+	void loadMapData()
+	{		
+		auto zoneDefenseMap = util::data::deserializeMapData();
+		if (zoneDefenseMap.size() > 0)
+		{
+			for (auto &zone : regionField)
+				zone->setTimesDefended(zoneDefenseMap[zone->getID()]);
+		}
+	}
+
+	void saveMapData()
+	{
+		util::data::serializeMapData(regionField);
+	}
 }

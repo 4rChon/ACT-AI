@@ -234,9 +234,9 @@ namespace CompositionHelper
 
 	void loadCompositions()
 	{
-		auto enemy = util::game::getEnemy();// util::getEnemy();
+		auto enemy = util::game::getEnemy();
 
-		auto directory = "compositions\\" + enemy->getRace().getName() + "\\";
+		auto directory = "ai-data\\" + enemy->getRace().getName() + "\\compositions\\";
 		fs::path path = fs::path(directory);
 		std::vector<fs::path> compFiles;
 		util::data::getFiles(path, ".comp", compFiles);
@@ -309,7 +309,5 @@ namespace CompositionHelper
 
 		for each(auto uniqueComposition in uniqueCompositions)
 			util::data::serializeComposition(uniqueComposition);
-
-
 	}
 };

@@ -15,6 +15,7 @@
 #include "Scout.h"
 #include "TaskHelper.h"
 #include "UtilHelper.h"
+#include "Zone.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -90,6 +91,7 @@ void SwarmCAT::onStart()
 void SwarmCAT::onEnd(bool isWinner)
 {
 	CompositionHelper::saveCompositions();
+	MapHelper::saveMapData();
 	std::cout << " ---------------- MATCH END ----------------\n";
 }
 
@@ -163,7 +165,7 @@ void SwarmCAT::onFrame()
 		EconHelper::updateEconomy();
 		ArmyHelper::updateArmyMovement();		
 
-		if (Broodwar->getFrameCount() % (24 * 120) == 0)
+		if (Broodwar->getFrameCount() % (24 * 30) == 0)
 			DesireHelper::updateSupplyDesire();
 		//std::cout << "---FrameEnd---\n";
 	}
@@ -326,10 +328,14 @@ void SwarmCAT::onUnitComplete(BWAPI::Unit unit)
 	{
 		//std::cout << unit->getID() << " : Unit complete!\n";
 		if (unit->getPlayer() == util::game::getSelf())
-		{
+		{			
 			if (unit->getType().isResourceDepot())
 				DesireHelper::updateSupplyDesire(unit->getType());
 			AgentHelper::createAgent(unit);
+
+			auto unitZone = MapHelper::getZone(unit->getRegion()); 			
+
+			DesireHelper::updateDefendDesire(unitZone, unitZone->getEnemyScore());
 		}
 	}
 }
@@ -434,9 +440,10 @@ void SwarmCAT::drawDebugText()
 	//}
 
 	/*draw zones*/
+	auto defendDesireMap = DesireHelper::getDefendDesireMap();
 	for (auto &zone : MapHelper::getRegionField())
 	{
-		Broodwar->drawTextMap(zone->getRegion()->getCenter(), "ZoneID : %d", zone->getID());
+		Broodwar->drawTextMap(zone->getRegion()->getCenter(), "ZoneID : %d\nDefend Count : %d\nDefend Desire : %.2f", zone->getID(), zone->getTimesDefended(), defendDesireMap[zone]);
 		if(zone->isDefending())
 			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 10, Colors::Red, true);
 		else

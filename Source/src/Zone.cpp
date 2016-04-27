@@ -85,6 +85,11 @@ void Zone::setDefending(bool defending)
 		DesireHelper::updateDefendDesire(this, 0.0);
 }
 
+void Zone::setTimesDefended(int timesDefended)
+{
+	this->timesDefended = timesDefended;
+}
+
 void Zone::defend(bool defendOrder)
 {
 	for (auto &zone : neighbourhood)

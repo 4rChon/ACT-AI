@@ -17,6 +17,13 @@ namespace CompositionHelper
 
 class Composition;
 
+class Zone;
+
+namespace MapHelper
+{
+	typedef BWAPI::SetContainer<Zone*, std::hash<void*>> Field;
+}
+
 namespace std
 {
 	template<> struct hash < BWAPI::UnitCommandType >
@@ -141,6 +148,7 @@ namespace util
 		void getFiles(const fs::path& root, const std::string& ext, std::vector<fs::path>& ret);
 		void serializeComposition(CompositionHelper::UsedComposition usedComposition);
 		CompositionHelper::UsedComposition deserializeComposition(std::string target);
-		void loadMapData();
+		void serializeMapData(MapHelper::Field regionField);
+		std::map<int, int> deserializeMapData();
 	}
 }

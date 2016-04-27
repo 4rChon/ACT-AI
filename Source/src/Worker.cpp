@@ -45,12 +45,6 @@ void Worker::setMiningBase(ResourceDepot* miningBase, bool gasMiner)
 {
 	unsetMiningBase();
 
-	if (!miningBase)
-		return;
-
-	if (!miningBase->getUnit()->exists())
-		return;
-
 	if (gasMiner)
 		miningBase->addGasWorker(this);		
 	else
@@ -96,7 +90,7 @@ void Worker::updateFreeActions()
 		auto resourceDepots = AgentHelper::getResourceDepots();
 		auto base = EconHelper::getLeastSaturatedBase();
 
-		if (base)
+		if (base && base->getBaseLocation() && base->getUnit()->exists())
 		{
 			setMiningBase(base, !base->isGasSaturated());
 			mining = true;
@@ -104,8 +98,7 @@ void Worker::updateFreeActions()
 		}
 	}
 
-	if (defend(BWAPI::Position(util::game::getSelf()->getStartLocation())))
-		return;
+	defend();
 }
 
 void Worker::act()
@@ -230,8 +223,18 @@ bool Worker::repair()
 
 bool Worker::defend(BWAPI::PositionOrUnit target)
 {
-	return false;/*build(BWAPI::UnitTypes::Terran_Bunker, &BWAPI::TilePosition(BWTA::getNearestChokepoint((target.getPosition()))->getCenter()));*/
-				 //build(BWAPI::UnitTypes::Terran_Missile_Turret, &BWAPI::TilePosition(target.getPosition()));
+	if (target.isPosition())
+		return build(BWAPI::UnitTypes::Terran_Bunker, &BWAPI::TilePosition(target.getPosition()));
+	else
+		return repair(target.getUnit());
+}
+
+bool Worker::defend()
+{
+	auto defenseZone = DesireHelper::getMostDesirableDefenseZone();
+	if (defenseZone)
+		return defend(defenseZone->getRegion()->getCenter());
+	return false;
 }
 
 void Worker::debugInfo() const

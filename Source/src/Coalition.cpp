@@ -195,7 +195,6 @@ void Coalition::addUnit(BWAPI::Unit unit)
 
 void Coalition::removeAgent(Agent* agent)
 {	
-
 	agentSet.erase(agent);
 	removeUnit(agent->getUnit());	
 

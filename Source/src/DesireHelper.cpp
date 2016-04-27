@@ -48,7 +48,7 @@ namespace DesireHelper
 		for (auto &region : BWAPI::Broodwar->getAllRegions())
 		{
 			attackDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));
-			defendDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));
+			defendDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), MapHelper::getZone(region)->getTimesDefended()));
 		}
 
 		supplyDesire = 1.0;
@@ -81,7 +81,23 @@ namespace DesireHelper
 
 	void updateDefendDesire(Zone* target, double desireMod)
 	{
-		defendDesireMap[target] = desireMod;
+		bool bunkerNearby = false;
+		for (auto &zone : target->getNeighbourhood())
+		{
+			if (zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::GetType == BWAPI::UnitTypes::Terran_Bunker).size() > 0)
+			{
+				bunkerNearby = true;
+				break;
+			}
+		}
+
+		for (auto &zone : target->getNeighbourhood())
+		{
+			if (bunkerNearby)
+				defendDesireMap[zone] = (desireMod);
+			else
+				defendDesireMap[zone] = (desireMod + 1) * zone->getTimesDefended();
+		}
 	}
 
 	void updateAttackDesire(Zone* target, double desireMod)
@@ -181,7 +197,6 @@ namespace DesireHelper
 				expansionDesireMap[expansion] = util::normaliseValues(valueArr, coeffArr);
 			}
 		}
-
 	}
 
 	BWTA::BaseLocation* getBestExpansionLocation()

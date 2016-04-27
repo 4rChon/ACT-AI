@@ -171,7 +171,7 @@ void ResourceDepot::removeWorker(Worker* worker)
 
 bool ResourceDepot::addGeyser(Worker* worker)
 {
-	for each (auto &geyser in baseLocation->getGeysers())
+	for (auto &geyser : baseLocation->getGeysers())
 	{
 		if (!geyser->getType().isRefinery())
 			return worker->build(util::game::getSelf()->getRace().getRefinery(), &geyser->getTilePosition());

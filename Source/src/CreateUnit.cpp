@@ -222,11 +222,5 @@ void CreateUnit::update()
 	if (coalition->isActive() && unitCount > 0)
 		act();
 
-	if (unitCount <= 0)
-	{
-		succeed();
-		return;
-	}
-
 	printDebugInfo("Update End");
 }

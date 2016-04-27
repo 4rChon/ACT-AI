@@ -58,6 +58,7 @@ Agent::Agent(BWAPI::Unit unit)
 
 Agent::~Agent()
 {
+	//std::cout << "\t~Agent\n";
 	coalitionID = -1;
 	taskID = -1;
 	coalition = nullptr;
@@ -93,6 +94,8 @@ void Agent::bind()
 {
 	//std::cout << unitID << " : Binding agent\n";
 	free = false;
+	if (unit->isLoaded())
+		unit->getTransport()->unload(unit);
 }
 
 void Agent::unbind()

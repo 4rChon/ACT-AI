@@ -13,4 +13,6 @@ namespace MapHelper
 	Zone* getZone(int id);
 	Zone* getZone(BWAPI::Region region);
 	const Field& getRegionField();
+	void loadMapData();
+	void saveMapData();
 }

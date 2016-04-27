@@ -35,6 +35,8 @@ public:
 	///setters
 	void setDefending(bool defending);
 
+	void setTimesDefended(int timesDefended);
+
 	void defend(bool defendOrder);
 
 	///helpers
