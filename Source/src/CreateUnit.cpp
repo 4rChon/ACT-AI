@@ -42,10 +42,10 @@ void CreateUnit::createCoalition()
 
 void CreateUnit::satisfyRequirements()
 {
-	if (unitType.gasPrice() > 0 && EconHelper::getGasIncome() == 0)
-	{
+	if ((unitType.gasPrice()/((double)unitType.buildTime() / (24 * 60))) - EconHelper::getGasIncome() > 0)
+	{		
 		requiresGas = true;
-		satisfied = false;		
+		satisfied = false;
 	}
 
 	if(!BWAPI::Broodwar->canMake(unitType))

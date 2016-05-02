@@ -248,7 +248,7 @@ bool Worker::defend(BWAPI::PositionOrUnit target)
 
 bool Worker::defend()
 {
-	auto defenseZone = DesireHelper::getMostDesirableDefenseZone(true);
+	auto defenseZone = DesireHelper::getStaticDefenseTarget();
 	if (defenseZone)
 		return defend(defenseZone->getRegion()->getCenter());
 	return false;

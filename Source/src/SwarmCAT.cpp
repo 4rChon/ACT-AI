@@ -279,8 +279,22 @@ void SwarmCAT::onUnitDestroy(BWAPI::Unit unit)
 		//std::cout << unit->getID() << " : " << unit->getType().c_str() << " : Unit destroyed!\n";
 		if (unit->getPlayer() == util::game::getSelf() && !unit->isBeingConstructed())
 		{
-			AgentHelper::removeAgent(unit->getID());
+			if (unit->getType() == BWAPI::UnitTypes::Terran_Bunker)
+			{
+				int bunkerCount = 0;
+				for (auto& zone : MapHelper::getZone(unit->getRegion())->getNeighbourhood())
+					bunkerCount += zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::GetType == BWAPI::UnitTypes::Terran_Bunker).size();
+
+				if (bunkerCount == 0)
+				{
+					for (auto& zone : MapHelper::getZone(unit->getRegion())->getNeighbourhood())
+						zone->setBunkerDefense(false);
+				}
+			}
+
 			DesireHelper::updateSupplyDesire(unit->getType(), true);
+			AgentHelper::removeAgent(unit->getID());
+			
 		}
 
 		if (unit->getPlayer() == util::game::getEnemy())
@@ -335,6 +349,12 @@ void SwarmCAT::onUnitComplete(BWAPI::Unit unit)
 
 			auto unitZone = MapHelper::getZone(unit->getRegion()); 			
 
+			if (unit->getType() == BWAPI::UnitTypes::Terran_Bunker)
+			{
+				for (auto& zone : unitZone->getNeighbourhood())
+					zone->setBunkerDefense(true);
+			}
+
 			DesireHelper::setDefendDesire(unitZone, unitZone->getEnemyScore());
 		}
 	}
@@ -370,10 +390,10 @@ void SwarmCAT::drawDebugText()
 			Broodwar->drawCircleMap(coalition->getUnitSet().getPosition(), 10 + (coalition->getUnitSet().size() * 5), BWAPI::Colors::Red);		
 	}
 
-	auto scoutedUnits = ArmyHelper::getScoutedUnits();
+	/*auto scoutedUnits = ArmyHelper::getScoutedUnits();
 	i = 1;
 	for (auto type : scoutedUnits.getTypes())
-		Broodwar->drawTextScreen(400, 250 + (10 * i++), "%s : %d", type.c_str(), scoutedUnits[type]);	
+		Broodwar->drawTextScreen(400, 250 + (10 * i++), "%s : %d", type.c_str(), scoutedUnits[type]);	*/
 
 	for (auto &a : AgentHelper::getAgentset())
 	{
@@ -427,31 +447,21 @@ void SwarmCAT::drawDebugText()
 	Broodwar->drawTextScreen(10, 20, "Expand Desire: %.2f", DesireHelper::getExpandDesire());
 	Broodwar->drawTextScreen(10, 30, "Supply Desire: %.2f", DesireHelper::getSupplyDesire());
 
-	i = 0;
-	/*for (auto &region : BWTA::getRegions())
-	{
-		for (auto &zone : MapHelper::getRegionField())
-		{
-			if (BWTA::getRegion(zone->getRegion()->getCenter()) == region)
-				Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 20, Color(10 * i, 100, 100), true);
-		}
-		i++;
-	}*/
 
 	/*draw zones*/
-	auto defendDesireMap = DesireHelper::getDefendDesireMap();
+	auto unitDefenseDesireMap = DesireHelper::getUnitDefenseDesireMap();
+	auto staticDefenseDesireMap = DesireHelper::getStaticDefenseDesireMap();
 	for (auto &zone : MapHelper::getRegionField())
 	{
-		Broodwar->drawTextMap(zone->getRegion()->getCenter(), "ZoneID : %d\nDefend Count : %d\nDefend Desire : %.2f", zone->getID(), zone->getTimesDefended(), defendDesireMap[zone]);
-		Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 15, Color((int)defendDesireMap[zone] * 10, 0, 0), true);
+		Broodwar->drawTextMap(zone->getRegion()->getCenter(), "ZoneID : %d\nDefend Count : %d\nUnit Defense Desire : %.2f\nStatic Defense Desire : %.2f", zone->getID(), zone->getTimesDefended(), unitDefenseDesireMap[zone], staticDefenseDesireMap[zone]);
+		Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 25, Color((int)staticDefenseDesireMap[zone] * 10, 0, 0), true);
+		Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 15, Color((int)unitDefenseDesireMap[zone] * 10, 0, 0), true);
+		
 		if(zone->isDefending())
 			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 5, Colors::Red, true);
 		else
 			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 5, Colors::Green, true);
 		
-		/*Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 10, "FriendScore : %d", zone->getFriendScore());
-		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 20, "EnemyScore: %d", zone->getEnemyScore());
-		Broodwar->drawTextMap(zone->getRegion()->getCenter().x, zone->getRegion()->getCenter().y + 30, "Time Since Last : %d", BWAPI::Broodwar->getFrameCount() - zone->getLastVisited());*/
 	}
 }
 

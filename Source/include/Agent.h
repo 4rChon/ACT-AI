@@ -15,6 +15,8 @@ class Agent
 {
 protected:
 
+	BWAPI::UnitCommand lastCommand;
+
 	//pointer to unit represented by agent - nullptr if no unit
 	BWAPI::Unit unit;
 
@@ -77,7 +79,6 @@ public:
 	Agent();
 	Agent(BWAPI::Unit unit);
 	virtual ~Agent();
-
 	///setters	
 	//Assign agent coalition and coalitionID
 	void setCoalition(Coalition* coalition);

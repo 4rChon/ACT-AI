@@ -12,7 +12,8 @@ namespace DesireHelper
 		static std::unordered_map<BWAPI::TechType, double> techDesireMap;
 		static std::unordered_map<BWTA::BaseLocation*, double, std::hash<void*>> expansionDesireMap;
 		static std::unordered_map<Zone*, double, std::hash<void*>> attackDesireMap;
-		static std::unordered_map<Zone*, double, std::hash<void*>> defendDesireMap;
+		static std::unordered_map<Zone*, double, std::hash<void*>> staticDefenseDesireMap;
+		static std::unordered_map<Zone*, double, std::hash<void*>> unitDefenseDesireMap;
 		static double supplyDesire;
 		static double expandDesire;
 	}
@@ -48,7 +49,8 @@ namespace DesireHelper
 		for (auto &region : BWAPI::Broodwar->getAllRegions())
 		{
 			attackDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));			
-			//defendDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), MapHelper::getZone(region)->getTimesDefended()));
+			unitDefenseDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));
+			staticDefenseDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));
 		}
 
 		supplyDesire = 1.0;
@@ -67,17 +69,23 @@ namespace DesireHelper
 		return bestZone.first;
 	}
 
-	Zone* getMostDesirableDefenseZone(bool buildingBunker)
+	Zone* getStaticDefenseTarget()
 	{
 		std::pair<Zone*, double> bestZone = std::pair<Zone*, double>(nullptr, 0.0);
-		for (auto& zone : defendDesireMap)
-		{			
-			if (zone.first->hasBunkerDefense() && buildingBunker)
-				continue;
+		for (auto& zone : staticDefenseDesireMap)
+		{
+			if (zone.second > bestZone.second)
+				bestZone = zone;
+		}
 
-			if (!zone.first->isDefending() && !buildingBunker)
-				continue;
+		return bestZone.first;
+	}
 
+	Zone* getUnitDefenseTarget()
+	{
+		std::pair<Zone*, double> bestZone = std::pair<Zone*, double>(nullptr, 0.0);
+		for (auto& zone : unitDefenseDesireMap)
+		{
 			if (zone.second > bestZone.second)
 				bestZone = zone;
 		}
@@ -87,23 +95,18 @@ namespace DesireHelper
 
 	void setDefendDesire(Zone* target, double desireMod)
 	{
-		target->setBunkerDefense(false);
-		for (auto &zone : target->getNeighbourhood())
-		{
-			if (zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::GetType == BWAPI::UnitTypes::Terran_Bunker).size() > 0)
-			{
-				target->setBunkerDefense(true);
-				break;
-			}
-		}
-
 		for (auto &zone : target->getNeighbourhood())
 		{
 			int defenseMod = 0;
 			if (zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::IsBuilding).size() > 0)
 				defenseMod = 1;
 			
-			defendDesireMap[zone] = (desireMod + 1) * zone->getTimesDefended() * defenseMod;
+			double defenseMultiplier = zone->getTimesDefended() / zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && !BWAPI::Filter::IsBuilding).size();
+			unitDefenseDesireMap[zone] = (desireMod + 1) * defenseMultiplier * defenseMod;
+			if (!zone->hasBunkerDefense())
+				staticDefenseDesireMap[zone] = zone->getTimesDefended() * defenseMod;
+			else
+				staticDefenseDesireMap[zone] = 0.0;
 		}
 	}
 
@@ -115,7 +118,7 @@ namespace DesireHelper
 	void updateUnitDesireMap()
 	{
 		for (auto& unit : unitDesireMap)
-			unitDesireMap[unit.first] = 0.0;
+			unit.second = 0.0;
 
 		for (auto& coalition : CoalitionHelper::getCoalitionset())
 		{
@@ -166,7 +169,7 @@ namespace DesireHelper
 	BWAPI::UnitType getMostDesirableAddon(BWAPI::UnitType building)
 	{
 		if (!building.canBuildAddon() || building == BWAPI::UnitTypes::None)
-			return BWAPI::UnitTypes::None;
+			return BWAPI::UnitTypes::None;		
 
 		auto bestAddon = std::pair<BWAPI::UnitType, double>(BWAPI::UnitTypes::None, 0.0);
 		for each(auto &unit in building.buildsWhat())
@@ -311,8 +314,13 @@ namespace DesireHelper
 		return attackDesireMap;
 	}
 
-	const std::unordered_map<Zone*, double, std::hash<void*>>& getDefendDesireMap()
+	const std::unordered_map<Zone*, double, std::hash<void*>>& getStaticDefenseDesireMap()
 	{
-		return defendDesireMap;
+		return staticDefenseDesireMap;
+	}
+
+	const std::unordered_map<Zone*, double, std::hash<void*>>& getUnitDefenseDesireMap()
+	{
+		return unitDefenseDesireMap;
 	}
 }

@@ -130,7 +130,7 @@ namespace util
 		std::string getSelfName()
 		{
 			std::ifstream nameFile;
-			nameFile.open("compositions\\Player.txt");
+			nameFile.open("ai-data//Player.txt");
 			std::string selfName;
 			getline(nameFile, selfName);
 			nameFile.close();
@@ -190,7 +190,9 @@ namespace util
 			std::ofstream compStream;
 
 			auto directory = "ai-data\\" + game::getEnemy()->getRace().getName() + "\\compositions\\";
-			int avgActivationFrame = (int)((double)usedComposition.activationFrame / usedComposition.useCount);
+			int avgActivationFrame = usedComposition.activationFrame;
+			if (usedComposition.useCount > 0)
+				avgActivationFrame = (int)((double)usedComposition.activationFrame / usedComposition.useCount);
 			int frameBracket = game::getFrameBracket(avgActivationFrame, 7200);
 			auto fileName = std::to_string(frameBracket) + "_" + std::to_string(usedComposition.taskType);
 
@@ -198,30 +200,33 @@ namespace util
 
 			int taskType = usedComposition.taskType;
 			
-			double fitness = usedComposition.fitness / usedComposition.useCount;
+			double fitness = usedComposition.fitness;
+			if (usedComposition.useCount > 0)
+				fitness = usedComposition.fitness / usedComposition.useCount;
+
 			int useCount = usedComposition.useCount;
 
 			compStream.write((char*)&taskType, sizeof(taskType));
 			compStream.write((char*)&avgActivationFrame, sizeof(avgActivationFrame));
 			compStream.write((char*)&fitness, sizeof(fitness));
 
-			int typeCount = 0;			
+			int totalTypeCount = 0;			
 			for each(auto unitType in usedComposition.composition.getTypes())
 			{
 				if (usedComposition.composition[unitType] > 0)
-					typeCount++;
+					totalTypeCount++;
 			}
 
-			compStream.write((char*)&typeCount, sizeof(typeCount));
+			compStream.write((char*)&totalTypeCount, sizeof(totalTypeCount));
 
 			for each(auto unitType in usedComposition.composition.getTypes())
 			{
 				if (usedComposition.composition[unitType] > 0)
 				{
 					int typeID = unitType.getID();
-					int typeCount = (int)((double)(usedComposition.composition[unitType]));
+					int unitTypeCount = (int)((double)(usedComposition.composition[unitType]));
 					compStream.write((char*)&typeID, sizeof(typeID));
-					compStream.write((char*)&typeCount, sizeof(typeCount));
+					compStream.write((char*)&unitTypeCount, sizeof(unitTypeCount));
 				}
 			}
 			compStream.write((char*)&useCount, sizeof(useCount));
@@ -239,8 +244,8 @@ namespace util
 
 			for each(auto unitType in usedComposition.composition.getTypes())
 			{				
-				int typeCount = (int)((double)(usedComposition.composition[unitType]));
-				readableStream << unitType.c_str() << " : " << typeCount << "\n";
+				int unitTypeCount = (int)((double)(usedComposition.composition[unitType]));
+				readableStream << unitType.c_str() << " : " << unitTypeCount << "\n";
 			}
 
 			readableStream.close();
@@ -261,16 +266,16 @@ namespace util
 			compStream.read((char*)&activationFrame, sizeof(activationFrame));
 			compStream.read((char*)&fitness, sizeof(fitness));			
 
-			int typeCount;
-			compStream.read((char*)&typeCount, sizeof(typeCount));
+			int totalTypeCount;
+			compStream.read((char*)&totalTypeCount, sizeof(totalTypeCount));
 
-			for (int i = 0; i < typeCount; i++)
+			for (int i = 0; i < totalTypeCount; i++)
 			{
 				int unitType;
-				int typeCount;
+				int unitTypeCount;
 				compStream.read((char*)&unitType, sizeof(unitType));
-				compStream.read((char*)&typeCount, sizeof(typeCount));
-				c.addType(unitType, typeCount);
+				compStream.read((char*)&unitTypeCount, sizeof(unitTypeCount));
+				c.addType(unitType, unitTypeCount);
 			}
 
 			compStream.read((char*)&useCount, sizeof(useCount));

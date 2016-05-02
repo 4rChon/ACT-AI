@@ -53,6 +53,7 @@ Agent::Agent(BWAPI::Unit unit)
 	isEngaged = false;
 	lastKillCount = 0;
 
+	lastCommand = unit->getLastCommand();
 	/*initialiseCommandMap();*/	
 }
 
@@ -283,6 +284,14 @@ void Agent::updateBoundActions()
 	if (task->getType() == ATT)
 		micro();
 
+	auto inRange = unit->getUnitsInRadius(unit->getType().sightRange(), BWAPI::Filter::IsNeutral && !BWAPI::Filter::IsInvincible);
+
+	for (auto& neutralUnit : inRange)
+	{
+		if (attack(neutralUnit))
+			break;
+	}
+
 	updateEngagement();
 	updateKillCount();
 }
@@ -290,9 +299,22 @@ void Agent::updateBoundActions()
 void Agent::updateFreeActions()
 {
 	pollCoalitions();
-	
+
+	if (!free)
+		return;
+
 	if (unit->getType().canBuildAddon())
 	{
+		BWAPI::SetContainer<BWAPI::UnitType> addonList;
+		for (auto& unitType : unit->getType().buildsWhat())
+		{
+			if (unitType.isAddon())
+				addonList.insert(unitType);
+		}
+
+		if (addonList.size() > 1)
+			return;
+
 		if(buildAddon(DesireHelper::getMostDesirableAddon(unit->getType())))
 			return;
 	}
@@ -356,7 +378,7 @@ void Agent::updateActions()
 			if (bullet->getType() == BWAPI::BulletTypes::Subterranean_Spines)
 				ArmyHelper::scan(bullet->getPosition());
 		}
-	}
+	}	
 }
 
 void Agent::act()
@@ -385,23 +407,39 @@ bool Agent::pollCoalitions()
 }
 
 bool Agent::move(BWAPI::Position target)
-{
+{	
 	if (unit->canMove())
+	{
+		if (lastCommand.getType() == BWAPI::UnitCommandTypes::Move && lastCommand.getTargetPosition() == target)
+			return false;
 		return unit->move(target);
+	}
 	return false;
 }
 
 bool Agent::attack(BWAPI::PositionOrUnit target)
-{
+{	
 	if (unit->canAttack(target))
+	{
+		if (target.isPosition())
+		{
+			if (lastCommand.getType() == BWAPI::UnitCommandTypes::Attack_Move && lastCommand.getTargetPosition() == target.getPosition())
+				return false;
+		}
+		if (target.isUnit())
+		{
+			if (lastCommand.getType() == BWAPI::UnitCommandTypes::Attack_Unit && lastCommand.getTarget() == target.getUnit())
+				return false;
+		}
 		return unit->attack(target);
+	}
 	return false;
 }
 
 bool Agent::defend()
-{
+{	
 	BWAPI::Position targetPosition = unit->getPosition();
-	Zone *targetZone = DesireHelper::getMostDesirableDefenseZone(false);
+	Zone *targetZone = DesireHelper::getUnitDefenseTarget();	
 
 	auto closestResourceDepot = unit->getClosestUnit(BWAPI::Filter::IsResourceDepot && BWAPI::Filter::IsOwned);
 	
@@ -413,7 +451,6 @@ bool Agent::defend()
 	
 	if (!targetPosition)
 		targetPosition = BWAPI::Position(unit->getClosestUnit(BWAPI::Filter::IsBuilding && BWAPI::Filter::IsOwned)->getPosition());
-
 
 	if (unit->getType() == BWAPI::UnitTypes::Terran_Bunker)
 	{
@@ -427,20 +464,20 @@ bool Agent::defend()
 
 		if (closestUnit != nullptr)
 		{
-			if (AgentHelper::getAgent(closestUnit->getID())->isFree() && closestUnit->getType().groundWeapon() != BWAPI::WeaponTypes::None)
-				return unit->load(closestUnit);
+			if (AgentHelper::getAgent(closestUnit->getID())->isFree() && closestUnit->getType().groundWeapon() != BWAPI::WeaponTypes::None)							
+				return unit->load(closestUnit);			
 		}
 		return false;
 	}
 	else if (unit->getType() == BWAPI::UnitTypes::Terran_Siege_Tank_Tank_Mode)
 	{
-		if (move(targetPosition))
-			return useAbility(BWAPI::TechTypes::Tank_Siege_Mode, targetPosition);
+		if (move(targetPosition))					
+			return useAbility(BWAPI::TechTypes::Tank_Siege_Mode, targetPosition);		
 	}
 
 	
 
-	if(MapHelper::getZone(unit->getRegion()) != MapHelper::getZone(BWAPI::Broodwar->getRegionAt(targetPosition)))
+	if (MapHelper::getZone(unit->getRegion()) != MapHelper::getZone(BWAPI::Broodwar->getRegionAt(targetPosition)))			
 		return attack(targetPosition);
 	else
 		return false;
@@ -454,13 +491,16 @@ bool Agent::expand()
 bool Agent::gather(BWAPI::Unit target)
 {
 	if (unit->canGather(target))
+	{
+		if (lastCommand.getType() == BWAPI::UnitCommandTypes::Gather && lastCommand.getUnit() == target)
+			return false;
 		return unit->gather(target);
+	}
 	return false;
 }
 
 bool Agent::build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPosition)
 {
-	std::cout << "Agent Build\n";
 	return false;
 }
 

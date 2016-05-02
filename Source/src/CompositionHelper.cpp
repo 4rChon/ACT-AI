@@ -259,7 +259,6 @@ namespace CompositionHelper
 
 		Composition composition;
 
-		//TO DO: fix unit multiplier
 		for each(auto& unit in coalition->getTargetComp().getUnitMap())
 		{
 			if(unit.second > 0)

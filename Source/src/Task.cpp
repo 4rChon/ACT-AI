@@ -133,7 +133,7 @@ void Task::cleanSubTasks()
 	subTasks.clear();
 }
 
-void Task::updateTaskTree()
+void Task::updateTaskTree()//check this out
 {	
 	if (subTasks.size() > 0)
 	{		

@@ -43,7 +43,7 @@ namespace ReplayHelper
 		enemyComposition = Composition(util::game::getEnemy()->getUnits());
 		std::cout << "Loaded Enemy Composition\n";
 		//respond to units with counters
-		if (usedComp.useCount > 1)
+		if (usedComp.useCount != 0)
 		{
 			if (usedComp.fitness < 0.5)
 			{
@@ -105,7 +105,7 @@ namespace ReplayHelper
 				usedComp.composition = mutateComposition(usedComp.composition);
 		}
 
-		usedComp.useCount = 1;
+		usedComp.useCount = 0;
 
 		CompositionHelper::saveComposition(usedComp);
 	}

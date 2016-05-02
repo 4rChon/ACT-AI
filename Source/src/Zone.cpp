@@ -125,9 +125,9 @@ void Zone::updateZone()
 	for (auto& unit : region->getUnits())
 	{
 		if (unit->getPlayer() == util::game::getEnemy())
-			enemyScore++;// = 100 + unit->getType().buildScore() + unit->getType().destroyScore();
+			enemyScore = 100 + unit->getType().buildScore() + unit->getType().destroyScore();
 		if (unit->getPlayer() == util::game::getSelf() && (!unit->getType().isBuilding() || unit->getType() == BWAPI::UnitTypes::Terran_Bunker || unit->getType() == BWAPI::UnitTypes::Terran_Missile_Turret))
-			friendScore++;//= 100 + unit->getType().buildScore() + unit->getType().destroyScore();
+			friendScore = 100 + unit->getType().buildScore() + unit->getType().destroyScore();
 		if (unit->getType().isResourceContainer())
 			resourceScore += unit->getResources();
 	}
