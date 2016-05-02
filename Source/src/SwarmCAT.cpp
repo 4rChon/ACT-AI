@@ -400,15 +400,15 @@ void SwarmCAT::drawDebugText()
 		auto u = a->getUnit();
 		if (u->exists())
 		{
-			if (u->getType().isWorker())
-			{
-				if (((Worker*)a)->getMiningBase())
-				{
-					Broodwar->drawLineMap(u->getPosition(), ((Worker*)a)->getMiningBase()->getBaseLocation()->getPosition(), Colors::Red);					
-					if(u->getOrderTargetPosition() != BWAPI::Position(0, 0))
-						Broodwar->drawLineMap(u->getPosition(), u->getOrderTargetPosition(), Colors::Blue);
-				}
-			}
+			//if (u->getType().isWorker())
+			//{
+			//	if (((Worker*)a)->getMiningBase())
+			//	{
+			//		Broodwar->drawLineMap(u->getPosition(), ((Worker*)a)->getMiningBase()->getBaseLocation()->getPosition(), Colors::Red);					
+			//		if(u->getOrderTargetPosition() != BWAPI::Position(0, 0))
+			//			Broodwar->drawLineMap(u->getPosition(), u->getOrderTargetPosition(), Colors::Blue);
+			//	}
+			//}
 			BWAPI::Color unitCircleColor;
 
 			if (a->isFree())

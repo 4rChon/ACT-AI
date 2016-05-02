@@ -306,15 +306,6 @@ void Agent::updateFreeActions()
 	if (unit->getType().canBuildAddon())
 	{
 		BWAPI::SetContainer<BWAPI::UnitType> addonList;
-		for (auto& unitType : unit->getType().buildsWhat())
-		{
-			if (unitType.isAddon())
-				addonList.insert(unitType);
-		}
-
-		if (addonList.size() > 1)
-			return;
-
 		if(buildAddon(DesireHelper::getMostDesirableAddon(unit->getType())))
 			return;
 	}
@@ -388,6 +379,9 @@ void Agent::act()
 
 	updateActions();
 
+	if (unit->getType() == BWAPI::UnitTypes::Terran_Supply_Depot)
+		return;
+
 	if (free)
 		updateFreeActions();
 	else
@@ -455,8 +449,12 @@ bool Agent::defend()
 	if (unit->getType() == BWAPI::UnitTypes::Terran_Bunker)
 	{
 		int spaceRemaining = unit->getSpaceRemaining();
+		if (spaceRemaining == 0)
+			return false;
+
 		auto closestUnit = unit->getClosestUnit(
-			BWAPI::Filter::ArmorUpgrade == BWAPI::UpgradeTypes::Terran_Infantry_Armor
+			BWAPI::Filter::IsOwned
+			&& BWAPI::Filter::ArmorUpgrade == BWAPI::UpgradeTypes::Terran_Infantry_Armor
 			&& !BWAPI::Filter::IsWorker
 			&& BWAPI::Filter::SpaceRequired <= spaceRemaining
 			&& BWAPI::Filter::IsIdle

@@ -142,7 +142,7 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 
 		BWAPI::TilePosition buildLocation;
 		if (!building.isResourceDepot())
-			buildLocation = BWAPI::Broodwar->getBuildLocation(building, *desiredPosition);
+			buildLocation = BWAPI::Broodwar->getBuildLocation(building, *desiredPosition, 99999);
 		else
 			buildLocation = *desiredPosition;
 

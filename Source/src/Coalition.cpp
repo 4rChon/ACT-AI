@@ -107,9 +107,9 @@ double Coalition::getProfit()
 	std::vector<double> valueArr;
 	std::vector<double> coeffArr;
 	valueArr.push_back(killCount);
-	coeffArr.push_back(1.0);
+	coeffArr.push_back(0.9);
 	valueArr.push_back(engageDuration);
-	coeffArr.push_back(0.8);
+	coeffArr.push_back(0.4);
 	profit = util::normaliseValues(valueArr, coeffArr);
 	return profit;
 }

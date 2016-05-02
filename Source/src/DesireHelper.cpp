@@ -101,8 +101,9 @@ namespace DesireHelper
 			if (zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::IsBuilding).size() > 0)
 				defenseMod = 1;
 			
-			double defenseMultiplier = zone->getTimesDefended() / (zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && !BWAPI::Filter::IsBuilding).size() + 1);
-			unitDefenseDesireMap[zone] = (desireMod + 1) * defenseMultiplier * defenseMod;
+			//double defenseMultiplier = zone->getTimesDefended()  / (zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && !BWAPI::Filter::IsBuilding && !BWAPI::Filter::IsWorker).size() + 1);
+			unitDefenseDesireMap[zone] = (desireMod + 1) * zone->getTimesDefended() * defenseMod;
+
 			if (!zone->hasBunkerDefense())
 				staticDefenseDesireMap[zone] = zone->getTimesDefended() * defenseMod;
 			else
@@ -128,11 +129,6 @@ namespace DesireHelper
 			for (auto& unit : targetUnitMap)
 				unitDesireMap[unit.first] += (double)(unit.second - currentUnitMap[unit.first]) / (double)unit.second;
 		}
-
-		if (util::game::getSelf()->allUnitCount(util::game::getSelf()->getRace().getWorker()) >= 70)
-			unitDesireMap[util::game::getSelf()->getRace().getWorker()] = 0.0;
-		else
-			unitDesireMap[util::game::getSelf()->getRace().getWorker()] = 1.0;
 	}	
 
 	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType producer)
@@ -141,6 +137,10 @@ namespace DesireHelper
 
 		if (producer == BWAPI::UnitTypes::None)
 			return BWAPI::UnitTypes::None;
+
+		if (producer == util::game::getSelf()->getRace().getCenter())
+			if (util::game::getSelf()->allUnitCount(util::game::getSelf()->getRace().getWorker()) < 70)
+				return util::game::getSelf()->getRace().getWorker();
 
 		auto bestUnit = std::pair<BWAPI::UnitType, double>(BWAPI::UnitTypes::None, 0.0);		
 

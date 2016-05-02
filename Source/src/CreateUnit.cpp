@@ -75,9 +75,6 @@ void CreateUnit::decrementUnitCount()
 void CreateUnit::assign()
 {
 	printDebugInfo("Assign");
-	satisfied = true;	
-	satisfyRequirements();
-		
 	if (satisfied && EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType))
 	{
 		createCoalition();
@@ -185,6 +182,9 @@ void CreateUnit::update()
 	printDebugInfo("Update");
 	if (complete)
 		return;
+
+	satisfied = true;
+	satisfyRequirements();
 
 	//if unitCount is <= 0, then succeed
 	if (unitCount <= 0)

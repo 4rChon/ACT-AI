@@ -88,7 +88,6 @@ void ResourceDepot::act()
 	updateSaturation();
 	updateRefineryCount();
 	
-	
 	if (free)
 		updateFreeActions();
 	else

@@ -15,6 +15,10 @@ namespace TaskHelper
 	void initialiseHelper()
 	{
 		nextID = 0;
+		
+		/* opening */
+		CreateUnit* createUnit = new CreateUnit(BWAPI::UnitTypes::Terran_Barracks);
+		addTask(createUnit, true);
 	}
 
 	int getNextID()

@@ -63,9 +63,7 @@ namespace AgentHelper
 		if (unit->getType() == BWAPI::UnitTypes::Zerg_Larva
 			|| unit->getType() == BWAPI::UnitTypes::Zerg_Egg
 			|| unit->getType() == BWAPI::UnitTypes::Zerg_Cocoon
-			|| unit->getType() == BWAPI::UnitTypes::Zerg_Lurker_Egg
-			|| unit->getType() == BWAPI::UnitTypes::Terran_Supply_Depot
-			|| unit->getType() == BWAPI::UnitTypes::Protoss_Pylon
+			|| unit->getType() == BWAPI::UnitTypes::Zerg_Lurker_Egg			
 			)
 			return;
 
