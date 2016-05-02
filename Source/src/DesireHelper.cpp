@@ -101,7 +101,7 @@ namespace DesireHelper
 			if (zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::IsBuilding).size() > 0)
 				defenseMod = 1;
 			
-			double defenseMultiplier = zone->getTimesDefended() / zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && !BWAPI::Filter::IsBuilding).size();
+			double defenseMultiplier = zone->getTimesDefended() / (zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && !BWAPI::Filter::IsBuilding).size() + 1);
 			unitDefenseDesireMap[zone] = (desireMod + 1) * defenseMultiplier * defenseMod;
 			if (!zone->hasBunkerDefense())
 				staticDefenseDesireMap[zone] = zone->getTimesDefended() * defenseMod;
