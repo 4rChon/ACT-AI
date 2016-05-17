@@ -51,9 +51,9 @@ public:
 
 	///getters
 	std::vector<BWAPI::UnitType> getTypes() const;
-	UnitMap getUnitMap() const;
-	double getCost() const;
-	Attributes &getAttributes();
+	UnitMap getUnitMap() const { return unitMap; }
+	double getCost() const { return cost; }
+	Attributes &getAttributes() { return attributes; }
 	/*Parameters &getParameters();*/	
 
 	///helpers		

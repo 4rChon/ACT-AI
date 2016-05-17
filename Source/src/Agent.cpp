@@ -57,7 +57,6 @@ Agent::~Agent()
 //	for (auto &commandType : BWAPI::UnitCommandTypes::allUnitCommandTypes())
 //		commandMap.insert(std::pair<BWAPI::UnitCommandType, double>(commandType, 0.0));
 //}
-
 void Agent::setCoalition(Coalition* coalition)
 {
 	coalitionID = coalition->getID();
@@ -69,11 +68,6 @@ void Agent::setTask(Task* task)
 	taskID = task->getID();
 	this->task = task;
 	target = task->getTarget();
-}
-
-void Agent::setUnit(BWAPI::Unit unit)
-{
-	this->unit = unit;
 }
 
 void Agent::bind()
@@ -93,46 +87,6 @@ void Agent::unbind()
 	task = nullptr;
 	target = nullptr;
 	free = true;
-}
-
-int Agent::getID() const
-{
-	return unitID;
-}
-
-int Agent::getCoalitionID() const
-{
-	return coalitionID;
-}
-
-Coalition* Agent::getCoalition() const
-{
-	return coalition;
-}
-
-int Agent::getTaskID() const
-{
-	return taskID;
-}
-
-Task* Agent::getTask() const
-{
-	return task;
-}
-
-BWAPI::Unit Agent::getUnit() const
-{
-	return unit;
-}
-
-double Agent::getPrice() const
-{
-	return unit->getType().mineralPrice() + (unit->getType().gasPrice() * 1.5);
-}
-
-bool Agent::isFree() const
-{
-	return free;
 }
 
 void Agent::micro()
@@ -481,11 +435,6 @@ bool Agent::defend()
 		return false;
 }
 
-bool Agent::expand()
-{
-	return false;
-}
-
 bool Agent::gather(BWAPI::Unit target)
 {
 	if (unit->canGather(target))
@@ -494,11 +443,6 @@ bool Agent::gather(BWAPI::Unit target)
 			return false;
 		return unit->gather(target);
 	}
-	return false;
-}
-
-bool Agent::build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPosition)
-{
 	return false;
 }
 

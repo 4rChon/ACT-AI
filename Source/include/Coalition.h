@@ -75,7 +75,7 @@ public:
 	int getAge() const;
 
 	//Get a unique coalition ID.
-	int getID() const;
+	int getID() const { return coalitionID; }
 
 	//Get the cost of the coalition so far.
 	double getCost();
@@ -87,27 +87,27 @@ public:
 	double getFitness();
 
 	//Get the unit multiplier used on the composition.
-	double getUnitMultiplier();
+	double getUnitMultiplier() { return unitMultiplier; }
 
 	//Returns true if coalition is active.
-	bool isActive() const;
+	bool isActive() const { return active; }
 
 	void activate();
 
 	//Get current assigned task.
-	Task * getTask() const;
+	Task* getTask() const { return task; }
 
 	//Get the current unit composition assigned to the coalition.
-	Composition getCurrentComp() const;
+	Composition getCurrentComp() const { return currentComp; }
 
 	//Get the target composition required for the coalition to activate.
-	Composition getTargetComp() const;
+	Composition getTargetComp() const { return targetComp; }
 
 	//Get the units assigned to the coalition.
-	BWAPI::Unitset &getUnitSet();
+	BWAPI::Unitset &getUnitSet() { return unitSet; }
 
 	//Get the agents assigned to the coalition.
-	Agentset &getAgentSet();
+	Agentset &getAgentSet() { return agentSet; }
 
 	///helpers	
 	//Add an agent to the coalition.
@@ -117,10 +117,10 @@ public:
 	void removeAgent(Agent* agent);
 
 	//Increase engagement count.
-	void addEngagement();
+	void addEngagement() { engageDuration++; }
 
 	//Increase kill count.
-	void addKillCount(int killCount = 1);
+	void addKillCount(int killCount = 1) { this->killCount += killCount; }
 
 	//Output coalition attributes.
 	void printAttributes();

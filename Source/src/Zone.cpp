@@ -27,86 +27,11 @@ void Zone::initNeighbourhood()
 	}
 }
 
-const MapHelper::Field & Zone::getNeighbourhood()
-{
-	return neighbourhood;
-}
-
-BWAPI::Region Zone::getRegion() const
-{
-	return region;
-}
-
-BWTA::Region * Zone::getSuperRegion() const
-{
-	return superRegion;
-}
-
-int Zone::getID() const
-{
-	return id;
-}
-
-int Zone::getLastVisited() const
-{
-	return lastVisited;
-}
-
-int Zone::getEnemyScore() const
-{
-	return enemyScore;
-}
-
-int Zone::getFriendScore() const
-{
-	return friendScore;
-}
-
-int Zone::getResourceScore() const
-{
-	return resourceScore;
-}
-
-int Zone::getTimesDefended() const
-{
-	return timesDefended;
-}
-
-bool Zone::hasBunkerDefense() const
-{
-	return hasBunker;
-}
-
-bool Zone::hasTurretDefense() const
-{
-	return hasTurret;
-}
-
-bool Zone::isDefending() const
-{
-	return defending;
-}
-
 void Zone::setDefending(bool defending)
 {
 	this->defending = defending;	
 
 	DesireHelper::setDefendDesire(this, getEnemyScore());
-}
-
-void Zone::setTimesDefended(int timesDefended)
-{
-	this->timesDefended = timesDefended;
-}
-
-void Zone::setBunkerDefense(bool hasBunker)
-{
-	this->hasBunker = hasBunker;
-}
-
-void Zone::setTurretDefense(bool hasTurret)
-{
-	this->hasTurret = hasTurret;
 }
 
 void Zone::defend(bool defendOrder)
@@ -115,18 +40,6 @@ void Zone::defend(bool defendOrder)
 		zone->setDefending(defendOrder);
 
 	timesDefended++;
-}
-
-void Zone::updateLastVisited()
-{
-	lastVisited = BWAPI::Broodwar->getFrameCount();
-}
-
-void Zone::resetScores()
-{
-	enemyScore = 0;
-	friendScore = 0;
-	resourceScore = 0;
 }
 
 void Zone::updateZone()

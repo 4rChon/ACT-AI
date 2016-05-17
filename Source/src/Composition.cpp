@@ -102,16 +102,6 @@ std::vector<BWAPI::UnitType> Composition::getTypes() const
 	return unitTypes;
 }
 
-UnitMap Composition::getUnitMap() const
-{
-	return unitMap;
-}
-
-double Composition::getCost() const
-{
-	return cost;
-}
-
 void Composition::removeType(const BWAPI::UnitType& unitType, int count)
 {
 	/*std::cout << "Removing " << count << unitType.c_str() << " from composition\n";*/
@@ -126,11 +116,6 @@ void Composition::addType(const BWAPI::UnitType& unitType, int count)
 	unitMap[unitType] += count;
 	cost += ((unitType.gasPrice() * 1.5) + (unitType.mineralPrice())) * count;
 	updateAttributes(unitType, count);
-}
-
-Composition::Attributes& Composition::getAttributes()
-{
-	return attributes;
 }
 
 //Composition::Parameters& Composition::getParameters()

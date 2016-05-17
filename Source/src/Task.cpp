@@ -38,56 +38,6 @@ Task::~Task()
 	}
 }
 
-void Task::setDebug(bool debug)
-{
-	this->debug = debug;
-}
-
-void Task::setCoalition(Coalition* coalition)
-{
-	this->coalition = coalition;
-	coalitionID = coalition->getID();
-}
-
-Zone* Task::getTarget()
-{
-	return target;
-}
-
-bool Task::isComplete() const
-{
-	return complete;
-}
-
-TaskType Task::getType() const
-{
-	return taskType;
-}
-
-int Task::getID() const
-{
-	return taskID;
-}
-
-std::string Task::getName() const
-{
-	return taskName;
-}
-
-Taskset& Task::getSubTasks()
-{
-	return subTasks;
-}
-
-Taskset& Task::getSuperTasks()
-{
-	return superTasks;
-}
-
-Coalition* Task::getCoalition() const
-{
-	return coalition;
-}
 
 double Task::getCost()
 {
@@ -101,11 +51,6 @@ double Task::getCost()
 	return cost;
 }
 
-double Task::getProfit()
-{
-	return profit;
-}
-
 void Task::addSubTask(Task* task)
 {
 	auto newTask = TaskHelper::addTask(task);
@@ -113,14 +58,9 @@ void Task::addSubTask(Task* task)
 	newTask->addSuperTask(this);
 }
 
-void Task::addSuperTask(Task* task)
-{
-	superTasks.insert(task);
-}
-
-void Task::deleteSubTasks()
-{
-	TaskHelper::deleteTaskTree(subTasks);
+void Task::deleteSubTasks() 
+{ 
+	TaskHelper::deleteTaskTree(subTasks); 
 }
 
 void Task::createCoalition()

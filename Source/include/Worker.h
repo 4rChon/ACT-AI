@@ -51,10 +51,10 @@ public:
 
 	///getters
 	//True if gasMiner is true
-	bool isMiningGas() const;
+	bool isMiningGas() const { return gasMiner; }
 
 	//Get current mining base - nullptr if no mining base
-	ResourceDepot* getMiningBase() const;
+	ResourceDepot* getMiningBase() const { return miningBase; }
 
 	///-
 	//Compute actions

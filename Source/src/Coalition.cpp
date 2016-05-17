@@ -59,31 +59,11 @@ Coalition::~Coalition()
 		agent->unbind();
 }
 
-Task* Coalition::getTask() const
-{
-	return task;
-}
-
 int Coalition::getAge() const
 {
 	if(!active)
 		return BWAPI::Broodwar->getFrameCount() - creationFrame;
 	return BWAPI::Broodwar->getFrameCount() - activationFrame;
-}
-
-int Coalition::getID() const
-{
-	return coalitionID;
-}
-
-BWAPI::Unitset &Coalition::getUnitSet()
-{
-	return unitSet;
-}
-
-Agentset &Coalition::getAgentSet()
-{
-	return agentSet;
 }
 
 double Coalition::getCost()
@@ -117,36 +97,6 @@ double Coalition::getFitness()
 	valueArr.push_back(profit/cost);
 	coeffArr.push_back(0.1);
 	return util::normaliseValues(valueArr, coeffArr);
-}
-
-double Coalition::getUnitMultiplier()
-{
-	return unitMultiplier;
-}
-
-void Coalition::addEngagement()
-{
-	engageDuration++;
-}
-
-void Coalition::addKillCount(int killCount)
-{
-	this->killCount += killCount;
-}
-
-Composition Coalition::getCurrentComp() const
-{
-	return currentComp;
-}
-
-Composition Coalition::getTargetComp() const
-{
-	return targetComp;
-}
-
-bool Coalition::isActive() const
-{
-	return active;
 }
 
 void Coalition::activate()

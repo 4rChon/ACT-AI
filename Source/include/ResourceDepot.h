@@ -35,25 +35,25 @@ public:
 
 	///getters
 	//Get pointer to BWTA::BaseLocation type
-	BWTA::BaseLocation* getBaseLocation();
+	BWTA::BaseLocation* getBaseLocation() { return this->baseLocation; }
 
 	//Get SetContainer of workers
-	Workerset& getWorkers();
+	Workerset& getWorkers() { return workers; }
 
 	//Get number of mineral miners
-	int getMineralMiners();
+	int getMineralMiners() { return mineralMiners; }
 
 	//Get number of gas miners
-	int getGasMiners();
+	int getGasMiners() { return gasMiners; }
 
 	//Get number of refineries built on vespene geysers
-	int getRefineryCount();
+	int getRefineryCount() { return refineryCount; }
 
 	void updateFreeActions();
 
 	//Get saturation
-	double getMineralSaturation();	
-	double getGasSaturation();
+	double getMineralSaturation() { return mineralSaturation; }
+	double getGasSaturation() { return gasSaturation; }
 
 	///-
 	//Compute Actions

@@ -54,16 +54,6 @@ void Worker::setMiningBase(ResourceDepot* miningBase, bool gasMiner)
 	this->miningBase = miningBase;
 }
 
-bool Worker::isMiningGas() const
-{
-	return gasMiner;
-}
-
-ResourceDepot* Worker::getMiningBase() const
-{
-	return miningBase;
-}
-
 void Worker::updateFreeActions()
 {
 	pollCoalitions();

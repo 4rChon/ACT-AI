@@ -20,15 +20,9 @@ void ComsatStation::updateFreeActions()
 	{
 		if (unit->exists())
 		{
-			//if can't see unit...
-			if ((unit->isCloaked() || unit->isBurrowed()) && !unit->isDetected())
+			if ((unit->isCloaked() || unit->isBurrowed()) && !unit->isDetected())	//if can't see unit...
 			{
-				//try scanning
-				if (!scan(unit->getPosition()))
-				{
-					//if scan fails... stop looking for units to scan
-					break;
-				}
+				if (!scan(unit->getPosition())) break;								//try scanning.. if scan fails... stop trying to scan
 			}
 		}
 	}

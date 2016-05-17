@@ -40,31 +40,6 @@ ResourceDepot::~ResourceDepot()
 	}
 }
 
-BWTA::BaseLocation* ResourceDepot::getBaseLocation()
-{
-	return this->baseLocation;
-}
-
-Workerset& ResourceDepot::getWorkers()
-{
-	return workers;
-}
-
-int ResourceDepot::getMineralMiners()
-{
-	return mineralMiners;
-}
-
-int ResourceDepot::getGasMiners()
-{
-	return gasMiners;
-}
-
-int ResourceDepot::getRefineryCount()
-{
-	return refineryCount;
-}
-
 void ResourceDepot::updateFreeActions()
 {
 	pollCoalitions();
@@ -114,16 +89,6 @@ void ResourceDepot::updateSaturation()
 		gasSaturation = (double)gasMiners / (3.0 * refineryCount);
 	else
 		gasSaturation = 1;
-}
-
-double ResourceDepot::getMineralSaturation()
-{
-	return mineralSaturation;
-}
-
-double ResourceDepot::getGasSaturation()
-{
-	return gasSaturation;
 }
 
 bool ResourceDepot::isMineralSaturated()

@@ -16,111 +16,59 @@ class Agent
 protected:
 
 	BWAPI::UnitCommand lastCommand;
-
-	//pointer to unit represented by agent - nullptr if no unit
-	BWAPI::Unit unit;
-
-	//pointer to agent's current coalition - nullptr if no coalition
-	Coalition* coalition;
-
-	//pointer to agent's current task - nullptr if no task
-	Task* task;
-
-	//unitID - -1 if no unit
-	int unitID;
-
-	//coalitionID - -1 if no coalition
-	int coalitionID;
-
-	//taskID - -1 if no task
-	int taskID;
-
-	//true if agent coalition is currently active, false otherwise
-	bool free;
-
-	//agent's current target zone - nullptr if no target
-	Zone* target;
-
+	
+	BWAPI::Unit unit;		//pointer to unit represented by agent - nullptr if no unit
+	Coalition* coalition;	//pointer to agent's current coalition - nullptr if no coalition
+	Task* task;				//pointer to agent's current task - nullptr if no task
+	int unitID;				//unitID - -1 if no unit
+	int coalitionID;		//coalitionID - -1 if no coalition
+	int taskID;				//taskID - -1 if no task
+	bool free;				//true if agent coalition is currently active, false otherwise
+	Zone* target;			//agent's current target zone - nullptr if no target
 	BWAPI::Unit unitTarget;
-	//number of frames that the agent has been engaged in combat
-	int engageDuration;
-
-	//last frame that agent was engaged in combat
-	int lastEngaged;
-
-	//true if agent is currently engaged in combat
-	bool isEngaged;
-
-	//number of recorded kills
-	int lastKillCount;
+	int engageDuration;		//number of frames that the agent has been engaged in combat
+	int lastEngaged;		//last frame that agent was engaged in combat
+	bool isEngaged;			//true if agent is currently engaged in combat
+	int lastKillCount;		//number of recorded kills
 
 	/*CommandMap commandMap;
 	void initialiseCommandMap();*/
 
 	///Private Helpers
-	//Update Engagement Time for coalition
-	void updateEngagement();
-
-	//Update Kill Count for coalition
-	void updateKillCount();
-
-	//Update Actions when not bound to a coalition
-	virtual void updateFreeActions();
+	void updateEngagement();	//Update Engagement Time for coalition
+	void updateKillCount();		//Update Kill Count for coalition
+	void updateActions();
+	void updateBoundActions();	//Update Coalition relevant information and micro if available
+	virtual void updateFreeActions();	//Update Actions when not bound to a coalition
 
 	bool exists();
-
-	void updateActions();
-
-	//Update Coalition relevant information and micro if available
-	void updateBoundActions();
 
 public:
 	///constructors	and destructors
 	Agent();
 	Agent(BWAPI::Unit unit);
 	virtual ~Agent();
+	
 	///setters	
-	//Assign agent coalition and coalitionID
-	void setCoalition(Coalition* coalition);
-
-	//Assign agent task and taskID
-	void setTask(Task* task);
-
-	//Assign agent unit and unitID
-	void setUnit(BWAPI::Unit unit);
+	void setCoalition(Coalition* coalition);	//Assign agent coalition and coalitionID
+	void setTask(Task* task);					//Assign agent task and taskID
+	void setUnit(BWAPI::Unit unit) { this->unit = unit; unitID = unit->getID(); }
 
 	///getters
-	//Get unitID - -1 if no unit
-	int getID() const;
-	//Get unit - nullptr if no unit
-	BWAPI::Unit getUnit() const;
-
-	//Get coalitionID - -1 if no coalition
-	int getCoalitionID() const;
-
-	//Get assigned coalition - nullptr if no coalition
-	Coalition* getCoalition() const;
-
-	//Get taskID - -1 if no task
-	int getTaskID() const;
-
-	//Get task - nullptr if no task
-	Task * getTask() const;
-
-	//Get unit cost - mineralCost + (gasCost*1.5)
-	double getPrice() const;
-
-	//True if agent is bound to a coalition and coalition is active
-	bool isFree() const;
-	
-	virtual void micro();	
+	int getID() const				{ return unitID; }
+	BWAPI::Unit getUnit() const		{ return unit; };
+	int getCoalitionID() const		{ return coalitionID; }
+	Coalition* getCoalition() const { return coalition; }
+	int getTaskID() const			{ return taskID; }
+	Task * getTask() const			{ return task; }
+	double getPrice() const			{ return unit->getType().mineralPrice() + (unit->getType().gasPrice() * 1.5); }
+	bool isFree() const				{ return free; }	//True if agent is bound to a coalition and coalition is active
 
 	///-	
-	//Compute agent actions
-	virtual void act();
+	virtual void act(); //Compute agent actions
+	virtual void micro();
 
-	//Poll open coalitions to join
-	virtual bool pollCoalitions();
+	virtual bool pollCoalitions();	//Poll open coalitions to join
 
 	///commands
 	//Generic move command to target. Returns false if API fails to pass command.
@@ -133,13 +81,13 @@ public:
 	virtual bool defend();
 
 	//Expand - Returns false if not a worker.
-	virtual bool expand();
+	virtual bool expand() { return false; }
 
 	//Gather from target - Returns false if not a worker.
 	virtual bool gather(BWAPI::Unit target);
 
 	//Build building at desiredPosition - Returns false if not a worker.
-	virtual bool build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPosition = nullptr);
+	virtual bool build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPosition = nullptr) { return false; }
 
 	//Build addon - Returns false if not a terran building that can build an addon.
 	virtual bool buildAddon(BWAPI::UnitType addon);

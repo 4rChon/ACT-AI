@@ -46,22 +46,26 @@ public:
 	virtual ~Task();	
 
 	//setters
-	void setDebug(bool debug);
-	void setCoalition(Coalition* coalition);
+	void setDebug(bool debug)				{ this->debug = debug; }
+	void setCoalition(Coalition* coalition)
+	{
+		this->coalition = coalition;
+		coalitionID = coalition->getID();
+	}
 
 	//getters
-	Zone* getTarget();
-	virtual bool Task::isComplete() const;
-	TaskType getType() const;
-	int getID() const;
-	std::string getName() const;
-	Taskset& getSubTasks();
-	Taskset& getSuperTasks();
-	virtual Coalition* getCoalition() const;
+	Zone* getTarget()						{ return target; }
+	virtual bool Task::isComplete() const	{ return complete; }
+	TaskType getType() const				{ return taskType; }
+	int getID() const						{ return taskID; }
+	std::string getName() const				{ return taskName; }
+	Taskset& getSubTasks()					{ return subTasks; }
+	Taskset& getSuperTasks()				{ return superTasks; }
+	virtual Coalition* getCoalition() const { return coalition; }
 	virtual double getCost();
-	virtual double getProfit();
+	virtual double getProfit()				{ return profit; }
 	void addSubTask(Task* task);
-	void addSuperTask(Task* task);
+	void addSuperTask(Task* task)			{ superTasks.insert(task); }
 
 	//-
 	virtual void createCoalition();
