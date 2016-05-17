@@ -18,7 +18,6 @@ namespace ArmyHelper
 	void removeTargetPriority(BWAPI::Unit unit);
 	void updateTargetPriority();
 	void clearZoneTargets(Zone * zone);
-	bool scan(BWAPI::Position target);
 	void addScoutedUnit(int unitID, BWAPI::UnitType unitType);
 	void removeScoutedUnit(int unitID);
 	Composition getScoutedUnits();

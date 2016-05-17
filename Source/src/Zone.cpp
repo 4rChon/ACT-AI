@@ -4,17 +4,18 @@
 #include <BWTA.h>
 
 Zone::Zone(BWAPI::Region region, int id)
+	: region(region)
+	, id(id)
+	, superRegion(BWTA::getRegion(region->getCenter()))
+	, lastVisited(0)
+	, enemyScore(0)
+	, friendScore(0)
+	, resourceScore(0)
+	, timesDefended(0)
+	, hasBunker(false)
+	, hasTurret(false)
+	, defending(false)
 {
-	this->region = region;
-	this->id = id;
-	superRegion = BWTA::getRegion(region->getCenter());
-	lastVisited = 0;
-	enemyScore = 0;
-	friendScore = 0;
-	resourceScore = 0;
-	timesDefended = 0;
-	hasBunker = false;
-	defending = false;
 }
 
 void Zone::initNeighbourhood()
@@ -76,6 +77,11 @@ bool Zone::hasBunkerDefense() const
 	return hasBunker;
 }
 
+bool Zone::hasTurretDefense() const
+{
+	return hasTurret;
+}
+
 bool Zone::isDefending() const
 {
 	return defending;
@@ -96,6 +102,11 @@ void Zone::setTimesDefended(int timesDefended)
 void Zone::setBunkerDefense(bool hasBunker)
 {
 	this->hasBunker = hasBunker;
+}
+
+void Zone::setTurretDefense(bool hasTurret)
+{
+	this->hasTurret = hasTurret;
 }
 
 void Zone::defend(bool defendOrder)
@@ -125,9 +136,9 @@ void Zone::updateZone()
 	for (auto& unit : region->getUnits())
 	{
 		if (unit->getPlayer() == util::game::getEnemy())
-			enemyScore = 100 + unit->getType().buildScore() + unit->getType().destroyScore();
+			enemyScore += 100 + unit->getType().buildScore() + unit->getType().destroyScore();
 		if (unit->getPlayer() == util::game::getSelf() && (!unit->getType().isBuilding() || unit->getType() == BWAPI::UnitTypes::Terran_Bunker || unit->getType() == BWAPI::UnitTypes::Terran_Missile_Turret))
-			friendScore = 100 + unit->getType().buildScore() + unit->getType().destroyScore();
+			friendScore += 100 + unit->getType().buildScore() + unit->getType().destroyScore();
 		if (unit->getType().isResourceContainer())
 			resourceScore += unit->getResources();
 	}

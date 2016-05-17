@@ -115,12 +115,18 @@ namespace util
 	//Normalises an array of values after weighing them with coefficients
 	double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr);
 
+	double normaliseDistance(BWAPI::Position pos1, BWAPI::Position pos2);
+
+	double getRandom(int min, int max);
+
 	BWAPI::UnitType getRandomType(Composition composition);
 	BWAPI::UnitType getRandomType(BWAPI::UnitType macroType);
 
 	namespace game
 	{
 		void setSelf();
+
+		void setStartLocation();
 
 		void setEnemy();
 
@@ -132,6 +138,8 @@ namespace util
 
 		//Returns player
 		BWAPI::Player getSelf();
+
+		BWAPI::TilePosition getStartLocation();
 
 		//Returns player name
 		std::string getSelfName();

@@ -12,5 +12,6 @@ public:
 	void assign();
 	void act();
 	void update();
+	void fail();
 	void succeed();
 };

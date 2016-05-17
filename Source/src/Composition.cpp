@@ -4,14 +4,14 @@
 #include <sstream>
 
 Composition::Composition()
+	: cost(0)
 {
-	cost = 0;
 	initAttributes();
 }
 
 Composition::Composition(BWAPI::Unitset unitSet)
+	: cost(0)
 {
-	cost = 0;
 	initAttributes();
 	for (auto unit : unitSet)
 		addType(unit->getType());
@@ -19,8 +19,8 @@ Composition::Composition(BWAPI::Unitset unitSet)
 }
 
 Composition::Composition(UnitMap unitMap)
+	: cost(0)
 {	
-	cost = 0;
 	initAttributes();
 	for (auto &unitType : unitMap)
 		addType(unitType.first, unitType.second);

@@ -11,60 +11,45 @@
 #include "Zone.h"
 
 Agent::Agent()
+	: unit(nullptr)
+	, task(nullptr)
+	, coalition(nullptr)
+	, unitID(-1)
+	, coalitionID(-1)
+	, taskID(-1)
+	, free(true)
+	, target(nullptr)
+	, unitTarget(nullptr)
+	, engageDuration(0)
+	, lastEngaged(0)
+	, isEngaged(false)
+	, lastKillCount(0)
 {
-	unit = nullptr;
-	task = nullptr;
-	coalition = nullptr;
-
-	unitID = -1;
-	coalitionID = -1;
-	taskID = -1;
-
-	free = true;
-
-	target = nullptr;
-	unitTarget = nullptr;
-
-	engageDuration = 0;
-	lastEngaged = 0;
-	isEngaged = false;
-	lastKillCount = 0;
-
 	/*initialiseCommandMap();*/
 }
 
 Agent::Agent(BWAPI::Unit unit)
+	: unit(unit)
+	, task(nullptr)
+	, coalition(nullptr)
+	, unitID(unit->getID())
+	, coalitionID(-1)
+	, taskID(-1)
+	, free(true)
+	, target(nullptr)
+	, unitTarget(nullptr)
+	, engageDuration(0)
+	, lastEngaged(0)
+	, isEngaged(false)
+	, lastKillCount(0)
+	, lastCommand(unit->getLastCommand())
 {
-	this->unit = unit;
-	unitID = unit->getID();
-	coalitionID = -1;
-	taskID = -1;
-
-	free = true;
-
-	task = nullptr;
-	coalition = nullptr;
-
-	target = nullptr;
-	unitTarget = nullptr;
-
-	engageDuration = 0;
-	lastEngaged = 0;
-	isEngaged = false;
-	lastKillCount = 0;
-
-	lastCommand = unit->getLastCommand();
 	/*initialiseCommandMap();*/	
 }
 
 Agent::~Agent()
 {
 	//std::cout << "\t~Agent\n";
-	coalitionID = -1;
-	taskID = -1;
-	coalition = nullptr;
-	target = nullptr;
-	task = nullptr;
 }
 
 //void Agent::initialiseCommandMap()
@@ -222,7 +207,10 @@ void Agent::micro()
 					{
 						int friendliesInRange = enemyUnit->getUnitsInRadius(enemyUnit->getType().sightRange(), BWAPI::Filter::IsOwned).size();
 						if (friendliesInRange > targetPriority)
+						{
 							unitTarget = enemyUnit;
+							targetPriority = friendliesInRange;
+						}
 					}
 				}
 			}
@@ -341,7 +329,11 @@ void Agent::updateFreeActions()
 
 bool Agent::exists()
 {
-	if (unit->getID() == 0)
+	if (!this)
+		return false;
+	if (!unit)
+		return false;
+	if (unit->getID() <= 0)
 		return false;
 
 	if (!unit->exists())
@@ -362,13 +354,6 @@ void Agent::updateActions()
 			Defend* defend = new Defend(unit);
 			TaskHelper::addTask(defend, true);
 		}
-
-		auto allBullets = BWAPI::Broodwar->getBullets();
-		for (auto bullet : allBullets)
-		{
-			if (bullet->getType() == BWAPI::BulletTypes::Subterranean_Spines)
-				ArmyHelper::scan(bullet->getPosition());
-		}
 	}	
 }
 
@@ -388,14 +373,29 @@ void Agent::act()
 		updateBoundActions();
 }
 
-//TO DO: add swarm equation
 bool Agent::pollCoalitions()
 {
-	for (auto &coalition : CoalitionHelper::getCoalitionset())
+	for (auto &candidateCoalition : CoalitionHelper::getCoalitionset())
 	{
-		if (!coalition->isActive())
-			if (coalition->addAgent(this))
+		if (!candidateCoalition->isActive())
+		{
+
+			double agentFitness = 0.0;
+			if(unit->getType().maxHitPoints() != 0)
+				agentFitness += unit->getHitPoints() / unit->getType().maxHitPoints();
+
+			Zone* candidateTarget = nullptr;
+
+			if(candidateCoalition->getTask() != nullptr)
+				candidateTarget = candidateCoalition->getTask()->getTarget();
+
+			if (candidateTarget != nullptr)
+				agentFitness += util::normaliseDistance(unit->getPosition(), candidateTarget->getRegion()->getCenter());
+
+			agentFitness /= 2;
+			if (candidateCoalition->addAgent(this) && util::getRandom(0, 1) < agentFitness)
 				return true;
+		}
 	}
 	return false;
 }

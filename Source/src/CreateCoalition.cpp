@@ -78,9 +78,11 @@ void CreateCoalition::update()
 	}
 
 	if (assigned && !acting)
+	{
 		act();
-	//if(age > x) fail();
-	//TODO: fail when taking too long
+		return;
+	}
+	
 	printDebugInfo("Update End");
 }
 

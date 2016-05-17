@@ -1,5 +1,4 @@
 #include "AgentHelper.h"
-#include "SCV.h"
 #include "Coalition.h"
 
 namespace AgentHelper
@@ -7,7 +6,6 @@ namespace AgentHelper
 	namespace
 	{
 		static Agentset agentSet;
-		static Agentset comsatStations;
 		static Baseset resourceDepots;
 		static Agentset::iterator lastServiced;
 	}
@@ -33,11 +31,6 @@ namespace AgentHelper
 	const Baseset& getResourceDepots()
 	{
 		return resourceDepots;
-	}
-
-	const Agentset& getComsatStations()
-	{
-		return comsatStations;
 	}
 
 	Agentset::iterator getLastServiced()
@@ -81,12 +74,12 @@ namespace AgentHelper
 		}
 		else if (unit->getType().isWorker())
 			agent = new Worker(unit);
+		else if (unit->getType() == BWAPI::UnitTypes::Terran_Comsat_Station)
+			agent = new ComsatStation(unit);
 		else
 			agent = new Agent(unit);
 
 		agentSet.insert(agent);
-		if (unit->getType() == BWAPI::UnitTypes::Terran_Comsat_Station)
-			comsatStations.insert(agent);
 	}
 
 	void removeAgent(int id)
@@ -96,15 +89,14 @@ namespace AgentHelper
 			std::cout << "\tAgent not found\n";
 		else
 		{
-			if (agent->getCoalitionID() != -1)
-				agent->getCoalition()->removeAgent(agent);
+			auto coalition = agent->getCoalition();
+			if (coalition)
+				coalition->removeAgent(agent);
 
 			agent->unbind();
 			agentSet.erase(agent);
 			if (resourceDepots.count((ResourceDepot*)agent))
 				resourceDepots.erase((ResourceDepot*)agent);
-			if (comsatStations.count(agent))
-				comsatStations.erase(agent);
 
 			delete agent;
 		}

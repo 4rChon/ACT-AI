@@ -5,6 +5,10 @@
 #include "Zone.h"
 #include <string>
 #include <vector>
+#include <math.h>
+#include <iostream>
+#include <random>
+#include <chrono>
 
 namespace util
 {			
@@ -14,11 +18,13 @@ namespace util
 		static BWAPI::Player self;
 		static BWAPI::Player enemy;
 		static BWAPI::Playerset enemySet;
+		static BWAPI::TilePosition playerStartLocation;
 	}
 
 	void initialiseUtil()
 	{
 		game::setSelf();
+		game::setStartLocation();
 		game::setEnemy();
 		std::cout << selfName << " (" << self->getRace().getName() << ") vs " << enemy->getName() << " (" << enemy->getRace().getName() << ")\n";
 	}	
@@ -30,6 +36,23 @@ namespace util
 			total += 1 / (1 + std::exp(-coeffArr[i] * valueArr[i]));
 
 		return ((2 / valueArr.size()) * total) - 1;
+	}
+
+	double normaliseDistance(BWAPI::Position pos1, BWAPI::Position pos2)
+	{
+		double dist = sqrt(pow(pos1.x - pos2.x, 2) + pow(pos1.y - pos2.y, 2));
+		double mapDist = sqrt(pow(BWAPI::Broodwar->mapWidth(), 2) + pow(BWAPI::Broodwar->mapHeight(), 2));
+		return dist / mapDist;		
+	}
+
+	double getRandom(int min, int max)
+	{
+		std::mt19937_64 rng;
+		uint64_t timeSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+		std::seed_seq ss{ uint32_t(timeSeed & 0xffffffff), uint32_t(timeSeed >> 32) };
+		rng.seed(ss);
+		std::uniform_real_distribution<double> unif(0, 1);
+		return unif(rng);
 	}
 
 	BWAPI::UnitType getRandomType(Composition composition)
@@ -92,6 +115,11 @@ namespace util
 			}
 		}
 
+		void setStartLocation()
+		{
+			playerStartLocation = self->getStartLocation();
+		}
+
 		void setEnemy()
 		{
 			if (!BWAPI::Broodwar->isReplay())
@@ -136,6 +164,11 @@ namespace util
 			nameFile.close();
 
 			return selfName;
+		}
+
+		BWAPI::TilePosition getStartLocation()
+		{
+			return playerStartLocation;
 		}
 
 		bool canMakeUnit(BWAPI::UnitType unitType)
@@ -297,7 +330,7 @@ namespace util
 		{
 			std::ofstream dataStream;
 
-			auto startLocation = BWAPI::Broodwar->self()->getStartLocation();
+			auto startLocation = util::game::getStartLocation();
 			auto xStart = startLocation.x;
 			auto yStart = startLocation.y;
 

@@ -7,16 +7,15 @@
 #include "CompositionHelper.h"
 
 Expand::Expand()
+	: builder(nullptr)
 {
 	taskName = "Expand()";
-	builder = nullptr;
 	taskType = EXP;
 	//debug = true;
 }
 
 Expand::~Expand()
 {
-	builder = nullptr;
 }
 
 void Expand::assign()
@@ -67,7 +66,7 @@ void Expand::succeed()
 
 	EconHelper::doneExpanding();
 
-	cleanSubTasks();
+	deleteSubTasks();
 }
 
 void Expand::fail()
@@ -78,5 +77,5 @@ void Expand::fail()
 
 	EconHelper::doneExpanding();
 
-	cleanSubTasks();
+	deleteSubTasks();
 }

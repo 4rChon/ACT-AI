@@ -27,6 +27,7 @@
     <ClInclude Include="Source\include\CoalitionHelper.h" />
     <ClInclude Include="Source\include\Composition.h" />
     <ClInclude Include="Source\include\CompositionHelper.h" />
+    <ClInclude Include="Source\include\ComsatStation.h" />
     <ClInclude Include="Source\include\CreateCoalition.h" />
     <ClInclude Include="Source\include\CreateUnit.h" />
     <ClInclude Include="Source\include\Defend.h" />
@@ -56,6 +57,7 @@
     <ClCompile Include="Source\src\CoalitionHelper.cpp" />
     <ClCompile Include="Source\src\Composition.cpp" />
     <ClCompile Include="Source\src\CompositionHelper.cpp" />
+    <ClCompile Include="Source\src\ComsatStation.cpp" />
     <ClCompile Include="Source\src\CreateCoalition.cpp" />
     <ClCompile Include="Source\src\CreateUnit.cpp" />
     <ClCompile Include="Source\src\Defend.cpp" />

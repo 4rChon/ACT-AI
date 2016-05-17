@@ -11,7 +11,8 @@ namespace DesireHelper
 	void initialiseHelper();
 
 	Zone* getMostDesirableAttackZone();
-	Zone * getStaticDefenseTarget();
+	Zone * getBunkerDefenseTarget();
+	Zone * getTurretDefenseTarget();
 	Zone * getUnitDefenseTarget();
 	void setDefendDesire(Zone * target, double desireMod);
 	void updateAttackDesire(Zone * target, double desireMod);
@@ -36,7 +37,8 @@ namespace DesireHelper
 	double getExpandDesire();
 	double getExpansionDesire(BWTA::BaseLocation* baseLocation);
 	const std::unordered_map<Zone*, double, std::hash<void*>>& getAttackDesireMap();
-	const std::unordered_map<Zone*, double, std::hash<void*>>& getStaticDefenseDesireMap();
+	const std::unordered_map<Zone*, double, std::hash<void*>>& getBunkerDefenseDesireMap();
+	const std::unordered_map<Zone*, double, std::hash<void*>>& getTurretDefenseDesireMap();
 	const std::unordered_map<Zone*, double, std::hash<void*>>& getUnitDefenseDesireMap();
 
 	BWTA::BaseLocation * getBestExpansionLocation();

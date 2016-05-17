@@ -9,7 +9,6 @@ private:
 	bool satisfying;
 	bool satisfied;
 	bool requiresGas;
-	int successfulOrders;
 public:
 	//constructors
 	CreateUnit(BWAPI::UnitType unitType, int unitCount = 1);

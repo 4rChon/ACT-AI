@@ -40,8 +40,8 @@ private:
 	//Set to first frame of coalition's activation
 	int activationFrame;
 	
-	//Current coalitioniD - obtained from CoalitionHelper
-	int coalitionID;
+	//coalitioniD - obtained from CoalitionHelper
+	const int coalitionID;
 
 	//Current coalition money and time cost
 	double cost;

@@ -9,21 +9,21 @@
 #include <BWAPI.h>
 
 Worker::Worker()
+	: gasMiner(false)
+	, miningBase(nullptr)
+	, reservedMinerals(0)
+	, reservedGas(0)
 {
-	gasMiner = false;
-	miningBase = nullptr;
-	reservedMinerals = 0;
-	reservedGas = 0;
 }
 
 Worker::Worker(BWAPI::Unit unit)
+	: gasMiner(false)
+	, miningBase(nullptr)
+	, reservedMinerals(0)
+	, reservedGas(0)
 {
 	this->unit = unit;
 	unitID = unit->getID();
-	miningBase = nullptr;
-	reservedMinerals = 0;
-	reservedGas = 0;
-	gasMiner = false;
 }
 
 Worker::~Worker()
@@ -98,8 +98,6 @@ void Worker::updateFreeActions()
 			return;
 		}
 	}
-
-	
 }
 
 void Worker::act()
@@ -235,22 +233,36 @@ bool Worker::defend(BWAPI::PositionOrUnit target)
 	if (target.isPosition())
 	{
 		auto zone = MapHelper::getZone(BWAPI::Broodwar->getRegionAt(target.getPosition()));
-		if (!zone->hasBunkerDefense() && zone->getTimesDefended() > 0 && zone->getFriendScore() > 0 && BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::UnitTypes::Terran_Bunker) == 0)
-			return build(BWAPI::UnitTypes::Terran_Bunker, &BWAPI::TilePosition(target.getPosition()));
-		else
-			return repair(BWAPI::Broodwar->getRegionAt(target.getPosition()));
+		if (zone->getTimesDefended() > 0 && zone->getFriendScore() > 0)
+		{
+			if (!zone->hasBunkerDefense() && BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::UnitTypes::Terran_Bunker) == 0)
+			{
+				return build(BWAPI::UnitTypes::Terran_Bunker, &BWAPI::TilePosition(target.getPosition()));
+			}
+			else if (!zone->hasTurretDefense() && BWAPI::Broodwar->self()->incompleteUnitCount(BWAPI::UnitTypes::Terran_Missile_Turret) == 0)
+			{
+				return build(BWAPI::UnitTypes::Terran_Missile_Turret, &BWAPI::TilePosition(target.getPosition()));
+			}
+			else
+			{
+				return repair(BWAPI::Broodwar->getRegionAt(target.getPosition()));
+			}
+		}
 	}
-
-	if(target.getUnit()->getType().isMechanical())
+	else if(target.getUnit()->getType().isMechanical())
 		return repair(target.getUnit());
 	return false;
 }
 
 bool Worker::defend()
 {
-	auto defenseZone = DesireHelper::getStaticDefenseTarget();
+	auto defenseZone = DesireHelper::getBunkerDefenseTarget();
+	if(!defenseZone)
+		defenseZone = DesireHelper::getTurretDefenseTarget();
+
 	if (defenseZone)
 		return defend(defenseZone->getRegion()->getCenter());
+
 	return false;
 }
 

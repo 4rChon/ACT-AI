@@ -47,6 +47,15 @@ void Attack::update()
 	if (complete)
 		return;
 
+	if (coalition)
+	{
+		if (coalition->getAge() > 24 * 60 * 8)
+		{
+			fail();
+			return;
+		}
+	}
+
 	if (BWAPI::Broodwar->getFrameCount() - target->getLastVisited() < 5 && target->getEnemyScore() == 0)
 	{
 		succeed();
@@ -59,15 +68,27 @@ void Attack::update()
 		return;
 	}
 
-	if (!acting && assigned)
+	if (!acting)
 		act();
 
 	printDebugInfo("Update End");
 }
 
+void Attack::fail()
+{
+	complete = true;
+	profit = coalition->getProfit();
+	printDebugInfo("Failure!", true);
+
+	ArmyHelper::defend();
+	ArmyHelper::updateTargetPriority();
+
+	deleteSubTasks();
+}
+
 void Attack::succeed()
 {
-	complete = true;	
+	complete = true;
 	profit = coalition->getProfit();
 	printDebugInfo("Success!", true);
 
@@ -75,5 +96,5 @@ void Attack::succeed()
 	ArmyHelper::updateTargetPriority();
 	ArmyHelper::clearZoneTargets(target);
 
-	cleanSubTasks();
+	deleteSubTasks();
 }

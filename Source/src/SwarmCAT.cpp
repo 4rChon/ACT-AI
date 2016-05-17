@@ -92,6 +92,9 @@ void SwarmCAT::onEnd(bool isWinner)
 {
 	CompositionHelper::saveCompositions();
 	MapHelper::saveMapData();
+	TaskHelper::deleteTaskTree(TaskHelper::getRootTasks());
+	for(auto coalition : CoalitionHelper::getCoalitionset())
+		CoalitionHelper::removeCoalition(coalition);
 	std::cout << " ---------------- MATCH END ----------------\n";
 }
 
@@ -156,8 +159,8 @@ void SwarmCAT::onFrame()
 
 			auto diff = std::chrono::high_resolution_clock::now() - currentTime;
 
-			//if (diff.count() > 0.005)
-			//	return;
+			if (diff.count() > 0.015)
+				break;
 		}
 
 		DesireHelper::updateDesireMaps();
@@ -234,12 +237,9 @@ void SwarmCAT::onUnitShow(BWAPI::Unit unit)
 	if (!Broodwar->isReplay())
 	{
 		if (unit->getPlayer() == util::game::getEnemy())
-		{
 			ArmyHelper::addScoutedUnit(unit->getID(), unit->getType());
-			if (unit->isCloaked())
-				ArmyHelper::scan(unit->getPosition());
-		}
 	}
+
 	
 	//if (unit->getType() == BWAPI::UnitTypes::Zerg_Lurker || unit->getType().hasPermanentCloak())
 	//	ArmyHelper::scan(unit->getPosition());
@@ -289,6 +289,19 @@ void SwarmCAT::onUnitDestroy(BWAPI::Unit unit)
 				{
 					for (auto& zone : MapHelper::getZone(unit->getRegion())->getNeighbourhood())
 						zone->setBunkerDefense(false);
+				}
+			}
+
+			if (unit->getType() == BWAPI::UnitTypes::Terran_Missile_Turret)
+			{
+				int turretCount = 0;
+				for (auto& zone : MapHelper::getZone(unit->getRegion())->getNeighbourhood())
+					turretCount += zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::GetType == BWAPI::UnitTypes::Terran_Missile_Turret).size();
+
+				if (turretCount == 0)
+				{
+					for (auto& zone : MapHelper::getZone(unit->getRegion())->getNeighbourhood())
+						zone->setTurretDefense(false);
 				}
 			}
 
@@ -353,6 +366,12 @@ void SwarmCAT::onUnitComplete(BWAPI::Unit unit)
 			{
 				for (auto& zone : unitZone->getNeighbourhood())
 					zone->setBunkerDefense(true);
+			}
+
+			if (unit->getType() == BWAPI::UnitTypes::Terran_Missile_Turret)
+			{
+				for (auto& zone : unitZone->getNeighbourhood())
+					zone->setTurretDefense(true);
 			}
 
 			DesireHelper::setDefendDesire(unitZone, unitZone->getEnemyScore());
@@ -450,12 +469,14 @@ void SwarmCAT::drawDebugText()
 
 	/*draw zones*/
 	auto unitDefenseDesireMap = DesireHelper::getUnitDefenseDesireMap();
-	auto staticDefenseDesireMap = DesireHelper::getStaticDefenseDesireMap();
+	auto bunkerDefenseDesireMap = DesireHelper::getBunkerDefenseDesireMap();
+	auto turretDefenseDesireMap = DesireHelper::getTurretDefenseDesireMap();
 	for (auto &zone : MapHelper::getRegionField())
 	{
-		Broodwar->drawTextMap(zone->getRegion()->getCenter(), "ZoneID : %d\nDefend Count : %d\nUnit Defense Desire : %.2f\nStatic Defense Desire : %.2f", zone->getID(), zone->getTimesDefended(), unitDefenseDesireMap[zone], staticDefenseDesireMap[zone]);
-		Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 25, Color((int)staticDefenseDesireMap[zone] * 10, 0, 0), true);
-		Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 15, Color((int)unitDefenseDesireMap[zone] * 10, 0, 0), true);
+		//Broodwar->drawTextMap(zone->getRegion()->getCenter(), "ZoneID : %d\nDefend Count : %d\nUnit Defense Desire : %.2f\nStatic Defense Desire : %.2f", zone->getID(), zone->getTimesDefended(), unitDefenseDesireMap[zone], staticDefenseDesireMap[zone]);
+		Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 15, Color((int)bunkerDefenseDesireMap[zone] * 10, 0, 0), true);
+		Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 10, Color((int)turretDefenseDesireMap[zone] * 10, 0, 0), true);
+		Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 5, Color((int)unitDefenseDesireMap[zone] * 10, 0, 0), true);
 		
 		if(zone->isDefending())
 			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 5, Colors::Red, true);

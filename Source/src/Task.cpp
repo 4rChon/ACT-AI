@@ -7,20 +7,20 @@
 #include "CreateCoalition.h"
 
 Task::Task()
+	: taskID(TaskHelper::getNextID())
+	, taskName("Task")
+	, taskType(NON)
+	, complete(false)
+	, assigned(false)
+	, acting(false)
+	, coalitionID(-1)
+	, coalition(nullptr)
+	, creationFrame(BWAPI::Broodwar->getFrameCount())
+	, cost(0.0)
+	, profit(0.0)
+	, target(nullptr)
+	, debug(false)
 {
-	taskID = TaskHelper::getNextID();
-	taskName = "Task";
-	complete = false;
-	assigned = false;
-	acting = false;
-	coalitionID = -1;
-	coalition = nullptr;
-	creationFrame = BWAPI::Broodwar->getFrameCount();
-	cost = 0.0;
-	profit = 0.0;
-	target = nullptr;
-	debug = false;
-	taskType = NON;
 }
 
 Task::~Task()
@@ -29,8 +29,6 @@ Task::~Task()
 	if (taskType != CRC && taskType != STR && taskType != SUR && taskType != NON && coalition != nullptr)
 	{
 		CoalitionHelper::removeCoalition(coalition);
-		coalition = nullptr;
-		coalitionID = -1;
 	}
 
 	for (auto &superTaskIt = superTasks.begin(); superTaskIt != superTasks.end(); ++superTaskIt)
@@ -38,8 +36,6 @@ Task::~Task()
 		printDebugInfo("\n\tRemoving sub task: " + taskName + " \n\tfrom super task: " + (*superTaskIt)->getName());
 		(*superTaskIt)->getSubTasks().erase(this);
 	}
-
-	superTasks.clear();
 }
 
 void Task::setDebug(bool debug)
@@ -122,30 +118,9 @@ void Task::addSuperTask(Task* task)
 	superTasks.insert(task);
 }
 
-void Task::cleanSubTasks()
+void Task::deleteSubTasks()
 {
-	for (auto &taskIt = subTasks.begin(); taskIt != subTasks.end();)
-	{
-		(*taskIt)->getSuperTasks().erase(this);
-		printDebugInfo("\n\tRemoving sub task: " + (*taskIt)->getName() + " \n\tfrom super task: " + this->getName());	
-		TaskHelper::removeTask(*taskIt++);
-	}
-	subTasks.clear();
-}
-
-void Task::updateTaskTree()//check this out
-{	
-	if (subTasks.size() > 0)
-	{		
-		for (auto &it = subTasks.begin(); it != subTasks.end();)
-		{
-			if (!(*it)->isComplete())
-				(*it++)->updateTaskTree();
-			else
-				TaskHelper::removeTask(*it++);
-		}
-	}
-	update();
+	TaskHelper::deleteTaskTree(subTasks);
 }
 
 void Task::createCoalition()
@@ -160,8 +135,8 @@ void Task::succeed()
 	complete = true;
 	profit = 1.0;
 	printDebugInfo("Success!", true);
-
-	cleanSubTasks();
+	
+	deleteSubTasks();
 }
 
 void Task::fail()
@@ -169,18 +144,13 @@ void Task::fail()
 	complete = true;
 	profit = 0.0;
 	printDebugInfo("Failure!", true);
-	
-	if (taskType == ATT)
-	{
-		ArmyHelper::defend();
-	}
 
 	if (taskType == SCO)
 	{
 		ArmyHelper::stopScouting();
 	}	
-		
-	cleanSubTasks();
+	
+	deleteSubTasks();
 }
 
 void Task::printDebugInfo(std::string info, bool forceShow)

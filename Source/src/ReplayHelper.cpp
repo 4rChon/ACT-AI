@@ -21,7 +21,7 @@ namespace ReplayHelper
 		auto compositions = CompositionHelper::getCompositionSet();
 		for each(auto composition in compositions)
 		{
-			if (composition.fitness < 20 && composition.taskType == ATT)
+			if (composition.fitness < 0.5 && composition.taskType == ATT)
 				flaggedCompositions.push_back(composition);
 		}
 	}
@@ -45,46 +45,42 @@ namespace ReplayHelper
 		//respond to units with counters
 		if (usedComp.useCount != 0)
 		{
-			if (usedComp.fitness < 0.5)
+			for each(auto unitType in enemyComposition.getTypes())
 			{
-				for each(auto unitType in enemyComposition.getTypes())
+				if (unitType.isBuilding() || unitType == BWAPI::UnitTypes::Zerg_Larva)
+					continue;
+				//std::cout << "Responding to unit: " << unitType.c_str() << "\n";
+				auto counters = CompositionHelper::getCounters(unitType);
+				auto intersection = usedComp.composition.getIntersection(counters);
+				if (intersection.getTypes().size() == 0)
 				{
-					if (unitType.isBuilding() || unitType == BWAPI::UnitTypes::Zerg_Larva)
-						continue;
-					//std::cout << "Responding to unit: " << unitType.c_str() << "\n";
-					auto counters = CompositionHelper::getCounters(unitType);
+					//add random unit type from counter list
+					BWAPI::UnitType randomType = util::getRandomType(counters);
+					usedComp.composition.addType(randomType);
+				}
+				else
+				{
+					int evolveType = rand() % 100;
 
-					if (usedComp.composition.getIntersection(counters).getTypes().size() > 0)
+					//increase amount for existing unit type
+					if (evolveType <= 50)
 					{
-						//add random unit type from counter list
+						BWAPI::UnitType randomType = util::getRandomType(intersection.getUnitMap());
+						usedComp.composition.addType(randomType);
+					}
+
+					//add a new counter unit type
+					else if (evolveType <= 75)
+					{
 						BWAPI::UnitType randomType = util::getRandomType(counters);
 						usedComp.composition.addType(randomType);
 					}
-					else
-					{
-						int evolveType = rand() % 100;
-
-						//increase amount for existing unit type
-						if (evolveType <= 33)
-						{
-							auto intersection = usedComp.composition.getIntersection(counters).getUnitMap();
-							BWAPI::UnitType randomType = util::getRandomType(intersection);
-							usedComp.composition.addType(randomType);
-						}
-
-						//add a new counter unit type
-						else if (evolveType > 33 && evolveType <= 66)
-						{
-							BWAPI::UnitType randomType = util::getRandomType(counters);
-							usedComp.composition.addType(randomType);
-						}
-					}
 				}
+			}
 
-				std::cout << "\n==Composition Evolved==\n\n";
-				std::cout << "Composition After Evolution\n";
-				usedComp.composition.printDebugInfo();
-			}			
+			std::cout << "\n==Composition Evolved==\n\n";
+			std::cout << "Composition After Evolution\n";
+			usedComp.composition.printDebugInfo();		
 
 			////possible mutation
 			//int mutateProbability = rand() % 100;

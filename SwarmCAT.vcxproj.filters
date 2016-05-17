@@ -114,6 +114,9 @@
     <ClInclude Include="Source\include\Zone.h">
       <Filter>include\Map</Filter>
     </ClInclude>
+    <ClInclude Include="Source\include\ComsatStation.h">
+      <Filter>include\Agents</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\src\DesireHelper.cpp">
@@ -199,6 +202,9 @@
     </ClCompile>
     <ClCompile Include="Source\src\Zone.cpp">
       <Filter>src\Map</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\src\ComsatStation.cpp">
+      <Filter>src\Agents</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

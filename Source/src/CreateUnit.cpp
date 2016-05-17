@@ -74,6 +74,9 @@ void CreateUnit::decrementUnitCount()
 // assign a producer coalition
 void CreateUnit::assign()
 {
+	if ((unitType.isWorker() || unitType.isResourceDepot()) && (util::game::getSelf()->allUnitCount(BWAPI::UnitTypes::Terran_SCV) == 0 && util::game::getSelf()->allUnitCount(BWAPI::UnitTypes::Terran_Command_Center) == 0))
+		fail();
+
 	printDebugInfo("Assign");
 	if (satisfied && EconHelper::haveMoney(unitType) && EconHelper::haveSupply(unitType))
 	{

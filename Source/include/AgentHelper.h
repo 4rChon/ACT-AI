@@ -3,6 +3,7 @@
 #include "Agent.h"
 #include "ResourceDepot.h"
 #include "Worker.h"
+#include "ComsatStation.h"
 #include <BWTA.h>
 #include <vector>
 
@@ -21,7 +22,6 @@ namespace AgentHelper
 	Agent* getAgent(int id);
 	const Agentset& getAgentset();
 	const Baseset& getResourceDepots();
-	const Agentset & getComsatStations();
 	Agentset::iterator getLastServiced();
 
 	//-

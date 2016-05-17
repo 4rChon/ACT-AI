@@ -13,6 +13,7 @@ private:
 	int resourceScore;
 	int timesDefended;
 	bool hasBunker;
+	bool hasTurret;
 	bool defending;
 	
 	MapHelper::Field neighbourhood;	
@@ -33,6 +34,7 @@ public:
 	int getResourceScore() const;
 	int getTimesDefended() const;
 	bool hasBunkerDefense() const;
+	bool hasTurretDefense() const;
 	bool isDefending() const;
 
 	///setters
@@ -41,6 +43,8 @@ public:
 	void setTimesDefended(int timesDefended);
 
 	void setBunkerDefense(bool hasBunker);
+
+	void setTurretDefense(bool hasTurret);
 
 	void defend(bool defendOrder);
 

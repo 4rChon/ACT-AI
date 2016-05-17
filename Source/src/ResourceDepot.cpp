@@ -7,27 +7,27 @@
 #include "DesireHelper.h"
 
 ResourceDepot::ResourceDepot()
-{	
-	baseLocation = nullptr;
+	: baseLocation(nullptr)
+	, mineralMiners(0)
+	, gasMiners(0)
+	, mineralSaturation(0)
+	, gasSaturation(0)
+	, refineryCount(0)
+{
 	workers.clear();
-	mineralMiners = 0;
-	gasMiners = 0;
-	mineralSaturation = 0;
-	gasSaturation = 0;
-	refineryCount = 0;
 }
 
 ResourceDepot::ResourceDepot(BWAPI::Unit unit)
+	: baseLocation(BWTA::getNearestBaseLocation(unit->getPosition()))
+	, mineralMiners(0)
+	, gasMiners(0)
+	, mineralSaturation(0)
+	, gasSaturation(0)
+	, refineryCount(0)
 {
 	this->unit = unit;
 	unitID = unit->getID();
-	baseLocation = BWTA::getNearestBaseLocation(unit->getPosition());
 	workers.clear();
-	mineralMiners = 0;
-	gasMiners = 0;
-	mineralSaturation = 0;
-	gasSaturation = 0;
-	refineryCount = 0;
 }
 
 ResourceDepot::~ResourceDepot()
@@ -38,8 +38,6 @@ ResourceDepot::~ResourceDepot()
 		worker->unsetMiningBase();
 		worker->getUnit()->stop();
 	}
-	workers.clear();
-	baseLocation = nullptr;	
 }
 
 BWTA::BaseLocation* ResourceDepot::getBaseLocation()

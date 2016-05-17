@@ -13,41 +13,40 @@
 #include <fstream>
 
 Coalition::Coalition()
+	: creationFrame(BWAPI::Broodwar->getFrameCount())
+	, activationFrame(-1)
+	, task(nullptr)
+	, taskID(-1)
+	, active(false)
+	, focusFire(true)
+	, coalitionID(CoalitionHelper::getNextID())
+	, engageDuration(0)
+	, cost(0.0)
+	, profit(0.0)
+	, killCount(0)
+	, unitMultiplier(1)
 {
-	creationFrame = BWAPI::Broodwar->getFrameCount();
-	activationFrame = -1;
-	task = nullptr;
-	taskID = -1;
-	active = false;	
-
-	focusFire = true;
-		
-	coalitionID = CoalitionHelper::getNextID();	
-	engageDuration = 0;
-	cost = 0.0;
-	profit = 0.0;
-	killCount = 0;
 }
 
 Coalition::Coalition(Composition targetComp, Task* task)
+	: creationFrame(BWAPI::Broodwar->getFrameCount())
+	, activationFrame(-1)
+	, task(task)
+	, taskID(task->getID())
+	, targetComp(targetComp)
+	, active(false)
+	, focusFire(true)
+	, coalitionID(CoalitionHelper::getNextID())
+	, engageDuration(0)
+	, cost(0.0)
+	, profit(0.0)
+	, killCount(0)
 {
-	creationFrame = BWAPI::Broodwar->getFrameCount();
-	this->task = task;
-	taskID = task->getID();
-	active = false;
-
-	focusFire = true;
-
-	this->targetComp = targetComp;
 	if (task->getType() == ATT)
 		unitMultiplier = EconHelper::getUnitMultiplier(targetComp);
 	else
 		unitMultiplier = 1;
-	coalitionID = CoalitionHelper::getNextID();
-	engageDuration = 0;
-	killCount = 0;
-	cost = 0;
-	profit = 0.0;	
+	
 }
 
 Coalition::~Coalition()
@@ -56,11 +55,8 @@ Coalition::~Coalition()
 
 	CompositionHelper::saveComposition(this);
 
-	active = false;
 	for (auto agent : agentSet)
 		agent->unbind();
-	agentSet.clear();
-	unitSet.clear();
 }
 
 Task* Coalition::getTask() const
@@ -163,7 +159,7 @@ void Coalition::activate()
 
 bool Coalition::addAgent(Agent* agent)
 {	
-	if (agent->getCoalition() == this)
+	if (agent->getCoalitionID() == this->coalitionID)
 		return false;
 
 	/*if (agent->getCoalitionID() != -1)
@@ -201,7 +197,7 @@ void Coalition::removeAgent(Agent* agent)
 	//if all agents die while coalition is activated, the task is a failure
 	//or
 	//if no agents can deal damage in an attack coalition, the task is a failure
-	if (active && (agentSet.size() == 0 || (task->getType() == ATT && currentComp.getAttributes().groundDPS == 0 && currentComp.getAttributes().airDPS == 0)))
+	if (active && (currentComp.getCost() == 0 || agentSet.size() == 0 || (task->getType() == ATT && currentComp.getAttributes().groundDPS == 0 && currentComp.getAttributes().airDPS == 0)))
 		task->fail();
 
 	if (agent->getCoalition() != this)

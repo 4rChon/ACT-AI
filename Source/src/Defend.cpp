@@ -73,7 +73,7 @@ void Defend::succeed()
 	profit = 1.0;// coalition->getProfit();
 	printDebugInfo("Success!", true);
 
-	cleanSubTasks();
+	deleteSubTasks();
 }
 
 void Defend::fail()
@@ -83,5 +83,5 @@ void Defend::fail()
 	profit = 0.0;// coalition->getProfit();
 	printDebugInfo("Failure!", true);
 
-	cleanSubTasks();
+	deleteSubTasks();
 }

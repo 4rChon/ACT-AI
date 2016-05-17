@@ -17,8 +17,8 @@ namespace TaskHelper
 		nextID = 0;
 		
 		/* opening */
-		CreateUnit* createUnit = new CreateUnit(BWAPI::UnitTypes::Terran_Barracks);
-		addTask(createUnit, true);
+		//CreateUnit* createUnit = new CreateUnit(BWAPI::UnitTypes::Terran_Barracks, 1);
+		//addTask(createUnit, true);
 	}
 
 	int getNextID()
@@ -66,24 +66,46 @@ namespace TaskHelper
 		{
 			fullTaskSet.erase(task);
 			delete task;
+			task = nullptr;
 		}
 	}
 
 	void updateRootTasks()
 	{		
-		if (rootTaskSet.size() > 0)
+		updateTaskTree(rootTaskSet);
+	}
+
+	void deleteTaskTree(Taskset &taskTree)
+	{
+		for (auto &task : taskTree)
 		{
-			for (auto it = rootTaskSet.begin(); it != rootTaskSet.end();)
-				if ((*it)->isComplete())
-				{					
-					removeTask(*it);
-					it = rootTaskSet.erase(it);
-				}
-				else
-				{
-					(*it)->updateTaskTree();
-					++it;
-				}
+			auto superTasks = task->getSuperTasks();
+			for (auto &superTask : superTasks)
+			{
+				superTask->getSubTasks().erase(task);
+			}
+		
+			removeTask(task);
+			taskTree.erase(task);
+		}
+	}
+
+	void updateTaskTree(Taskset &taskTree)
+	{
+		if (taskTree.size() == 0)
+			return;
+
+		for (auto &task : taskTree)
+		{
+			if (task->isComplete())
+			{
+				taskTree.erase(task);
+				removeTask(task);
+				continue;
+			}
+
+			updateTaskTree(task->getSubTasks());
+			task->update();
 		}
 	}
 }

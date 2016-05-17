@@ -12,7 +12,8 @@ namespace DesireHelper
 		static std::unordered_map<BWAPI::TechType, double> techDesireMap;
 		static std::unordered_map<BWTA::BaseLocation*, double, std::hash<void*>> expansionDesireMap;
 		static std::unordered_map<Zone*, double, std::hash<void*>> attackDesireMap;
-		static std::unordered_map<Zone*, double, std::hash<void*>> staticDefenseDesireMap;
+		static std::unordered_map<Zone*, double, std::hash<void*>> bunkerDefenseDesireMap;
+		static std::unordered_map<Zone*, double, std::hash<void*>> turretDefenseDesireMap;
 		static std::unordered_map<Zone*, double, std::hash<void*>> unitDefenseDesireMap;
 		static double supplyDesire;
 		static double expandDesire;
@@ -50,7 +51,8 @@ namespace DesireHelper
 		{
 			attackDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));			
 			unitDefenseDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));
-			staticDefenseDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));
+			bunkerDefenseDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));
+			turretDefenseDesireMap.insert(std::pair<Zone*, double>(MapHelper::getZone(region), 0.0));
 		}
 
 		supplyDesire = 1.0;
@@ -69,10 +71,22 @@ namespace DesireHelper
 		return bestZone.first;
 	}
 
-	Zone* getStaticDefenseTarget()
+	Zone* getBunkerDefenseTarget()
 	{
 		std::pair<Zone*, double> bestZone = std::pair<Zone*, double>(nullptr, 0.0);
-		for (auto& zone : staticDefenseDesireMap)
+		for (auto& zone : bunkerDefenseDesireMap)
+		{
+			if (zone.second > bestZone.second)
+				bestZone = zone;
+		}
+
+		return bestZone.first;
+	}
+
+	Zone* getTurretDefenseTarget()
+	{
+		std::pair<Zone*, double> bestZone = std::pair<Zone*, double>(nullptr, 0.0);
+		for (auto& zone : turretDefenseDesireMap)
 		{
 			if (zone.second > bestZone.second)
 				bestZone = zone;
@@ -105,9 +119,22 @@ namespace DesireHelper
 			unitDefenseDesireMap[zone] = (desireMod + 1) * zone->getTimesDefended() * defenseMod;
 
 			if (!zone->hasBunkerDefense())
-				staticDefenseDesireMap[zone] = zone->getTimesDefended() * defenseMod;
+			{
+				bunkerDefenseDesireMap[zone] = zone->getTimesDefended() * defenseMod;
+			}
 			else
-				staticDefenseDesireMap[zone] = 0.0;
+			{
+				bunkerDefenseDesireMap[zone] = 0.0;
+			}
+
+			if (!zone->hasTurretDefense())
+			{
+				turretDefenseDesireMap[zone] = zone->getTimesDefended() * defenseMod;
+			}
+			else
+			{
+				turretDefenseDesireMap[zone] = 0.0;
+			}
 		}
 	}
 
@@ -314,9 +341,14 @@ namespace DesireHelper
 		return attackDesireMap;
 	}
 
-	const std::unordered_map<Zone*, double, std::hash<void*>>& getStaticDefenseDesireMap()
+	const std::unordered_map<Zone*, double, std::hash<void*>>& getBunkerDefenseDesireMap()
 	{
-		return staticDefenseDesireMap;
+		return bunkerDefenseDesireMap;
+	}
+
+	const std::unordered_map<Zone*, double, std::hash<void*>>& getTurretDefenseDesireMap()
+	{
+		return turretDefenseDesireMap;
 	}
 
 	const std::unordered_map<Zone*, double, std::hash<void*>>& getUnitDefenseDesireMap()

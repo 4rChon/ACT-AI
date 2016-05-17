@@ -173,25 +173,6 @@ namespace ArmyHelper
 		}
 	}
 
-	bool scan(BWAPI::Position target)
-	{		
-		static int lastScanFrame = 0;
-
-		if (BWAPI::Broodwar->getFrameCount() - lastScanFrame > 10 * 24)
-		{
-			for (auto &comsatStation : AgentHelper::getComsatStations())
-			{
-				if (comsatStation->useAbility(BWAPI::TechTypes::Scanner_Sweep, target))
-				{
-					lastScanFrame = BWAPI::Broodwar->getFrameCount();
-					return true;
-				}
-			}
-		}
-
-		return false;
-	}
-
 	void addScoutedUnit(int unitID, BWAPI::UnitType unitType)
 	{
 		scoutedUnits.insert(std::pair<int, BWAPI::UnitType>(unitID, unitType));

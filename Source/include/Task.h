@@ -25,7 +25,7 @@ enum TaskType
 class Task
 {
 protected:
-	std::string taskName; //debug purposes
+	std::string taskName;
 	Taskset subTasks;
 	Taskset superTasks;
 	bool assigned;
@@ -69,8 +69,7 @@ public:
 	virtual void act() = 0;
 	virtual void update() = 0;
 
-	void cleanSubTasks();
-	void updateTaskTree();
+	void deleteSubTasks();
 	
 	virtual void succeed();
 	virtual void fail();
