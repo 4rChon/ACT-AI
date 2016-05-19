@@ -9,7 +9,7 @@ private:
 	Coalition* taskCoalition;
 public:
 	//constructors and destructors
-	CreateCoalition(Composition targetComposition, Task* task);	
+	CreateCoalition(Composition targetComposition, Task* const& task);	
 
 	//getters
 	double getCost();

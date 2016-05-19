@@ -4,7 +4,7 @@
 #include "ArmyHelper.h"
 #include <string>
 
-Scout::Scout(Zone* target)
+Scout::Scout(Zone* const& target)
 {
 	taskName = "Scout(" + std::to_string(target->getID()) + ")";
 	this->target = target;

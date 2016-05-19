@@ -31,7 +31,7 @@ namespace CompositionHelper
 	}
 
 
-	Composition getComposition(Task* task)
+	Composition getComposition(Task* const& task)
 	{ 
 		TaskType taskType = task->getType();
 		//TO DO: consider time proximity
@@ -255,7 +255,7 @@ namespace CompositionHelper
 		std::cout << "Compositions Loaded...\n";
 	}
 
-	void saveComposition(Coalition* coalition)
+	void saveComposition(Coalition* const& coalition)
 	{
 		if (coalition->getTask()->getType() != ATT)
 			return;

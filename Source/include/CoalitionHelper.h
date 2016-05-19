@@ -10,17 +10,11 @@ namespace CoalitionHelper
 {
 	void initialiseHelper();
 
-	///getters
-	//Return all coalitions
-	const Coalitionset& getCoalitionset();
+	///getters	
+	const Coalitionset& getCoalitionset();	//Return all coalitions	
+	int getNextID();						//Get next coalitionID - used for initialising new coalitions
 
-	//Get next coalitionID - used for initialising new coalitions
-	int getNextID();
-
-	///helpers
-	//Add a new coalition with composition and task
-	Coalition* addCoalition(Composition composition, Task* task);	
-
-	//Remove a coalition
-	void removeCoalition(Coalition* coalition);
+	///helpers	
+	Coalition* addCoalition(Composition composition, Task* task);	//Add a new coalition with composition and task
+	void removeCoalition(Coalition* const& coalition);						//Remove a coalition
 };

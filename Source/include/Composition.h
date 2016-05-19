@@ -44,9 +44,9 @@ public:
 
 	///operator overrides
 	bool operator==(const Composition& rhs) const;
-	bool operator>=(const Composition & rhs) const;	
+	bool operator>=(const Composition& rhs) const;	
 	Composition operator-(const Composition& b);
-	Composition getIntersection(const Composition & b);
+	Composition getIntersection(const Composition& b);
 	int operator[](const BWAPI::UnitType& b);
 
 	///getters

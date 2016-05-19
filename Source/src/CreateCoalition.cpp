@@ -6,7 +6,7 @@
 #include <stdio.h> //ceil
 #include <math.h> //ceil
 
-CreateCoalition::CreateCoalition(Composition composition, Task* task)
+CreateCoalition::CreateCoalition(Composition composition, Task* const& task)
 {
 	taskName = "CreateCoalition(Composition, " + task->getName() + ")";
 	Composition adjustedComposition;

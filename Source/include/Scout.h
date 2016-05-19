@@ -5,7 +5,7 @@
 class Scout : public Task
 {
 public:
-	Scout(Zone* target);
+	Scout(Zone* const& target);
 	void assign();
 	void act();
 	void update();

@@ -107,7 +107,7 @@ namespace DesireHelper
 		return bestZone.first;
 	}
 
-	void setDefendDesire(Zone* target, double desireMod)
+	void setDefendDesire(Zone* const& target, double desireMod)
 	{
 		for (auto &zone : target->getNeighbourhood())
 		{
@@ -138,7 +138,7 @@ namespace DesireHelper
 		}
 	}
 
-	void updateAttackDesire(Zone* target, double desireMod)
+	void updateAttackDesire(Zone* const& target, double desireMod)
 	{
 		attackDesireMap[target] = desireMod;
 	}
@@ -326,12 +326,12 @@ namespace DesireHelper
 		return expandDesire;
 	}
 
-	void setExpansionDesire(BWTA::BaseLocation* baseLocation, double desire)
+	void setExpansionDesire(BWTA::BaseLocation* const& baseLocation, double desire)
 	{
 		expansionDesireMap[baseLocation] = desire;
 	}
 
-	double getExpansionDesire(BWTA::BaseLocation* baseLocation)
+	double getExpansionDesire(BWTA::BaseLocation* const& baseLocation)
 	{
 		return expansionDesireMap[baseLocation];
 	}

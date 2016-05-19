@@ -29,8 +29,6 @@ namespace ArmyHelper
 		static bool defending;
 		static bool scouting;
 		static double productionRatio;
-		static Zone* attackTarget;
-		/*static Zone* defendTarget;*/
 		static Zone* scoutTarget;
 		static Zone* enemyStart;		
 		static std::map<UnitCostPair, Zone*, compareUnit> targetPriorityList;
@@ -42,8 +40,6 @@ namespace ArmyHelper
 		attacking = false;
 		scouting = false;
 		defending = true;		
-		attackTarget = nullptr;
-		/*defendTarget = MapHelper::getZone(BWAPI::Broodwar->getRegionAt(BWTA::getNearestChokepoint(BWTA::getStartLocation(util::game::getSelf())->getPosition())->getCenter()));*/
 		scoutTarget = nullptr;
 		if (BWTA::getStartLocations().size() == 2)
 		{
@@ -150,8 +146,6 @@ namespace ArmyHelper
 	{
 		auto target = std::pair<UnitCostPair, Zone*>(UnitCostPair(unit->getID(), unit->getType()), MapHelper::getZone(unit->getRegion()));
 		targetPriorityList.insert(target);
-
-		attackTarget = (*targetPriorityList.begin()).second;
 	}
 
 	void removeTargetPriority(BWAPI::Unit unit)
@@ -161,8 +155,6 @@ namespace ArmyHelper
 			if (target.first.first == unit->getID())
 				targetPriorityList.erase(target.first);				
 		}
-
-		attackTarget = (*targetPriorityList.begin()).second;
 	}
 
 	void updateTargetPriority()
@@ -174,7 +166,7 @@ namespace ArmyHelper
 		}
 	}
 
-	void clearZoneTargets(Zone *zone)
+	void clearZoneTargets(Zone* const&zone)
 	{
 		for (auto &target : targetPriorityList)
 		{

@@ -18,13 +18,13 @@ namespace CompositionHelper
 	void initialiseHelper();
 
 	//getters
-	Composition getComposition(Task* task);
+	Composition getComposition(Task* const& task);
 	Composition getCounters(BWAPI::UnitType enemyUnitType);
 	const std::vector<UsedComposition>& getCompositionSet();
 
 	//helpers
 	void loadCompositions();
-	void saveComposition(Coalition* coalition);
+	void saveComposition(Coalition* const& coalition);
 	void saveComposition(UsedComposition usedComposition);
 	void saveCompositions();
 };

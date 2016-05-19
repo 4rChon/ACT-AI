@@ -52,7 +52,7 @@ namespace TaskHelper
 		return attackTasks;
 	}
 
-	Task* addTask(Task* newTask, bool root)
+	Task* addTask(Task* const& newTask, bool root)
 	{
 		//check whether similar task has been added
 		if (root)
@@ -78,7 +78,7 @@ namespace TaskHelper
 		return newTask;
 	}
 
-	void deleteTask(Task* task)
+	void deleteTask(Task* const& task)
 	{
 		if (!task)
 			return;
@@ -87,7 +87,7 @@ namespace TaskHelper
 		fullTaskSet.erase(task);			
 
 		delete task;
-		task = nullptr;
+		//task = nullptr;
 	}
 
 	void updateRootTasks()

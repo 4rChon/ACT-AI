@@ -32,7 +32,7 @@ namespace CoalitionHelper
 		return coalition;
 	}
 
-	void removeCoalition(Coalition* coalition)
+	void removeCoalition(Coalition* const& coalition)
 	{
 		if (coalition == nullptr)
 			return;

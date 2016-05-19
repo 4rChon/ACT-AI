@@ -7,7 +7,7 @@
 #include "EconHelper.h"
 #include <string>
 
-Attack::Attack(Zone* target)
+Attack::Attack(Zone* const& target)
 {
 	taskName = "Attack(" + std::to_string(target->getID()) + ")";
 	this->target = target;
@@ -46,6 +46,15 @@ void Attack::update()
 
 	if (complete)
 		return;
+
+	if (coalition)
+	{
+		if (coalition->getTargetComp().getCost() == 0)
+		{
+			fail();
+			return;
+		}
+	}
 
 	if (BWAPI::Broodwar->getFrameCount() - target->getLastVisited() < 5 && target->getEnemyScore() == 0)
 	{

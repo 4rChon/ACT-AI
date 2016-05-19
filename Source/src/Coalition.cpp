@@ -28,7 +28,8 @@ Coalition::Coalition()
 {
 }
 
-Coalition::Coalition(Composition targetComp, Task* task)
+
+Coalition::Coalition(Composition targetComp, Task * const & task)
 	: creationFrame(BWAPI::Broodwar->getFrameCount())
 	, activationFrame(-1)
 	, task(task)
@@ -107,13 +108,10 @@ void Coalition::activate()
 		agent->bind();
 }
 
-bool Coalition::addAgent(Agent* agent)
+bool Coalition::addAgent(Agent* const& agent)
 {	
-	if (agent->getCoalitionID() == this->coalitionID)
+	if (agent->getCoalitionID() != -1)
 		return false;
-
-	/*if (agent->getCoalitionID() != -1)
-		agent->getCoalition()->removeAgent(agent);*/
 
 	auto unitType = agent->getUnit()->getType();
 
@@ -139,7 +137,7 @@ void Coalition::addUnit(BWAPI::Unit unit)
 		activate();	
 }
 
-void Coalition::removeAgent(Agent* agent)
+void Coalition::removeAgent(Agent* const& agent)
 {	
 	agentSet.erase(agent);
 	removeUnit(agent->getUnit());	
@@ -174,7 +172,6 @@ void Coalition::logCoalition()
 	std::cout << "Logging Performance...\n";
 	std::ofstream composition;
 	auto race = util::game::getSelf()->getRace().toString();
-	//composition.open("compositions\\" + BWAPI::Broodwar->mapName() + "\\" + util::getEnemy()->getRace().getName() + "\\" + race + "_" + task->getName() + ".txt");
 	composition.open("compositions\\" + util::game::getEnemy()->getRace().getName() + "\\" + race + "_" + task->getName() + ".txt");
 	composition << "Map Name: " << BWAPI::Broodwar->mapName() << " : " << BWAPI::Broodwar->mapFileName() << "\n";
 	composition << "EngageDuration: " << engageDuration << "\n";

@@ -6,7 +6,7 @@ class Attack : public Task
 {
 public:
 	//constructors and destructors
-	Attack(Zone* target);
+	Attack(Zone* const& target);
 
 	//-
 	void assign();

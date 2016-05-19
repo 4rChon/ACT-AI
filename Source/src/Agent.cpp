@@ -75,7 +75,6 @@ void Agent::bind()
 {
 	//std::cout << unitID << " : Binding agent\n";
 	free = false;
-	isCandidateAgent = false;
 	if (unit->isLoaded())
 		unit->getTransport()->unload(unit);
 }
@@ -242,8 +241,7 @@ void Agent::updateBoundActions()
 
 void Agent::updateFreeActions()
 {
-	if(!isCandidateAgent)
-		isCandidateAgent = pollCoalitions();
+	pollCoalitions();
 
 	if (!free)
 		return;
@@ -332,8 +330,6 @@ void Agent::act()
 
 bool Agent::pollCoalitions()
 {
-	Coalition* bestCoalition = nullptr;
-	double bestFitness = 0.0;
 	for (auto &candidateCoalition : CoalitionHelper::getCoalitionset())
 	{
 		if (!candidateCoalition->isActive())
@@ -351,20 +347,10 @@ bool Agent::pollCoalitions()
 				agentFitness += util::calc::normaliseDistance(unit->getPosition(), candidateTarget->getRegion()->getCenter());
 
 			agentFitness /= 2;
-			if (agentFitness > bestFitness)
-			{
-				bestFitness = agentFitness;
-				bestCoalition = candidateCoalition;
-			}
+			if (candidateCoalition->addAgent(this) && util::calc::getRandom(0, 1) < agentFitness)
+				return true;
 		}
 	}
-
-	if (!bestCoalition)
-		return false;
-
-	if (bestCoalition->addAgent(this) && util::calc::getRandom(0, 1) < bestFitness)
-		return true;
-
 	return false;
 }
 
@@ -388,11 +374,13 @@ bool Agent::attack(BWAPI::PositionOrUnit target)
 			if (lastCommand.getType() == BWAPI::UnitCommandTypes::Attack_Move && lastCommand.getTargetPosition() == target.getPosition())
 				return false;
 		}
+
 		if (target.isUnit())
 		{
 			if (lastCommand.getType() == BWAPI::UnitCommandTypes::Attack_Unit && lastCommand.getTarget() == target.getUnit())
 				return false;
 		}
+
 		return unit->attack(target);
 	}
 	return false;

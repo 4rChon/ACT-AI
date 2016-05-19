@@ -47,7 +47,7 @@ public:
 
 	//setters
 	void setDebug(bool debug)				{ this->debug = debug; }
-	void setCoalition(Coalition* coalition)
+	void setCoalition(Coalition* const& coalition)
 	{
 		this->coalition = coalition;
 		coalitionID = coalition->getID();
