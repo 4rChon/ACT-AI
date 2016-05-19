@@ -92,9 +92,9 @@ void SwarmCAT::onEnd(bool isWinner)
 {
 	CompositionHelper::saveCompositions();
 	MapHelper::saveMapData();
-	TaskHelper::deleteTaskTree(TaskHelper::getRootTasks());
-	for(auto coalition : CoalitionHelper::getCoalitionset())
-		CoalitionHelper::removeCoalition(coalition);
+	/*TaskHelper::deleteTaskTree(TaskHelper::getRootTasks());
+	for(auto &coalition : CoalitionHelper::getCoalitionset())
+		CoalitionHelper::removeCoalition(coalition);*/
 	std::cout << " ---------------- MATCH END ----------------\n";
 }
 
@@ -195,6 +195,21 @@ void SwarmCAT::onSendText(std::string text)
 			}
 		}
 	}
+	if (text.compare(0, 17, "print composition") == 0)
+	{
+		//if (text.length() <= 18)
+		//	return;
+
+		std::string number = text.substr(18);
+		char * pEnd;
+		int id = (int)std::strtol(number.c_str(), &pEnd, 10);
+		std::cout << "Printing Composition " << id << "\n";		
+		auto task = TaskHelper::getTask(id);
+		if (task)
+			std::cout << task->getCoalition()->getTargetComp().toString() << "\n";
+		else
+			std::cout << "No composition found\n";
+	}
 }
 
 void SwarmCAT::onReceiveText(BWAPI::Player player, std::string text)
@@ -282,12 +297,13 @@ void SwarmCAT::onUnitDestroy(BWAPI::Unit unit)
 			if (unit->getType() == BWAPI::UnitTypes::Terran_Bunker)
 			{
 				int bunkerCount = 0;
-				for (auto& zone : MapHelper::getZone(unit->getRegion())->getNeighbourhood())
+				const MapHelper::Field& neighbourhood = MapHelper::getZone(unit->getRegion())->getNeighbourhood();
+				for (auto& zone : neighbourhood)
 					bunkerCount += zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::GetType == BWAPI::UnitTypes::Terran_Bunker).size();
 
 				if (bunkerCount == 0)
 				{
-					for (auto& zone : MapHelper::getZone(unit->getRegion())->getNeighbourhood())
+					for (auto& zone : neighbourhood)
 						zone->setBunkerDefense(false);
 				}
 			}

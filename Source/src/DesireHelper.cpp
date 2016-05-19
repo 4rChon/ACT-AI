@@ -42,7 +42,7 @@ namespace DesireHelper
 				std::vector<double> coeffArr;
 				valueArr.push_back(1/expansion->getGroundDistance(BWTA::getStartLocation(util::game::getSelf())));
 				coeffArr.push_back(1);
-				desire = util::normaliseValues(valueArr, coeffArr);
+				desire = util::calc::normaliseValues(valueArr, coeffArr);
 			}
 			expansionDesireMap.insert(std::pair<BWTA::BaseLocation*, double>(expansion, desire));
 		}
@@ -231,7 +231,7 @@ namespace DesireHelper
 				std::vector<double> coeffArr;
 				valueArr.push_back(1/expansion->getGroundDistance(BWTA::getStartLocation(util::game::getSelf())));
 				coeffArr.push_back(1.0);
-				expansionDesireMap[expansion] = util::normaliseValues(valueArr, coeffArr);
+				expansionDesireMap[expansion] = util::calc::normaliseValues(valueArr, coeffArr);
 			}
 		}
 	}

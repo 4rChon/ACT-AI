@@ -30,7 +30,7 @@ namespace ArmyHelper
 		static bool scouting;
 		static double productionRatio;
 		static Zone* attackTarget;
-		static Zone* defendTarget;
+		/*static Zone* defendTarget;*/
 		static Zone* scoutTarget;
 		static Zone* enemyStart;		
 		static std::map<UnitCostPair, Zone*, compareUnit> targetPriorityList;
@@ -43,7 +43,7 @@ namespace ArmyHelper
 		scouting = false;
 		defending = true;		
 		attackTarget = nullptr;
-		defendTarget = MapHelper::getZone(BWAPI::Broodwar->getRegionAt(BWTA::getNearestChokepoint(BWTA::getStartLocation(util::game::getSelf())->getPosition())->getCenter()));
+		/*defendTarget = MapHelper::getZone(BWAPI::Broodwar->getRegionAt(BWTA::getNearestChokepoint(BWTA::getStartLocation(util::game::getSelf())->getPosition())->getCenter()));*/
 		scoutTarget = nullptr;
 		if (BWTA::getStartLocations().size() == 2)
 		{
@@ -60,8 +60,8 @@ namespace ArmyHelper
 	{
 		if(!scouting)
 			scout();
-		if(!attacking)
-			attack();		
+		//if(!attacking)
+		attack();		
 	}
 
 	void scout()
@@ -96,22 +96,32 @@ namespace ArmyHelper
 	}
 
 	void attack()
-	{
+	{		
 		if (targetPriorityList.size() > 0)
 		{
-			attacking = true;
-			/*int i = 0;
-			for (auto &target = targetPriorityList.begin(); target != targetPriorityList.end(); target++)
-			{					
-				Attack* attack = new Attack((*target).second);
-				TaskHelper::addTask(attack, true);					
+			//attacking = true;
+			for (auto &target : targetPriorityList)
+			{		
+				Taskset& attackTasks = TaskHelper::getAttackTasks();
+				if (attackTasks.size() >= 3)
+					return;
 
-				if (i++ == 3 || i == targetPriorityList.size())
-					break;
-			}*/
-			Attack* attack = new Attack(attackTarget);
-			TaskHelper::addTask(attack, true);
-			defending = false;
+				bool sameRegion = false;
+				for (auto &task : attackTasks)
+				{
+					if (target.second->getSuperRegion()->getCenter() == task->getTarget()->getSuperRegion()->getCenter())
+					{
+						sameRegion = true;
+						break;
+					}
+				}
+
+				if (!sameRegion)
+				{
+					Attack* attack = new Attack(target.second);
+					TaskHelper::addTask(attack, true);
+				}
+			}
 		}
 	}
 

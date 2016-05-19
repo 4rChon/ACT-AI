@@ -17,19 +17,20 @@ protected:
 
 	BWAPI::UnitCommand lastCommand;
 	
-	BWAPI::Unit unit;		//pointer to unit represented by agent - nullptr if no unit
-	Coalition* coalition;	//pointer to agent's current coalition - nullptr if no coalition
-	Task* task;				//pointer to agent's current task - nullptr if no task
-	int unitID;				//unitID - -1 if no unit
-	int coalitionID;		//coalitionID - -1 if no coalition
-	int taskID;				//taskID - -1 if no task
-	bool free;				//true if agent coalition is currently active, false otherwise
-	Zone* target;			//agent's current target zone - nullptr if no target
+	BWAPI::Unit unit;					//pointer to unit represented by agent - nullptr if no unit
+	Coalition* coalition;				//pointer to agent's current coalition - nullptr if no coalition	
+	Task* task;							//pointer to agent's current task - nullptr if no task
+	int unitID;							//unitID - -1 if no unit
+	int coalitionID;					//coalitionID - -1 if no coalition
+	int taskID;							//taskID - -1 if no task
+	bool free;							//true if agent coalition is currently active, false otherwise
+	Zone* target;						//agent's current target zone - nullptr if no target
 	BWAPI::Unit unitTarget;
-	int engageDuration;		//number of frames that the agent has been engaged in combat
-	int lastEngaged;		//last frame that agent was engaged in combat
-	bool isEngaged;			//true if agent is currently engaged in combat
-	int lastKillCount;		//number of recorded kills
+	int engageDuration;					//number of frames that the agent has been engaged in combat
+	int lastEngaged;					//last frame that agent was engaged in combat
+	bool isEngaged;						//true if agent is currently engaged in combat
+	int lastKillCount;					//number of recorded kills
+	bool isCandidateAgent;
 
 	/*CommandMap commandMap;
 	void initialiseCommandMap();*/
@@ -50,8 +51,8 @@ public:
 	virtual ~Agent();
 	
 	///setters	
-	void setCoalition(Coalition* coalition);	//Assign agent coalition and coalitionID
-	void setTask(Task* task);					//Assign agent task and taskID
+	void setCoalition(Coalition* const& coalition);	//Assign agent coalition and coalitionID
+	void setTask(Task* const& task);				//Assign agent task and taskID
 	void setUnit(BWAPI::Unit unit) { this->unit = unit; unitID = unit->getID(); }
 
 	///getters

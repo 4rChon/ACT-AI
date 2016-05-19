@@ -112,15 +112,18 @@ namespace util
 
 	void initialiseUtil();
 
-	//Normalises an array of values after weighing them with coefficients
-	double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr);
+	namespace calc
+	{
+		//Normalises an array of values after weighing them with coefficients
+		double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr);
 
-	double normaliseDistance(BWAPI::Position pos1, BWAPI::Position pos2);
+		double normaliseDistance(BWAPI::Position pos1, BWAPI::Position pos2);
 
-	double getRandom(int min, int max);
+		double getRandom(int min, int max);
 
-	BWAPI::UnitType getRandomType(Composition composition);
-	BWAPI::UnitType getRandomType(BWAPI::UnitType macroType);
+		BWAPI::UnitType getRandomType(Composition composition);
+		BWAPI::UnitType getRandomType(BWAPI::UnitType macroType);
+	}
 
 	namespace game
 	{
@@ -149,7 +152,6 @@ namespace util
 		int getFrameBracket(int frame, int bracket);
 	}	
 
-	//Get all files in root path with ext extension and places them in ret
 	namespace data
 	{
 		namespace fs = ::boost::filesystem;

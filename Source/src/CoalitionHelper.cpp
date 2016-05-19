@@ -34,6 +34,9 @@ namespace CoalitionHelper
 
 	void removeCoalition(Coalition* coalition)
 	{
+		if (coalition == nullptr)
+			return;
+
 		if (coalitionSet.count(coalition) > 0)
 		{
 			coalitionSet.erase(coalition);

@@ -63,9 +63,11 @@ public:
 	Taskset& getSuperTasks()				{ return superTasks; }
 	virtual Coalition* getCoalition() const { return coalition; }
 	virtual double getCost();
+	
 	virtual double getProfit()				{ return profit; }
-	void addSubTask(Task* task);
-	void addSuperTask(Task* task)			{ superTasks.insert(task); }
+	void addSubTask(Task* const& task);
+	void removeSubTask(Task* const& task)	{ subTasks.erase(task); }
+	void addSuperTask(Task* const& task)	{ superTasks.insert(task); }
 
 	//-
 	virtual void createCoalition();
@@ -74,6 +76,7 @@ public:
 	virtual void update() = 0;
 
 	void deleteSubTasks();
+	void updateSubTasks();
 	
 	virtual void succeed();
 	virtual void fail();

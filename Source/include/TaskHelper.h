@@ -5,11 +5,11 @@ namespace TaskHelper
 {
 	void initialiseHelper();
 	int getNextID();
+	Task* getTask(int id);
 	Task* addTask(Task* task, bool root = false);
-	void removeTask(Task* task);
-	void deleteTaskTree(Taskset & taskTree);
-	void updateTaskTree(Taskset & taskTree);
+	void deleteTask(Task * task);
 	void updateRootTasks();
 	Taskset& getRootTasks();
 	Taskset& getAllTasks();
+	Taskset& getAttackTasks();
 }

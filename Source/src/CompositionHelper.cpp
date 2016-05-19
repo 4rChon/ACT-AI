@@ -76,8 +76,7 @@ namespace CompositionHelper
 				}
 			}
 		}
-		
-		if(candidateSet.size() == 0)
+		else
 		{
 			Composition c;
 			switch (taskType)
@@ -108,7 +107,11 @@ namespace CompositionHelper
 				return c;
 			}
 			default:
+			{
+				c.addType(BWAPI::UnitTypes::Terran_Marine);
+				c.addType(BWAPI::UnitTypes::Terran_Medic);
 				return c;
+			}
 			}
 		}
 		auto bestComposition = *candidateSet.begin();

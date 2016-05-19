@@ -55,7 +55,7 @@ namespace ReplayHelper
 				if (intersection.getTypes().size() == 0)
 				{
 					//add random unit type from counter list
-					BWAPI::UnitType randomType = util::getRandomType(counters);
+					BWAPI::UnitType randomType = util::calc::getRandomType(counters);
 					usedComp.composition.addType(randomType);
 				}
 				else
@@ -65,14 +65,14 @@ namespace ReplayHelper
 					//increase amount for existing unit type
 					if (evolveType <= 50)
 					{
-						BWAPI::UnitType randomType = util::getRandomType(intersection.getUnitMap());
+						BWAPI::UnitType randomType = util::calc::getRandomType(intersection.getUnitMap());
 						usedComp.composition.addType(randomType);
 					}
 
 					//add a new counter unit type
 					else if (evolveType <= 75)
 					{
-						BWAPI::UnitType randomType = util::getRandomType(counters);
+						BWAPI::UnitType randomType = util::calc::getRandomType(counters);
 						usedComp.composition.addType(randomType);
 					}
 				}
@@ -90,7 +90,7 @@ namespace ReplayHelper
 		else
 		{			
 			std::cout << "Removing Unit\n";
-			BWAPI::UnitType randomType = util::getRandomType(usedComp.composition);
+			BWAPI::UnitType randomType = util::calc::getRandomType(usedComp.composition);
 			usedComp.composition.removeType(randomType);
 
 			std::cout << "\n==Composition Evolved==\n\n";
@@ -111,7 +111,7 @@ namespace ReplayHelper
 		std::cout << "\n==Mutating Composition==\n\n";
 		std::vector<BWAPI::UnitType> possibleTypes;
 
-		BWAPI::UnitType randomUnit = util::getRandomType(BWAPI::UnitTypes::Men);
+		BWAPI::UnitType randomUnit = util::calc::getRandomType(BWAPI::UnitTypes::Men);
 		composition.addType(randomUnit);
 		std::cout << "\n\n==Composition After Mutation==\n";
 		composition.printDebugInfo();

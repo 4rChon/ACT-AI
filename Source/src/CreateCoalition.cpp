@@ -27,6 +27,8 @@ CreateCoalition::CreateCoalition(Composition composition, Task* task)
 	task->setCoalition(taskCoalition);
 	cost = composition.getCost();
 	taskType = CRC;
+	if (cost == 0)
+		succeed();
 	//debug = true;
 }
 
@@ -89,7 +91,7 @@ void CreateCoalition::update()
 double CreateCoalition::getCost()
 {
 	cost = taskCoalition->getTargetComp().getCost() - taskCoalition->getCurrentComp().getCost();
-	for (auto task : subTasks)
+	for (auto &task : subTasks)
 		cost += task->getCost();
 
 	return cost;

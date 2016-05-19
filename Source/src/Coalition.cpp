@@ -74,7 +74,7 @@ double Coalition::getCost()
 	coeffArr.push_back(0.0001);
 	valueArr.push_back(getAge());
 	coeffArr.push_back(0.00001);
-	cost = util::normaliseValues(valueArr, coeffArr);
+	cost = util::calc::normaliseValues(valueArr, coeffArr);
 	return cost;
 }
 
@@ -86,7 +86,7 @@ double Coalition::getProfit()
 	coeffArr.push_back(0.9);
 	valueArr.push_back(engageDuration);
 	coeffArr.push_back(0.4);
-	profit = util::normaliseValues(valueArr, coeffArr);
+	profit = util::calc::normaliseValues(valueArr, coeffArr);
 	return profit;
 }
 
@@ -96,7 +96,7 @@ double Coalition::getFitness()
 	std::vector<double> coeffArr;
 	valueArr.push_back(profit/cost);
 	coeffArr.push_back(0.1);
-	return util::normaliseValues(valueArr, coeffArr);
+	return util::calc::normaliseValues(valueArr, coeffArr);
 }
 
 void Coalition::activate()

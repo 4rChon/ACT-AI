@@ -47,15 +47,6 @@ void Attack::update()
 	if (complete)
 		return;
 
-	if (coalition)
-	{
-		if (coalition->getAge() > 24 * 60 * 8)
-		{
-			fail();
-			return;
-		}
-	}
-
 	if (BWAPI::Broodwar->getFrameCount() - target->getLastVisited() < 5 && target->getEnemyScore() == 0)
 	{
 		succeed();

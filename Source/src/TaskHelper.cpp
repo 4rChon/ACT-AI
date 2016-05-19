@@ -9,6 +9,7 @@ namespace TaskHelper
 	{
 		static Taskset rootTaskSet;
 		static Taskset fullTaskSet;
+		static Taskset attackTasks;
 		static int nextID;
 	}
 
@@ -26,6 +27,16 @@ namespace TaskHelper
 		return ++nextID;
 	}
 
+	Task * getTask(int id)
+	{
+		for (auto& task : fullTaskSet)
+		{
+			if (task->getID() == id)
+				return task;
+		}
+		return nullptr;
+	}
+
 	Taskset& getRootTasks()
 	{
 		return rootTaskSet;
@@ -34,6 +45,11 @@ namespace TaskHelper
 	Taskset& getAllTasks()
 	{
 		return fullTaskSet;
+	}
+
+	Taskset& getAttackTasks()
+	{
+		return attackTasks;
 	}
 
 	Task* addTask(Task* newTask, bool root)
@@ -46,65 +62,46 @@ namespace TaskHelper
 			for (auto &task : fullTaskSet)
 			{
 				if (rootTaskSet.count(task) == 0 && 
-					(newTask->getType() == STR 
-					|| newTask->getType() == SUR)
+					(newTask->getType() == STR || newTask->getType() == SUR)
 					&& task->getName().compare(newTask->getName()) == 0)
 				{
-					removeTask(newTask);
+					deleteTask(newTask);
 					return task;
 				}
 			}
 		}
 
+		if (newTask->getType() == ATT)
+			attackTasks.insert(newTask);
+
 		fullTaskSet.insert(newTask);
 		return newTask;
 	}
 
-	void removeTask(Task* task)
+	void deleteTask(Task* task)
 	{
-		if (fullTaskSet.count(task) > 0)
-		{
-			fullTaskSet.erase(task);
-			delete task;
-			task = nullptr;
-		}
+		if (!task)
+			return;
+
+		attackTasks.erase(task);
+		fullTaskSet.erase(task);			
+
+		delete task;
+		task = nullptr;
 	}
 
 	void updateRootTasks()
-	{		
-		updateTaskTree(rootTaskSet);
-	}
-
-	void deleteTaskTree(Taskset &taskTree)
 	{
-		for (auto &task : taskTree)
-		{
-			auto superTasks = task->getSuperTasks();
-			for (auto &superTask : superTasks)
-			{
-				superTask->getSubTasks().erase(task);
-			}
-		
-			removeTask(task);
-			taskTree.erase(task);
-		}
-	}
-
-	void updateTaskTree(Taskset &taskTree)
-	{
-		if (taskTree.size() == 0)
-			return;
-
-		for (auto &task : taskTree)
+		for (auto &task : rootTaskSet)
 		{
 			if (task->isComplete())
 			{
-				taskTree.erase(task);
-				removeTask(task);
+				rootTaskSet.erase(task);
+				deleteTask(task);
 				continue;
 			}
 
-			updateTaskTree(task->getSubTasks());
+			task->updateSubTasks();
 			task->update();
 		}
 	}

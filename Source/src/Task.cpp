@@ -26,16 +26,10 @@ Task::Task()
 Task::~Task()
 {
 	printDebugInfo("DELETE");
-	if (taskType != CRC && taskType != STR && taskType != SUR && taskType != NON && coalition != nullptr)
-	{
-		CoalitionHelper::removeCoalition(coalition);
-	}
+	CoalitionHelper::removeCoalition(coalition);
 
-	for (auto &superTaskIt = superTasks.begin(); superTaskIt != superTasks.end(); ++superTaskIt)
-	{
-		printDebugInfo("\n\tRemoving sub task: " + taskName + " \n\tfrom super task: " + (*superTaskIt)->getName());
-		(*superTaskIt)->getSubTasks().erase(this);
-	}
+	for (auto &superTask : superTasks)
+		superTask->removeSubTask(this);
 }
 
 
@@ -43,7 +37,7 @@ double Task::getCost()
 {
 	cost = 0.0;
 
-	for (auto task : subTasks)
+	for (auto &task : subTasks)
 		cost += task->getCost();
 	if (coalitionID != -1)
 		cost += coalition->getCost();
@@ -51,16 +45,39 @@ double Task::getCost()
 	return cost;
 }
 
-void Task::addSubTask(Task* task)
+void Task::addSubTask(Task* const& task)
 {
-	auto newTask = TaskHelper::addTask(task);
+	Task* const& newTask = TaskHelper::addTask(task);
 	subTasks.insert(newTask);
 	newTask->addSuperTask(this);
 }
 
-void Task::deleteSubTasks() 
-{ 
-	TaskHelper::deleteTaskTree(subTasks); 
+void Task::deleteSubTasks()
+{
+	for (auto &task : subTasks)
+		TaskHelper::deleteTask(task);
+
+	subTasks.clear();
+}
+
+void Task::updateSubTasks()
+{
+	//std::cout << taskTree.size() << "\n";
+	for (auto &task : subTasks)
+	{
+		if (!task)
+			continue;
+
+		if (task->isComplete())
+		{
+			subTasks.erase(task);
+			TaskHelper::deleteTask(task);
+			continue;
+		}
+
+		task->updateSubTasks();
+		task->update();
+	}
 }
 
 void Task::createCoalition()

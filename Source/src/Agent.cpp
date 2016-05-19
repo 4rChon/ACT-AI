@@ -12,11 +12,11 @@
 
 Agent::Agent()
 	: unit(nullptr)
-	, task(nullptr)
-	, coalition(nullptr)
 	, unitID(-1)
-	, coalitionID(-1)
+	, task(nullptr)
 	, taskID(-1)
+	, coalition(nullptr)
+	, coalitionID(-1)
 	, free(true)
 	, target(nullptr)
 	, unitTarget(nullptr)
@@ -24,6 +24,7 @@ Agent::Agent()
 	, lastEngaged(0)
 	, isEngaged(false)
 	, lastKillCount(0)
+	, isCandidateAgent(false)
 {
 	/*initialiseCommandMap();*/
 }
@@ -57,13 +58,13 @@ Agent::~Agent()
 //	for (auto &commandType : BWAPI::UnitCommandTypes::allUnitCommandTypes())
 //		commandMap.insert(std::pair<BWAPI::UnitCommandType, double>(commandType, 0.0));
 //}
-void Agent::setCoalition(Coalition* coalition)
+void Agent::setCoalition(Coalition* const& coalition)
 {
 	coalitionID = coalition->getID();
 	this->coalition = coalition;
 }
 
-void Agent::setTask(Task* task)
+void Agent::setTask(Task* const& task)
 {
 	taskID = task->getID();
 	this->task = task;
@@ -74,6 +75,7 @@ void Agent::bind()
 {
 	//std::cout << unitID << " : Binding agent\n";
 	free = false;
+	isCandidateAgent = false;
 	if (unit->isLoaded())
 		unit->getTransport()->unload(unit);
 }
@@ -240,7 +242,8 @@ void Agent::updateBoundActions()
 
 void Agent::updateFreeActions()
 {
-	pollCoalitions();
+	if(!isCandidateAgent)
+		isCandidateAgent = pollCoalitions();
 
 	if (!free)
 		return;
@@ -329,11 +332,12 @@ void Agent::act()
 
 bool Agent::pollCoalitions()
 {
+	Coalition* bestCoalition = nullptr;
+	double bestFitness = 0.0;
 	for (auto &candidateCoalition : CoalitionHelper::getCoalitionset())
 	{
 		if (!candidateCoalition->isActive())
 		{
-
 			double agentFitness = 0.0;
 			if(unit->getType().maxHitPoints() != 0)
 				agentFitness += unit->getHitPoints() / unit->getType().maxHitPoints();
@@ -344,13 +348,23 @@ bool Agent::pollCoalitions()
 				candidateTarget = candidateCoalition->getTask()->getTarget();
 
 			if (candidateTarget != nullptr)
-				agentFitness += util::normaliseDistance(unit->getPosition(), candidateTarget->getRegion()->getCenter());
+				agentFitness += util::calc::normaliseDistance(unit->getPosition(), candidateTarget->getRegion()->getCenter());
 
 			agentFitness /= 2;
-			if (candidateCoalition->addAgent(this) && util::getRandom(0, 1) < agentFitness)
-				return true;
+			if (agentFitness > bestFitness)
+			{
+				bestFitness = agentFitness;
+				bestCoalition = candidateCoalition;
+			}
 		}
 	}
+
+	if (!bestCoalition)
+		return false;
+
+	if (bestCoalition->addAgent(this) && util::calc::getRandom(0, 1) < bestFitness)
+		return true;
+
 	return false;
 }
 

@@ -29,65 +29,68 @@ namespace util
 		std::cout << selfName << " (" << self->getRace().getName() << ") vs " << enemy->getName() << " (" << enemy->getRace().getName() << ")\n";
 	}	
 
-	double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr)
+	namespace calc
 	{
-		double total = 0.0;
-		for (std::size_t i = 0; i < valueArr.size(); i++)
-			total += 1 / (1 + std::exp(-coeffArr[i] * valueArr[i]));
-
-		return ((2 / valueArr.size()) * total) - 1;
-	}
-
-	double normaliseDistance(BWAPI::Position pos1, BWAPI::Position pos2)
-	{
-		double dist = sqrt(pow(pos1.x - pos2.x, 2) + pow(pos1.y - pos2.y, 2));
-		double mapDist = sqrt(pow(BWAPI::Broodwar->mapWidth(), 2) + pow(BWAPI::Broodwar->mapHeight(), 2));
-		return dist / mapDist;		
-	}
-
-	double getRandom(int min, int max)
-	{
-		std::mt19937_64 rng;
-		uint64_t timeSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-		std::seed_seq ss{ uint32_t(timeSeed & 0xffffffff), uint32_t(timeSeed >> 32) };
-		rng.seed(ss);
-		std::uniform_real_distribution<double> unif(0, 1);
-		return unif(rng);
-	}
-
-	BWAPI::UnitType getRandomType(Composition composition)
-	{
-		int randomIndex = rand() % composition.getTypes().size();
-		return composition.getTypes()[randomIndex];
-	}
-
-	BWAPI::UnitType getRandomType(BWAPI::UnitType macroType = BWAPI::UnitTypes::AllUnits)
-	{
-		if (!BWAPI::UnitTypes::allMacroTypes().contains(macroType))
-			return macroType;
-
-		std::vector<BWAPI::UnitType> unitTypeBag;
-
-		for each(auto unitType in BWAPI::UnitTypes::allUnitTypes())
+		double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr)
 		{
-			if (unitType.getRace() != util::game::getSelf()->getRace()
-				|| unitType.isHero()
-				|| unitType == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine
-				|| unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode
-				|| unitType.isWorker())
-				continue;
+			double total = 0.0;
+			for (std::size_t i = 0; i < valueArr.size(); i++)
+				total += 1 / (1 + std::exp(-coeffArr[i] * valueArr[i]));
 
-			if (macroType == BWAPI::UnitTypes::Men && unitType.isBuilding())
-				continue;
-
-			if (macroType == BWAPI::UnitTypes::Buildings && !unitType.isBuilding())
-				continue;
-
-			unitTypeBag.push_back(unitType);
+			return ((2 / valueArr.size()) * total) - 1;
 		}
 
-		int randomIndex = rand() % unitTypeBag.size();
-		return unitTypeBag[randomIndex];
+		double normaliseDistance(BWAPI::Position pos1, BWAPI::Position pos2)
+		{
+			double dist = sqrt(pow(pos1.x - pos2.x, 2) + pow(pos1.y - pos2.y, 2));
+			double mapDist = sqrt(pow(BWAPI::Broodwar->mapWidth(), 2) + pow(BWAPI::Broodwar->mapHeight(), 2));
+			return (mapDist - dist) / mapDist;
+		}
+
+		double getRandom(int min, int max)
+		{
+			std::mt19937_64 rng;
+			uint64_t timeSeed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+			std::seed_seq ss{ uint32_t(timeSeed & 0xffffffff), uint32_t(timeSeed >> 32) };
+			rng.seed(ss);
+			std::uniform_real_distribution<double> unif(0, 1);
+			return unif(rng);
+		}
+
+		BWAPI::UnitType getRandomType(Composition composition)
+		{
+			int randomIndex = rand() % composition.getTypes().size();
+			return composition.getTypes()[randomIndex];
+		}
+
+		BWAPI::UnitType getRandomType(BWAPI::UnitType macroType = BWAPI::UnitTypes::AllUnits)
+		{
+			if (!BWAPI::UnitTypes::allMacroTypes().contains(macroType))
+				return macroType;
+
+			std::vector<BWAPI::UnitType> unitTypeBag;
+
+			for each(auto unitType in BWAPI::UnitTypes::allUnitTypes())
+			{
+				if (unitType.getRace() != util::game::getSelf()->getRace()
+					|| unitType.isHero()
+					|| unitType == BWAPI::UnitTypes::Terran_Vulture_Spider_Mine
+					|| unitType == BWAPI::UnitTypes::Terran_Siege_Tank_Siege_Mode
+					|| unitType.isWorker())
+					continue;
+
+				if (macroType == BWAPI::UnitTypes::Men && unitType.isBuilding())
+					continue;
+
+				if (macroType == BWAPI::UnitTypes::Buildings && !unitType.isBuilding())
+					continue;
+
+				unitTypeBag.push_back(unitType);
+			}
+
+			int randomIndex = rand() % unitTypeBag.size();
+			return unitTypeBag[randomIndex];
+		}
 	}
 
 	namespace game

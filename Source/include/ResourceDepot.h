@@ -35,7 +35,7 @@ public:
 
 	///getters
 	//Get pointer to BWTA::BaseLocation type
-	BWTA::BaseLocation* getBaseLocation() { return this->baseLocation; }
+	BWTA::BaseLocation* getBaseLocation() { return baseLocation; }
 
 	//Get SetContainer of workers
 	Workerset& getWorkers() { return workers; }
