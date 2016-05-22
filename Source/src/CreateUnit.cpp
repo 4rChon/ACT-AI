@@ -9,17 +9,14 @@
 #include <string>
 
 CreateUnit::CreateUnit(BWAPI::UnitType unitType, int unitCount)
+	:unitType(unitType)
+	,unitCount(unitCount)
+	,satisfying(false)
+	,satisfied(true)
+	,requiresGas(false)
 {
 	taskName = "CreateUnit(" + unitType.getName() + " - " + std::to_string(unitCount) + ")";
-		
-	this->unitType = unitType;	
-	this->unitCount = unitCount;
-	satisfying = false;	
-	satisfied = true;
-	requiresGas = false;
 	taskType = CRU;
-
-	//debug = true;
 }
 
 void CreateUnit::createCoalition()
@@ -36,7 +33,7 @@ void CreateUnit::createCoalition()
 	else
 		producer.addType(whatBuilds, unitType.whatBuilds().second);
 	CreateCoalition* createCoalition = new CreateCoalition(producer, this);
-	subTasks.insert(createCoalition);
+	addSubTask(createCoalition);
 }
 
 
@@ -63,12 +60,6 @@ void CreateUnit::satisfyRequirements()
 		}
 		satisfying = true;
 	}
-}
-
-void CreateUnit::decrementUnitCount()
-{
-	printDebugInfo("Decrementing Unit Count");
-	unitCount--;
 }
 
 // assign a producer coalition

@@ -6,13 +6,12 @@
 #include "CoalitionHelper.h"
 
 ResearchTech::ResearchTech(BWAPI::TechType techType)
+	:satisfying(false)
+	,satisfied(true)
+	,techType(techType)
 {
 	taskName = "ResearchTech(" + techType.getName() + ")";
-	satisfying = false;
-	satisfied = true;
-	this->techType = techType;	
 	taskType = RES;
-	//debug = true;
 }
 
 void ResearchTech::createCoalition()

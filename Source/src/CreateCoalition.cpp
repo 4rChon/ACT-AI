@@ -68,10 +68,7 @@ void CreateCoalition::update()
 		return;
 
 	if (!assigned)
-	{
 		assign();
-		return;
-	}
 
 	if (taskCoalition->isActive())
 	{

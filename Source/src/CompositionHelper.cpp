@@ -31,10 +31,8 @@ namespace CompositionHelper
 	}
 
 
-	Composition getComposition(Task* const& task)
+	Composition getComposition(TaskType taskType)
 	{ 
-		TaskType taskType = task->getType();
-		//TO DO: consider time proximity
 		//return best composition for tasktype
 		std::vector<UsedComposition> candidateSet;
 		for each(auto usedComposition in compositionSet)
@@ -121,11 +119,6 @@ namespace CompositionHelper
 				bestComposition = candidate;
 		}
 
-		//if (taskType == ATT)
-		//{
-		//	/*std::cout << "Countering with...\n";
-		//	bestComposition.composition.debugInfo();*/
-		//}
 		return bestComposition.composition;
 	}
 
@@ -206,13 +199,6 @@ namespace CompositionHelper
 				continue;
 		}
 		
-		/*std::cout << "Unit to Counter: \n";		
-		std::cout << "\t" << enemyUnitType.getName() << "\n";*/
-		/*std::cout << "\t\t" << enemyUnitType.size().c_str() << "\n";
-		std::cout << "\t\t" << enemyUnitType.groundWeapon().damageType().c_str() << "\n";
-		std::cout << "\t\t" << enemyUnitType.airWeapon().damageType().c_str() << "\n";*/
-
-		/*std::cout << "Counters: \n";*/
 		Composition counterComposition;
 		for (auto unitType = unitTypeCounterAmount.begin(); unitType != unitTypeCounterAmount.end(); unitType++)
 		{
@@ -225,7 +211,6 @@ namespace CompositionHelper
 			else
 				counterComposition.addType(unitType->first, unitType->second);
 		}
-		/*counterComposition.debugInfo();*/
 		return counterComposition;
 	}
 

@@ -26,7 +26,6 @@ Agent::Agent()
 	, lastKillCount(0)
 	, isCandidateAgent(false)
 {
-	/*initialiseCommandMap();*/
 }
 
 Agent::Agent(BWAPI::Unit unit)
@@ -45,19 +44,12 @@ Agent::Agent(BWAPI::Unit unit)
 	, lastKillCount(0)
 	, lastCommand(unit->getLastCommand())
 {
-	/*initialiseCommandMap();*/	
 }
 
 Agent::~Agent()
 {
-	//std::cout << "\t~Agent\n";
 }
 
-//void Agent::initialiseCommandMap()
-//{
-//	for (auto &commandType : BWAPI::UnitCommandTypes::allUnitCommandTypes())
-//		commandMap.insert(std::pair<BWAPI::UnitCommandType, double>(commandType, 0.0));
-//}
 void Agent::setCoalition(Coalition* const& coalition)
 {
 	coalitionID = coalition->getID();
@@ -73,7 +65,6 @@ void Agent::setTask(Task* const& task)
 
 void Agent::bind()
 {
-	//std::cout << unitID << " : Binding agent\n";
 	free = false;
 	if (unit->isLoaded())
 		unit->getTransport()->unload(unit);
@@ -81,7 +72,6 @@ void Agent::bind()
 
 void Agent::unbind()
 {
-	//std::cout << unitID << " : Unbinding Agent\n";
 	coalitionID = -1;
 	coalition = nullptr;
 	taskID = -1;
@@ -249,8 +239,29 @@ void Agent::updateFreeActions()
 	if (unit->getType().canBuildAddon())
 	{
 		BWAPI::SetContainer<BWAPI::UnitType> addonList;
-		if(buildAddon(DesireHelper::getMostDesirableAddon(unit->getType())))
-			return;
+
+		for (auto unitType : unit->getType().buildsWhat())
+			if (unitType.isAddon())
+				addonList.insert(unitType);
+
+		if (addonList.size() > 1)
+		{
+			for (auto& task : TaskHelper::getAllTasks())
+			{
+				if (task->getType() == CRU)
+				{
+					auto unitType = task->getUnitType();
+					if (unitType.isAddon() && addonList.count(unitType) != 0)
+					{
+						if (buildAddon(unitType))
+							return;
+					}
+				}
+			}
+		}
+		else
+			if(buildAddon(DesireHelper::getMostDesirableAddon(unit->getType())))
+				return;
 	}
 
 	if (unit->getType().canProduce())
@@ -261,7 +272,7 @@ void Agent::updateFreeActions()
 
 	//if (unit->canUpgrade())
 	//{
-	//	//TO DO: upgrade(DesireHelper::getMostDesirableUpgrade(unit->getType()));
+	//	upgrade(DesireHelper::getMostDesirableUpgrade(unit->getType()));
 	//	for (auto upgradeType : unit->getType().upgradesWhat())
 	//	{
 	//		if (upgrade(upgradeType))
@@ -271,13 +282,14 @@ void Agent::updateFreeActions()
 
 	//if (unit->canResearch())
 	//{
-	//	//TO DO: research(DesireHelper::getMostDesirableResearch(unit->getType()));
+	//	research(DesireHelper::getMostDesirableResearch(unit->getType()));
 	//	for (auto researchType : unit->getType().researchesWhat())
 	//	{
 	//		if (research(researchType))
 	//			return;
 	//	}
 	//}	
+
 	if(unit->isIdle())
 		defend();	
 }

@@ -31,6 +31,12 @@
     <Filter Include="src\Map">
       <UniqueIdentifier>{03c0d2df-cabd-44d0-b3e7-5ef4c82d712d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="include\BuildingPlacement">
+      <UniqueIdentifier>{8909349c-029c-40a2-9fdc-fcb86f58e6c8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\BuildingPlacement">
+      <UniqueIdentifier>{9dfa2b7d-b331-4142-9ee4-24ab053f46c2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Source\include\DesireHelper.h">
@@ -116,6 +122,12 @@
     </ClInclude>
     <ClInclude Include="Source\include\ComsatStation.h">
       <Filter>include\Agents</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\BuildingPlacer.h">
+      <Filter>include\BuildingPlacement</Filter>
+    </ClInclude>
+    <ClInclude Include="Source\include\RectangleArray.h">
+      <Filter>include\BuildingPlacement</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -206,9 +218,11 @@
     <ClCompile Include="Source\src\ComsatStation.cpp">
       <Filter>src\Agents</Filter>
     </ClCompile>
+    <ClCompile Include="Source\src\BuildingPlacer.cpp">
+      <Filter>src\BuildingPlacement</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="ClassDiagram.cd" />
   </ItemGroup>
 </Project>

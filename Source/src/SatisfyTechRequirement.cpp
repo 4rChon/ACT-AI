@@ -4,12 +4,10 @@
 #include "CoalitionHelper.h"
 
 SatisfyTechRequirement::SatisfyTechRequirement(BWAPI::TechType techType)
+	:techType(techType)
 {
 	taskName = "SatisfyTechRequirement(" + techType.getName() + ")";
-	
-	this->techType = techType;
 	taskType = STR;
-	//debug = true;
 }
 
 void SatisfyTechRequirement::assign()

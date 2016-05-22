@@ -28,8 +28,8 @@ Task::~Task()
 	printDebugInfo("DELETE");
 	CoalitionHelper::removeCoalition(coalition);
 
-	for (auto &superTask : superTasks)
-		superTask->removeSubTask(this);
+	deleteSubTasks();
+	removeSuperTasks();
 }
 
 
@@ -54,35 +54,38 @@ void Task::addSubTask(Task* const& task)
 
 void Task::deleteSubTasks()
 {
-	for (auto &task : subTasks)
-		TaskHelper::deleteTask(task);
+	for (Taskset::iterator taskIt = subTasks.begin(); taskIt != subTasks.end(); ++taskIt)
+		TaskHelper::deleteTask(*taskIt);		
 
 	subTasks.clear();
 }
 
 void Task::updateSubTasks()
 {
-	//std::cout << taskTree.size() << "\n";
-	for (auto &task : subTasks)
-	{
-		if (!task)
-			continue;
-
-		if (task->isComplete())
+	for (Taskset::iterator taskIt = subTasks.begin(); taskIt != subTasks.end(); ++taskIt)
+	{				
+		if ((*taskIt)->isComplete())
 		{
-			subTasks.erase(task);
-			TaskHelper::deleteTask(task);
+			TaskHelper::deleteTask(*taskIt);
 			continue;
 		}
 
-		task->updateSubTasks();
-		task->update();
+		(*taskIt)->updateSubTasks();
+		(*taskIt)->update();
 	}
+}
+
+void Task::removeSuperTasks()
+{
+	for (Taskset::iterator taskIt = superTasks.begin(); taskIt != superTasks.end(); ++taskIt)
+		(*taskIt)->removeSubTask(this);
+
+	superTasks.clear();
 }
 
 void Task::createCoalition()
 {
-	Composition c = CompositionHelper::getComposition(this);
+	Composition c = CompositionHelper::getComposition(taskType);
 	CreateCoalition *createCoalition = new CreateCoalition(c, this);
 	addSubTask(createCoalition);
 }
@@ -91,9 +94,7 @@ void Task::succeed()
 {
 	complete = true;
 	profit = 1.0;
-	printDebugInfo("Success!", true);
-	
-	deleteSubTasks();
+	printDebugInfo("Success!", true);	
 }
 
 void Task::fail()
@@ -103,11 +104,7 @@ void Task::fail()
 	printDebugInfo("Failure!", true);
 
 	if (taskType == SCO)
-	{
 		ArmyHelper::stopScouting();
-	}	
-	
-	deleteSubTasks();
 }
 
 void Task::printDebugInfo(std::string info, bool forceShow)

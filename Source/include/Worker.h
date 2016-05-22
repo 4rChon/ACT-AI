@@ -6,25 +6,15 @@ class ResourceDepot;
 
 class Worker : public Agent
 {
-protected:
-	//True if worker is mining gas
-	bool gasMiner;
-
-	//Pointer to current mining base
-	ResourceDepot* miningBase;
-
-	//Minerals reserved for construction
-	int reservedMinerals;
-
-	//Gas reserved for construction
-	int reservedGas;
+private:	
+	bool gasMiner;									//True if worker is mining gas	
+	ResourceDepot* miningBase;						//Pointer to current mining base
+	int reservedMinerals;							//Minerals reserved for construction
+	int reservedGas;								//Gas reserved for construction
 
 	///Private Helpers
-	//Reserve minerals and gas for construction
-	void reserveResources(int minerals, int gas);
-
-	//Release minerals and gas
-	void releaseResources();
+	void reserveResources(int minerals, int gas);	//Reserve minerals and gas for construction
+	void releaseResources();						//Release minerals and gas
 
 	bool repair(BWAPI::Unit damagedUnit);
 	bool repair(BWAPI::Region region);
@@ -43,31 +33,21 @@ public:
 	~Worker();
 
 	///setters
-	//Set current mining base to miningBase and gasMiner to gas
-	void setMiningBase(ResourceDepot* miningBase, bool gas);
-
-	//Unset current mining base
-	void unsetMiningBase();	
+	void setMiningBase(ResourceDepot* miningBase, bool gas);	//Set current mining base to miningBase and gasMiner to gas
+	void unsetMiningBase();										//Unset current mining base
 
 	///getters
-	//True if gasMiner is true
-	bool isMiningGas() const { return gasMiner; }
+	bool isMiningGas() const { return gasMiner; }				//True if gasMiner is true
 
-	//Get current mining base - nullptr if no mining base
-	ResourceDepot* getMiningBase() const { return miningBase; }
+	ResourceDepot* getMiningBase() const { return miningBase; }	//Get current mining base - nullptr if no mining base
 
 	///-
-	//Compute actions
-	virtual void act();	
+	virtual void act();	//Compute actions
 
 	///commands
-	//Specific build command for worker - construct building at desiredPosition.
-	bool build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPosition = nullptr);
-	
-	//Specific expand command for worker - expand.
-	bool expand();	
+	bool build(BWAPI::UnitType building, BWAPI::TilePosition * desiredPosition = nullptr);		//Specific build command for worker - construct building at desiredPosition.
+	bool expand();																				//Specific expand command for worker - expand.
 	
 	///Public Helpers
-	//Print unitID and unitType to console
-	void debugInfo() const;
+	void debugInfo() const;		//Print unitID and unitType to console
 };

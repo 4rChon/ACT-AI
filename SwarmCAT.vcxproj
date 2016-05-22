@@ -23,6 +23,7 @@
     <ClInclude Include="Source\include\AgentHelper.h" />
     <ClInclude Include="Source\include\ArmyHelper.h" />
     <ClInclude Include="Source\include\Attack.h" />
+    <ClInclude Include="Source\include\BuildingPlacer.h" />
     <ClInclude Include="Source\include\Coalition.h" />
     <ClInclude Include="Source\include\CoalitionHelper.h" />
     <ClInclude Include="Source\include\Composition.h" />
@@ -35,6 +36,7 @@
     <ClInclude Include="Source\include\EconHelper.h" />
     <ClInclude Include="Source\include\Expand.h" />
     <ClInclude Include="Source\include\MapHelper.h" />
+    <ClInclude Include="Source\include\RectangleArray.h" />
     <ClInclude Include="Source\include\ReplayHelper.h" />
     <ClInclude Include="Source\include\ResearchTech.h" />
     <ClInclude Include="Source\include\ResourceDepot.h" />
@@ -53,6 +55,7 @@
     <ClCompile Include="Source\src\AgentHelper.cpp" />
     <ClCompile Include="Source\src\ArmyHelper.cpp" />
     <ClCompile Include="Source\src\Attack.cpp" />
+    <ClCompile Include="Source\src\BuildingPlacer.cpp" />
     <ClCompile Include="Source\src\Coalition.cpp" />
     <ClCompile Include="Source\src\CoalitionHelper.cpp" />
     <ClCompile Include="Source\src\Composition.cpp" />
@@ -80,7 +83,6 @@
     <ClCompile Include="Source\src\Zone.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="ClassDiagram.cd" />
     <None Include="packages.config" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -134,7 +136,8 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>D:\Games\StarCraft\BWAPI\SwarmCAT\Source\include;D:\Games\StarCraft\BWAPI\include;$(IncludePath)</IncludePath>
+    <IncludePath>D:\Games\StarCraft\BWAPI\SwarmCAT\packages\boost.1.60.0.0\lib\native\include;D:\Games\StarCraft\BWAPI\SwarmCAT\Source\include;D:\Games\StarCraft\BWAPI\include;$(IncludePath)</IncludePath>
+    <GenerateManifest>true</GenerateManifest>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>D:\Games\StarCraft\BWAPI\SwarmCAT\packages\boost.1.60.0.0\lib\native\include;D:\Games\StarCraft\BWAPI\SwarmCAT\Source\include;D:\Games\StarCraft\BWAPI\include;$(IncludePath)</IncludePath>
@@ -148,6 +151,8 @@
     <Link>
       <AdditionalDependencies>../lib/BWAPId.lib;../lib/BWTAd.lib;../lib/libboost_filesystem-vc120-mt-gd-1_56.lib;../lib/libboost_system-vc120-mt-gd-1_56.lib;../lib/libboost_thread-vc120-mt-gd-1_56.lib;../lib/libCGAL-vc120-mt-gd-4.4.lib;../lib/libgmp-10.lib;../lib/libmpfr-4.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AllowIsolation>true</AllowIsolation>
+      <IgnoreEmbeddedIDL>false</IgnoreEmbeddedIDL>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -164,6 +169,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
+      <TreatWarningAsError>true</TreatWarningAsError>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

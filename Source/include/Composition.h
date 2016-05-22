@@ -27,11 +27,6 @@ private:
 		int unitCount;
 		bool detection;
 	} attributes;
-	//struct Parameters
-	//{
-	//	double coverage;
-	//	BWAPI::Position position;
-	//} parameters;
 
 	void initAttributes();
 	void updateMaxRange();
@@ -41,6 +36,7 @@ public:
 	Composition();
 	Composition(BWAPI::Unitset unitSet);
 	Composition(UnitMap unitMap);
+	Composition(const Composition & comp);
 
 	///operator overrides
 	bool operator==(const Composition& rhs) const;
@@ -54,7 +50,6 @@ public:
 	UnitMap getUnitMap() const { return unitMap; }
 	double getCost() const { return cost; }
 	Attributes &getAttributes() { return attributes; }
-	/*Parameters &getParameters();*/	
 
 	///helpers		
 	void removeType(const BWAPI::UnitType& unitType, int count = 1);

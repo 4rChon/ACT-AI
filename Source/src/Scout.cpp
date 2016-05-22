@@ -61,7 +61,5 @@ void Scout::succeed()
 	printDebugInfo("Success!", true);
 
 	ArmyHelper::stopScouting();
-
-	deleteSubTasks();
 }
 

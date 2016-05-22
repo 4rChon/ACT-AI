@@ -10,6 +10,7 @@ namespace MapHelper
 	namespace
 	{
 		Field regionField;
+		BuildingPlacer* bp;
 	}		
 
 	void initialiseHelper()
@@ -22,8 +23,15 @@ namespace MapHelper
 
 		for (auto &zone : regionField)
 			zone->initNeighbourhood();
+		
+		bp = new BuildingPlacer();
 
 		loadMapData();
+	}
+
+	const BuildingPlacer* getBuildingPlacer()
+	{
+		return bp;
 	}
 
 	Zone* getZone(int id)
@@ -42,7 +50,7 @@ namespace MapHelper
 		return nullptr;
 	}
 
-	const Field& getRegionField()
+	Field& getRegionField()
 	{
 		return regionField;
 	}

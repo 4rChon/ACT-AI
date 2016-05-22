@@ -5,10 +5,9 @@
 #include "CoalitionHelper.h"
 
 SatisfyUnitRequirement::SatisfyUnitRequirement(BWAPI::UnitType unitType)
+	:unitType(unitType)
 {
 	taskName = "SatisfyUnitRequirement(" + unitType.getName() + ")";
-	
-	this->unitType = unitType;
 	taskType = SUR;
 	//debug = true;
 }

@@ -333,12 +333,8 @@ namespace util
 		{
 			std::ofstream dataStream;
 
-			auto startLocation = util::game::getStartLocation();
-			auto xStart = startLocation.x;
-			auto yStart = startLocation.y;
-
 			auto directory = "ai-data\\" + game::getEnemy()->getRace().getName() + "\\maps\\";
-			auto fileName = BWAPI::Broodwar->mapHash() + "_" + std::to_string(xStart) + "_" + std::to_string(yStart);
+			auto fileName = BWAPI::Broodwar->mapHash();
 			auto target = directory + fileName;
 
 			dataStream.open(target, std::ios::binary | std::ios::out);			
@@ -359,12 +355,8 @@ namespace util
 
 		std::map<int, int> deserializeMapData()
 		{	
-			auto startLocation = BWAPI::Broodwar->self()->getStartLocation();
-			auto xStart = startLocation.x;
-			auto yStart = startLocation.y;
-
 			auto directory = "ai-data\\" + game::getEnemy()->getRace().getName() + "\\maps\\";
-			auto fileName = BWAPI::Broodwar->mapHash() + "_" + std::to_string(xStart) + "_" + std::to_string(yStart);
+			auto fileName = BWAPI::Broodwar->mapHash();
 			auto target = directory + fileName;
 
 			std::map<int, int> zoneDefenseMap;
@@ -386,10 +378,7 @@ namespace util
 				dataStream.read((char*)&defenseCount, sizeof(defenseCount));
 
 				zoneDefenseMap[zoneID] = defenseCount;
-				//std::cout << "ZoneID : " << zoneID << " -- DefenseCount : " << defenseCount << "\n";
 			}
-
-			//std::cout << "Region Count : " << regionCount << "\n";
 
 			dataStream.close();
 

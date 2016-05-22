@@ -62,12 +62,10 @@ public:
 	Taskset& getSubTasks()					{ return subTasks; }
 	Taskset& getSuperTasks()				{ return superTasks; }
 	virtual Coalition* getCoalition() const { return coalition; }
-	virtual double getCost();
-	
+	virtual double getCost();	
 	virtual double getProfit()				{ return profit; }
-	void addSubTask(Task* const& task);
-	void removeSubTask(Task* const& task)	{ subTasks.erase(task); }
-	void addSuperTask(Task* const& task)	{ superTasks.insert(task); }
+
+	virtual BWAPI::UnitType getUnitType()	{ return BWAPI::UnitTypes::None; }
 
 	//-
 	virtual void createCoalition();
@@ -75,8 +73,12 @@ public:
 	virtual void act() = 0;
 	virtual void update() = 0;
 
+	void addSubTask(Task* const& task);
+	void removeSubTask(Task* const& task)	{ subTasks.erase(task); }
 	void deleteSubTasks();
 	void updateSubTasks();
+	void addSuperTask(Task* const& task)	{ superTasks.insert(task); }
+	void removeSuperTasks();
 	
 	virtual void succeed();
 	virtual void fail();

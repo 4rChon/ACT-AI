@@ -17,8 +17,8 @@ namespace TaskHelper
 	{
 		nextID = 0;
 		
-		/* opening */
-		//CreateUnit* createUnit = new CreateUnit(BWAPI::UnitTypes::Terran_Barracks, 1);
+		/* optional opening */
+		//CreateUnit* createUnit = new CreateUnit(...);
 		//addTask(createUnit, true);
 	}
 
@@ -62,7 +62,7 @@ namespace TaskHelper
 			for (auto &task : fullTaskSet)
 			{
 				if (rootTaskSet.count(task) == 0 && 
-					(newTask->getType() == STR || newTask->getType() == SUR)
+					(newTask->getType() == STR || newTask->getType() == SUR || newTask->getType() == CRU)
 					&& task->getName().compare(newTask->getName()) == 0)
 				{
 					deleteTask(newTask);
@@ -84,25 +84,28 @@ namespace TaskHelper
 			return;
 
 		attackTasks.erase(task);
-		fullTaskSet.erase(task);			
+		fullTaskSet.erase(task);
 
 		delete task;
-		//task = nullptr;
 	}
 
 	void updateRootTasks()
 	{
-		for (auto &task : rootTaskSet)
+		for (Taskset::iterator taskIt = rootTaskSet.begin(); taskIt != rootTaskSet.end();)
 		{
-			if (task->isComplete())
+			(*taskIt)->printDebugInfo("Iterating");
+			if ((*taskIt)->isComplete())
 			{
-				rootTaskSet.erase(task);
-				deleteTask(task);
+				(*taskIt)->printDebugInfo("\n\tDeleting");
+				deleteTask(*taskIt);
+				taskIt = rootTaskSet.erase(taskIt);
 				continue;
 			}
 
-			task->updateSubTasks();
-			task->update();
+			(*taskIt)->printDebugInfo("\n\tUpdating");
+			(*taskIt)->updateSubTasks();
+			(*taskIt)->update();
+			++taskIt;
 		}
 	}
 }

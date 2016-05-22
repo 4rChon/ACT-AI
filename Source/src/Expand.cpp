@@ -11,7 +11,6 @@ Expand::Expand()
 {
 	taskName = "Expand()";
 	taskType = EXP;
-	//debug = true;
 }
 
 Expand::~Expand()
@@ -65,8 +64,6 @@ void Expand::succeed()
 	printDebugInfo("Success!", true);
 
 	EconHelper::doneExpanding();
-
-	deleteSubTasks();
 }
 
 void Expand::fail()
@@ -76,6 +73,4 @@ void Expand::fail()
 	printDebugInfo("Failure!", true);
 
 	EconHelper::doneExpanding();
-
-	deleteSubTasks();
 }

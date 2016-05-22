@@ -109,18 +109,29 @@ namespace EconHelper
 	{
 		double gasCostPerMinute = 0;
 		double minCostPerMinute = 0;
+		auto unitMap = composition.getUnitMap();
+		int min = 0;
+		for each(auto &unit in composition.getUnitMap())
+		{
+			if (unit.second > 0 && (min == 0 || unit.second < min))
+				min = unit.second;
+		}
+
 		for each(auto &unitType in composition.getTypes())
 		{
-			double minCost = unitType.mineralPrice();
-			double gasCost = unitType.gasPrice();
-			double buildTimeInMinutes = (double)unitType.buildTime() / (24 * 60);
-			minCostPerMinute += (minCost / buildTimeInMinutes);
-			gasCostPerMinute += (gasCost / buildTimeInMinutes);
+			double unitCount = ((double)composition[unitType]/min) / 5;
+			double minCost = unitType.mineralPrice() + unitType.whatBuilds().first.mineralPrice();
+			double gasCost = unitType.gasPrice() + unitType.whatBuilds().first.gasPrice();
+			double buildTimeInMinutes = ((double)(unitType.buildTime() + unitType.whatBuilds().first.buildTime()) / (24 * 60)) * unitCount;
+			minCostPerMinute += (minCost / buildTimeInMinutes) * unitCount;
+			gasCostPerMinute += (gasCost / buildTimeInMinutes) * unitCount;
 		}
 
 		std::cout << "Mineral Ratio: " << (double)getMineralIncome() / minCostPerMinute  << "\n";
 		std::cout << "Gas Ratio: " << (double)getGasIncome() / gasCostPerMinute  << "\n";
-		return std::max((getMineralIncome() + getMinerals()) / minCostPerMinute, (getGasIncome() + getGas()) / gasCostPerMinute);
+		if(getGasIncome() == 0 && gasCostPerMinute > 0)
+			return double(getMineralIncome()) / minCostPerMinute;
+		return std::max(double(getMineralIncome()) / minCostPerMinute, double(getGasIncome()) / gasCostPerMinute);
 	}
 
 	void doneExpanding()

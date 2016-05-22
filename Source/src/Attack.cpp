@@ -12,7 +12,6 @@ Attack::Attack(Zone* const& target)
 	taskName = "Attack(" + std::to_string(target->getID()) + ")";
 	this->target = target;
 	taskType = ATT;
-	//debug = true;
 }
 
 // assign an attacking coalition
@@ -82,8 +81,6 @@ void Attack::fail()
 
 	ArmyHelper::defend();
 	ArmyHelper::updateTargetPriority();
-
-	deleteSubTasks();
 }
 
 void Attack::succeed()
@@ -95,6 +92,4 @@ void Attack::succeed()
 	ArmyHelper::defend();
 	ArmyHelper::updateTargetPriority();
 	ArmyHelper::clearZoneTargets(target);
-
-	deleteSubTasks();
 }

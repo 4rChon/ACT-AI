@@ -38,6 +38,7 @@ DWORD WINAPI AnalyzeThread()
 
 void SwarmCAT::onStart()
 {	
+
 	std::cout << " ---------------- MATCH START ----------------\n";
 	Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
 
@@ -76,15 +77,6 @@ void SwarmCAT::onStart()
 		DesireHelper::initialiseHelper();
 		TaskHelper::initialiseHelper();
 		ArmyHelper::initialiseHelper();
-
-		//BWAPI::SetContainer<BWAPI::UnitType> unitTypes;
-		/*unitTypes.insert(BWAPI::UnitTypes::Zerg_Zergling);
-		unitTypes.insert(BWAPI::UnitTypes::Zerg_Lurker);
-		unitTypes.insert(BWAPI::UnitTypes::Zerg_Hydralisk);*/
-		/*CompositionHelper::filterByCounter(unitTypes);*/
-		//CompositionHelper::getCounters(BWAPI::UnitTypes::Protoss_Carrier);
-
-		/* just for testing */
 	}
 }
 
@@ -403,7 +395,6 @@ void SwarmCAT::drawDebugText()
 	Broodwar->drawTextScreen(510, 30, "%d", util::game::getSelf()->gas() - EconHelper::getGas());
 	Broodwar->drawTextScreen(200, 0, "FPS: %d", Broodwar->getFPS());
 	Broodwar->drawTextScreen(200, 10, "Average FPS: %f", Broodwar->getAverageFPS());
-	//Broodwar->drawTextScreen(200, 30, "Candidate Base Count: %d", AgentHelper::getCandidateBases().size());
 	Broodwar->drawTextScreen(200, 40, "Agent Count: %d", AgentHelper::getAgentset().size());	
 	Broodwar->drawTextScreen(200, 60, "Root Tasks: ");
 	int i = 1;
@@ -495,9 +486,9 @@ void SwarmCAT::drawDebugText()
 		Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 5, Color((int)unitDefenseDesireMap[zone] * 10, 0, 0), true);
 		
 		if(zone->isDefending())
-			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 5, Colors::Red, true);
+			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 2, Colors::Red, true);
 		else
-			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 5, Colors::Green, true);
+			Broodwar->drawCircleMap(zone->getRegion()->getCenter(), 2, Colors::Green, true);
 		
 	}
 }

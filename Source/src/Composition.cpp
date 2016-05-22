@@ -27,6 +27,15 @@ Composition::Composition(UnitMap unitMap)
 	
 }
 
+Composition::Composition(const Composition& comp)
+{
+	cost = comp.cost;
+	attributes = comp.attributes;
+	for (auto& unit : comp.unitMap)
+		unitMap[unit.first] = unit.second;
+	
+}
+
 bool Composition::operator==(const Composition& rhs) const
 {
 	if (cost != rhs.cost)
@@ -104,7 +113,6 @@ std::vector<BWAPI::UnitType> Composition::getTypes() const
 
 void Composition::removeType(const BWAPI::UnitType& unitType, int count)
 {
-	/*std::cout << "Removing " << count << unitType.c_str() << " from composition\n";*/
 	unitMap[unitType] -= count;
 	cost -= ((unitType.gasPrice() * 1.5) + (unitType.mineralPrice())) * count;
 	updateAttributes(unitType, -count);
@@ -112,16 +120,11 @@ void Composition::removeType(const BWAPI::UnitType& unitType, int count)
 
 void Composition::addType(const BWAPI::UnitType& unitType, int count)
 {
-	/*std::cout << "Adding " << count << unitType.c_str() << " from composition\n";*/
 	unitMap[unitType] += count;
 	cost += ((unitType.gasPrice() * 1.5) + (unitType.mineralPrice())) * count;
 	updateAttributes(unitType, count);
 }
 
-//Composition::Parameters& Composition::getParameters()
-//{
-//	return parameters;
-//}
 
 void Composition::updateMaxRange()
 {

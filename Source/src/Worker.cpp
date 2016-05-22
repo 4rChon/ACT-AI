@@ -4,6 +4,7 @@
 #include "EconHelper.h"
 #include "DesireHelper.h"
 #include "UtilHelper.h"
+#include "MapHelper.h"
 #include "Task.h"
 #include "CreateUnit.h"
 #include <BWAPI.h>
@@ -28,7 +29,6 @@ Worker::Worker(BWAPI::Unit unit)
 
 Worker::~Worker()
 {
-	/*std::cout << "\t~Worker\n";*/
 	releaseResources();
 	unsetMiningBase();
 }
@@ -71,7 +71,7 @@ void Worker::updateFreeActions()
 			baseLocation = &miningBase->getBaseLocation()->getTilePosition();
 
 		if (build(util::game::getSelf()->getRace().getSupplyProvider(), baseLocation))
-			DesireHelper::updateSupplyDesire(util::game::getSelf()->getRace().getSupplyProvider());
+			DesireHelper::updateSupplyDesire(util::game::getSelf()->getRace().getSupplyProvider());			
 	}
 
 	if (unit->isIdle())
@@ -105,12 +105,13 @@ void Worker::act()
 
 bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPosition)
 {	
+	const BuildingPlacer* bp = MapHelper::getBuildingPlacer();	
 	if (!BWAPI::Broodwar->canMake(building, unit))
 		return false;
 
 	if (EconHelper::haveMoney(building) && !unit->isConstructing())
 	{
-		if (reservedMinerals == 0 && reservedGas == 0)
+		if (reservedMinerals + reservedGas == 0)
 			reserveResources(building.mineralPrice(), building.gasPrice());
 	
 		if (!desiredPosition)
@@ -130,7 +131,7 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 
 		BWAPI::TilePosition buildLocation;
 		if (!building.isResourceDepot())
-			buildLocation = BWAPI::Broodwar->getBuildLocation(building, *desiredPosition, 99999);
+			buildLocation = bp->getBuildLocationNear(*desiredPosition, building);
 		else
 			buildLocation = *desiredPosition;
 
@@ -164,8 +165,11 @@ bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPositio
 				[this](BWAPI::Game*) {return !getUnit()->exists() || this->getUnit()->getOrder() == BWAPI::Orders::ConstructingBuilding || !this->getUnit()->isConstructing(); },
 				1);
 		}
-		return unit->isConstructing();
-	}
+
+		if (unit->isConstructing())
+			return true;		
+		releaseResources();
+	}	
 	return false;
 }
 

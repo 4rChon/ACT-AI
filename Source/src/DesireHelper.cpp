@@ -154,12 +154,12 @@ namespace DesireHelper
 			auto currentUnitMap = coalition->getCurrentComp().getUnitMap();
 		
 			for (auto& unit : targetUnitMap)
-				unitDesireMap[unit.first] += (double)(unit.second - currentUnitMap[unit.first]) / (double)unit.second;
+				unitDesireMap[unit.first] += 1 + (double)(unit.second - currentUnitMap[unit.first]) / (double)unit.second;
 		}
 	}	
 
 	BWAPI::UnitType getMostDesirableUnit(BWAPI::UnitType producer)
-	{				
+	{
 		updateUnitDesireMap();
 
 		if (producer == BWAPI::UnitTypes::None)
@@ -173,7 +173,7 @@ namespace DesireHelper
 
 		for each(auto &unit in producer.buildsWhat())
 		{
-			if (util::game::canMakeUnit(unit) && (unitDesireMap[unit] > bestUnit.second || (unitDesireMap[unit] == bestUnit.second && unit.buildScore() > bestUnit.first.buildScore())))
+			if (util::game::canMakeUnit(unit) && unitDesireMap[unit] > bestUnit.second)// || (unitDesireMap[unit] == bestUnit.second && unit.buildScore() > bestUnit.first.buildScore())))
 				bestUnit = std::pair<BWAPI::UnitType, double>(unit, unitDesireMap[unit]);
 		}
 
@@ -182,7 +182,6 @@ namespace DesireHelper
 
 	BWAPI::UnitType getMostDesirableUnit()
 	{
-
 		auto bestUnit = std::pair<BWAPI::UnitType, double>(BWAPI::UnitTypes::None, 0.0);
 		for each(auto &unit in unitDesireMap)
 		{
