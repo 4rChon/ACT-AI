@@ -27,9 +27,9 @@ namespace TaskHelper
 		return ++nextID;
 	}
 
-	Task * getTask(int id)
+	Task* getTask(int id)
 	{
-		for (auto& task : fullTaskSet)
+		for (auto &task : fullTaskSet)
 		{
 			if (task->getID() == id)
 				return task;
@@ -37,17 +37,17 @@ namespace TaskHelper
 		return nullptr;
 	}
 
-	Taskset& getRootTasks()
+	const Taskset& getRootTasks()
 	{
 		return rootTaskSet;
 	}
 
-	Taskset& getAllTasks()
+	const Taskset& getAllTasks()
 	{
 		return fullTaskSet;
 	}
 
-	Taskset& getAttackTasks()
+	const Taskset& getAttackTasks()
 	{
 		return attackTasks;
 	}
@@ -91,7 +91,7 @@ namespace TaskHelper
 
 	void updateRootTasks()
 	{
-		for (Taskset::iterator taskIt = rootTaskSet.begin(); taskIt != rootTaskSet.end();)
+		for (auto &taskIt = rootTaskSet.begin(); taskIt != rootTaskSet.end();)
 		{
 			(*taskIt)->printDebugInfo("Iterating");
 			if ((*taskIt)->isComplete())

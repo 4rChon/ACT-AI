@@ -62,7 +62,7 @@ namespace DesireHelper
 	Zone* getMostDesirableAttackZone()
 	{
 		std::pair<Zone*, double> bestZone = std::pair<Zone*, double>(nullptr, 0.0);
-		for (auto& zone : attackDesireMap)
+		for (auto &zone : attackDesireMap)
 		{
 			if (zone.second > bestZone.second)
 				bestZone = zone;
@@ -74,7 +74,7 @@ namespace DesireHelper
 	Zone* getBunkerDefenseTarget()
 	{
 		std::pair<Zone*, double> bestZone = std::pair<Zone*, double>(nullptr, 0.0);
-		for (auto& zone : bunkerDefenseDesireMap)
+		for (auto &zone : bunkerDefenseDesireMap)
 		{
 			if (zone.second > bestZone.second)
 				bestZone = zone;
@@ -86,7 +86,7 @@ namespace DesireHelper
 	Zone* getTurretDefenseTarget()
 	{
 		std::pair<Zone*, double> bestZone = std::pair<Zone*, double>(nullptr, 0.0);
-		for (auto& zone : turretDefenseDesireMap)
+		for (auto &zone : turretDefenseDesireMap)
 		{
 			if (zone.second > bestZone.second)
 				bestZone = zone;
@@ -98,7 +98,7 @@ namespace DesireHelper
 	Zone* getUnitDefenseTarget()
 	{
 		std::pair<Zone*, double> bestZone = std::pair<Zone*, double>(nullptr, 0.0);
-		for (auto& zone : unitDefenseDesireMap)
+		for (auto &zone : unitDefenseDesireMap)
 		{
 			if (zone.second > bestZone.second)
 				bestZone = zone;
@@ -112,29 +112,27 @@ namespace DesireHelper
 		for (auto &zone : target->getNeighbourhood())
 		{
 			int defenseMod = 0;
-			if (zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::IsBuilding).size() > 0)
-				defenseMod = 1;
+			for (auto &neighbour : zone->getNeighbourhood())
+			{
+				if (neighbour->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::IsBuilding).size() > 0)
+				{
+					defenseMod = 1;
+					break;
+				}
+			}
 			
 			//double defenseMultiplier = zone->getTimesDefended()  / (zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && !BWAPI::Filter::IsBuilding && !BWAPI::Filter::IsWorker).size() + 1);
 			unitDefenseDesireMap[zone] = (desireMod + 1) * zone->getTimesDefended() * defenseMod;
 
 			if (!zone->hasBunkerDefense())
-			{
 				bunkerDefenseDesireMap[zone] = zone->getTimesDefended() * defenseMod;
-			}
 			else
-			{
 				bunkerDefenseDesireMap[zone] = 0.0;
-			}
 
 			if (!zone->hasTurretDefense())
-			{
 				turretDefenseDesireMap[zone] = zone->getTimesDefended() * defenseMod;
-			}
 			else
-			{
 				turretDefenseDesireMap[zone] = 0.0;
-			}
 		}
 	}
 
@@ -145,15 +143,15 @@ namespace DesireHelper
 
 	void updateUnitDesireMap()
 	{
-		for (auto& unit : unitDesireMap)
+		for (auto &unit : unitDesireMap)
 			unit.second = 0.0;
 
-		for (auto& coalition : CoalitionHelper::getCoalitionset())
+		for (auto &coalition : CoalitionHelper::getCoalitionset())
 		{
 			auto targetUnitMap = coalition->getTargetComp().getUnitMap();
 			auto currentUnitMap = coalition->getCurrentComp().getUnitMap();
 		
-			for (auto& unit : targetUnitMap)
+			for (auto &unit : targetUnitMap)
 				unitDesireMap[unit.first] += 1 + (double)(unit.second - currentUnitMap[unit.first]) / (double)unit.second;
 		}
 	}	

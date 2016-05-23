@@ -25,7 +25,7 @@ namespace CoalitionHelper
 		return ++nextID;
 	}
 	
-	Coalition* addCoalition(Composition composition, Task* task)
+	Coalition* addCoalition(Composition composition, Task* const& task)
 	{
 		Coalition* coalition = new Coalition(composition, task);
 		coalitionSet.insert(coalition);

@@ -28,7 +28,6 @@ Coalition::Coalition()
 {
 }
 
-
 Coalition::Coalition(Composition targetComp, Task * const & task)
 	: creationFrame(BWAPI::Broodwar->getFrameCount())
 	, activationFrame(-1)
@@ -46,8 +45,7 @@ Coalition::Coalition(Composition targetComp, Task * const & task)
 	if (task->getType() == ATT)
 		unitMultiplier = EconHelper::getUnitMultiplier(targetComp);
 	else
-		unitMultiplier = 1;
-	
+		unitMultiplier = 1;		
 }
 
 Coalition::~Coalition()
@@ -56,7 +54,7 @@ Coalition::~Coalition()
 
 	CompositionHelper::saveComposition(this);
 
-	for (auto agent : agentSet)
+	for (auto &agent : agentSet)
 		agent->unbind();
 }
 
@@ -74,7 +72,7 @@ double Coalition::getCost()
 	valueArr.push_back(currentComp.getCost());
 	coeffArr.push_back(0.0001);
 	valueArr.push_back(getAge());
-	coeffArr.push_back(0.00001);
+	coeffArr.push_back(0.0001);
 	cost = util::calc::normaliseValues(valueArr, coeffArr);
 	return cost;
 }
@@ -102,6 +100,7 @@ double Coalition::getFitness()
 
 void Coalition::activate()
 {
+	activationFrame = BWAPI::Broodwar->getFrameCount();
 	active = true;
 	targetComp = currentComp;
 	for (auto &agent : agentSet)
@@ -148,7 +147,7 @@ void Coalition::removeAgent(Agent* const& agent)
 	if (active && (currentComp.getCost() == 0 || agentSet.size() == 0 || (task->getType() == ATT && currentComp.getAttributes().groundDPS == 0 && currentComp.getAttributes().airDPS == 0)))
 		task->fail();
 
-	if (agent->getCoalition() != this)
+	if (agent->getCoalitionID() != coalitionID)
 		return;
 
 	agent->unbind();

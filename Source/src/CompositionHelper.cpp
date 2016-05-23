@@ -33,9 +33,11 @@ namespace CompositionHelper
 
 	Composition getComposition(TaskType taskType)
 	{ 
+		if(taskType == ATT)
+			std::cout << "Getting Composition for Attack Type\n";
 		//return best composition for tasktype
 		std::vector<UsedComposition> candidateSet;
-		for each(auto usedComposition in compositionSet)
+		for each(auto &usedComposition in compositionSet)
 		{
 			if (usedComposition.taskType == taskType)
 			{
@@ -46,19 +48,28 @@ namespace CompositionHelper
 
 		if (candidateSet.size() > 0)
 		{
+			if (taskType == ATT)
+				std::cout << "Found " << candidateSet.size() << " Candidates\n";
 			auto scoutedUnits = ArmyHelper::getScoutedUnits();
 			//scoutedUnits.debugInfo();
-			for each(auto unitType in scoutedUnits.getTypes())
+			for (auto &unitType : scoutedUnits.getTypes())
 			{
 				auto counters = getCounters(unitType);
-				for (auto it = candidateSet.begin(); it != candidateSet.end();)
+				for (auto &it = candidateSet.begin(); it != candidateSet.end();)
 				{
+					if (taskType == ATT)
+						std::cout << "Iterating Candidate Sets\n";
 					bool canCounter = false;
 					//if usedComposition contains at least one counter...
-					for each(auto counterType in counters.getTypes())
+					for (auto &counterType : counters.getTypes())
 					{
+						if (taskType == ATT)
+							std::cout << "Testing Candidate Set for Counters\n";
 						if ((*it).composition[counterType] > 0)
 						{
+							if (taskType == ATT)
+								std::cout << "can counter\n";
+							
 							canCounter = true;
 							break;
 						}
@@ -66,28 +77,36 @@ namespace CompositionHelper
 
 					if (!canCounter)
 					{
-						auto nextIt = candidateSet.erase(it);
-						it = nextIt;
+						if (taskType == ATT)
+							std::cout << "Can't counter\nErasing iterator\n";
+						it = candidateSet.erase(it);
 					}
 					else
+					{
+						if (taskType == ATT)
+							std::cout << "Incrementing iterator\n";
 						it++;
+					}
 				}
 			}
 		}
 		else
 		{
+			if (taskType == ATT)
+				std::cout << "Found no Candidates\n";
 			Composition c;
 			switch (taskType)
 			{
 			case ATT:
 			{
+				std::cout << "Getting new Attack composition\n";
 				c.addType(BWAPI::UnitTypes::Terran_Marine);
 				c.addType(BWAPI::UnitTypes::Terran_Medic);
 				return c;
 			}
 			case DEF:
 			{
-				for (auto& agent : AgentHelper::getAgentset())
+				for (auto &agent : AgentHelper::getAgentset())
 				{
 					if (agent->getUnit()->exists() && agent->isFree() && !agent->getUnit()->getType().isBuilding() && !agent->getUnit()->getType().isSpell() && !agent->getUnit()->getType().isWorker())
 						c.addType(agent->getUnit()->getType());
@@ -106,19 +125,31 @@ namespace CompositionHelper
 			}
 			default:
 			{
+				std::cout << "Getting new Default?? composition\n";
 				c.addType(BWAPI::UnitTypes::Terran_Marine);
 				c.addType(BWAPI::UnitTypes::Terran_Medic);
 				return c;
 			}
 			}
 		}
+
+		if (taskType == ATT)
+			std::cout << "Choosing Candidate with highest fitness\n";
 		auto bestComposition = *candidateSet.begin();
-		for each(auto candidate in candidateSet)
+		for (auto &candidate : candidateSet)
 		{
+			if (taskType == ATT)
+				std::cout << "Iterating over candidates\n";
 			if (candidate.fitness > bestComposition.fitness)
+			{
+				if (taskType == ATT)
+					std::cout << "Assigning Candidate\n";
 				bestComposition = candidate;
+			}
 		}
 
+		if (taskType == ATT)
+			std::cout << "Returning best composition\n";
 		return bestComposition.composition;
 	}
 
@@ -200,7 +231,7 @@ namespace CompositionHelper
 		}
 		
 		Composition counterComposition;
-		for (auto unitType = unitTypeCounterAmount.begin(); unitType != unitTypeCounterAmount.end(); unitType++)
+		for (auto &unitType = unitTypeCounterAmount.begin(); unitType != unitTypeCounterAmount.end(); unitType++)
 		{
 			if (unitType->first == BWAPI::UnitTypes::Spell_Scanner_Sweep)
 				counterComposition.addType(BWAPI::UnitTypes::Terran_Comsat_Station, unitType->second);
@@ -213,7 +244,6 @@ namespace CompositionHelper
 		}
 		return counterComposition;
 	}
-
 
 	const std::vector<UsedComposition>& getCompositionSet()
 	{
@@ -247,10 +277,11 @@ namespace CompositionHelper
 
 		Composition composition;
 
-		for each(auto& unit in coalition->getTargetComp().getUnitMap())
+		double unitMultiplier = coalition->getUnitMultiplier();
+		for each(auto &unit in coalition->getTargetComp().getUnitMap())
 		{
 			if(unit.second > 0)
-				composition.addType(unit.first, (int)std::ceil((double)unit.second / coalition->getUnitMultiplier()));
+				composition.addType(unit.first, (int)std::ceil((double)unit.second / unitMultiplier));
 		}
 
 		if (composition.getTypes().size() == 0)
@@ -259,7 +290,7 @@ namespace CompositionHelper
 		UsedComposition usedComposition{
 			composition,
 			coalition->getTask()->getType(),
-			coalition->getAge(),			
+			coalition->getActivationFrame(),			
 			coalition->getFitness(),
 			1
 		};
@@ -278,7 +309,7 @@ namespace CompositionHelper
 		for each(auto usedComposition in workingSet)
 		{
 			bool unique = true;
-			for (auto& uniqueComposition : uniqueCompositions)
+			for (auto &uniqueComposition : uniqueCompositions)
 			{
 				if (usedComposition.composition == uniqueComposition.composition && util::game::getFrameBracket(usedComposition.activationFrame, 7200) == util::game::getFrameBracket(uniqueComposition.activationFrame, 7200))
 				{

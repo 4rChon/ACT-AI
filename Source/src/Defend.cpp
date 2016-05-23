@@ -9,13 +9,12 @@ Defend::Defend(BWAPI::Unit unit)
 {
 	taskName = "Defend(" + unit->getType().getName() + ", " + std::to_string(unit->getRegion()->getID()) + ")";
 	target = MapHelper::getZone(unit->getRegion());	
-	taskType = DEF;
-	target->defend(true);
+	taskType = DEF;	
 }
 
 void Defend::assign()
 {
-	//createCoalition();
+	target->defend(true);
 	assigned = true;
 }
 
@@ -70,7 +69,7 @@ void Defend::succeed()
 {
 	target->defend(false);
 	complete = true;
-	profit = 1.0;// coalition->getProfit();
+	profit = 1.0;
 	printDebugInfo("Success!", true);
 }
 
@@ -78,6 +77,6 @@ void Defend::fail()
 {
 	target->defend(false);
 	complete = true;
-	profit = 0.0;// coalition->getProfit();
+	profit = 0.0;
 	printDebugInfo("Failure!", true);
 }

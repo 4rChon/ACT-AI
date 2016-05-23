@@ -23,7 +23,7 @@ void CreateUnit::createCoalition()
 {
 	printDebugInfo("Unit requirements satisfied");
 	Composition producer;
-	auto whatBuilds = unitType.whatBuilds().first;
+	BWAPI::UnitType whatBuilds = unitType.whatBuilds().first;
 
 	if (!whatBuilds.isWorker())
 	{
@@ -35,7 +35,6 @@ void CreateUnit::createCoalition()
 	CreateCoalition* createCoalition = new CreateCoalition(producer, this);
 	addSubTask(createCoalition);
 }
-
 
 void CreateUnit::satisfyRequirements()
 {
@@ -98,39 +97,6 @@ void CreateUnit::act()
 		return;
 	}
 
-	//if the unitType is morphed from another unit, use a morph command
-	if (unitType == BWAPI::UnitTypes::Zerg_Lurker || unitType == BWAPI::UnitTypes::Zerg_Guardian)
-	{
-		for each (auto &agent in coalition->getAgentSet())
-			if (agent->morph(unitType))
-				unitCount--;
-		return;
-	}
-
-	//if the unitType is created by merging two high templar, use the archon warp ability
-	if (unitType == BWAPI::UnitTypes::Protoss_Archon)
-	{
-		if(coalition->getAgentSet().size() % 2 == 0)
-			for (auto agent = coalition->getAgentSet().begin(); agent != coalition->getAgentSet().end(); ++agent)
-			{
-				if ((*agent)->useAbility(BWAPI::TechTypes::Archon_Warp, (*++agent)->getUnit()))
-					unitCount--;
-			}
-		return;
-	}
-
-	//if the unitType is created by merging two dark templar, use the dark archon meld ability
-	if (unitType == BWAPI::UnitTypes::Protoss_Dark_Archon)
-	{
-		if (coalition->getAgentSet().size() % 2 == 0)
-			for (auto &agent = coalition->getAgentSet().begin(); agent != coalition->getAgentSet().end(); ++agent)
-			{
-				if ((*agent)->useAbility(BWAPI::TechTypes::Dark_Archon_Meld, (*++agent)->getUnit()))
-					unitCount--;
-			}
-		return;
-	}
-
 	//if the unitType is an addon, use the build addon command
 	if (unitType.isAddon())
 	{
@@ -145,26 +111,19 @@ void CreateUnit::act()
 	//if the unitType is a building, use the build command
 	if (unitType.isBuilding())
 	{
-		for each (auto &agent in coalition->getAgentSet())
-		{
-			if (unitType.getRace() == BWAPI::Races::Zerg
-				&& (unitType.isResourceDepot() && unitType != BWAPI::UnitTypes::Zerg_Hatchery)
-				|| unitType == BWAPI::UnitTypes::Zerg_Greater_Spire)
-			{
-				if (agent->morph(unitType))
-					unitCount--;
-			}
-			else
-				agent->build(unitType);
-		}
+		for (auto &agent : coalition->getAgentSet())
+			agent->build(unitType);
 		return;
 	}
+
 	//if the unitType is a unit, use the train command
 	else
 	{
-		for each (auto &agent in coalition->getAgentSet())
+		for (auto &agent : coalition->getAgentSet())
+		{
 			if (agent->train(unitType))
 				unitCount--;
+		}
 		return;
 	}
 		

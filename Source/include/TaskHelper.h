@@ -9,7 +9,7 @@ namespace TaskHelper
 	Task* addTask(Task* const& task, bool root = false);
 	void deleteTask(Task* const& task);
 	void updateRootTasks();
-	Taskset& getRootTasks();
-	Taskset& getAllTasks();
-	Taskset& getAttackTasks();
+	const Taskset& getRootTasks();
+	const Taskset& getAllTasks();
+	const Taskset& getAttackTasks();
 }

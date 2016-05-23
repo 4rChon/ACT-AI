@@ -33,13 +33,12 @@ public:
 	~Worker();
 
 	///setters
-	void setMiningBase(ResourceDepot* miningBase, bool gas);	//Set current mining base to miningBase and gasMiner to gas
-	void unsetMiningBase();										//Unset current mining base
+	void setMiningBase(ResourceDepot* const& miningBase, bool gas);	//Set current mining base to miningBase and gasMiner to gas
+	void unsetMiningBase();											//Unset current mining base
 
 	///getters
-	bool isMiningGas() const { return gasMiner; }				//True if gasMiner is true
-
-	ResourceDepot* getMiningBase() const { return miningBase; }	//Get current mining base - nullptr if no mining base
+	bool isMiningGas() const					{ return gasMiner; }	//True if gasMiner is true
+	ResourceDepot* getMiningBase() const		{ return miningBase; }	//Get current mining base - nullptr if no mining base
 
 	///-
 	virtual void act();	//Compute actions

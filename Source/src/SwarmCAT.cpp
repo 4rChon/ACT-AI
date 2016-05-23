@@ -56,7 +56,7 @@ void SwarmCAT::onStart()
 		Broodwar << "The following players are in this replay:" << std::endl;
 
 		Playerset players = Broodwar->getPlayers();
-		for (auto p : players)
+		for (auto &p : players)
 			if (!p->isObserver())
 				Broodwar << p->getName() << ", playing as " << p->getRace() << std::endl;
 
@@ -290,12 +290,12 @@ void SwarmCAT::onUnitDestroy(BWAPI::Unit unit)
 			{
 				int bunkerCount = 0;
 				const MapHelper::Field& neighbourhood = MapHelper::getZone(unit->getRegion())->getNeighbourhood();
-				for (auto& zone : neighbourhood)
+				for (const auto &zone : neighbourhood)
 					bunkerCount += zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::GetType == BWAPI::UnitTypes::Terran_Bunker).size();
 
 				if (bunkerCount == 0)
 				{
-					for (auto& zone : neighbourhood)
+					for (const auto &zone : neighbourhood)
 						zone->setBunkerDefense(false);
 				}
 			}
@@ -303,12 +303,12 @@ void SwarmCAT::onUnitDestroy(BWAPI::Unit unit)
 			if (unit->getType() == BWAPI::UnitTypes::Terran_Missile_Turret)
 			{
 				int turretCount = 0;
-				for (auto& zone : MapHelper::getZone(unit->getRegion())->getNeighbourhood())
+				for (auto &zone : MapHelper::getZone(unit->getRegion())->getNeighbourhood())
 					turretCount += zone->getRegion()->getUnits(BWAPI::Filter::IsOwned && BWAPI::Filter::GetType == BWAPI::UnitTypes::Terran_Missile_Turret).size();
 
 				if (turretCount == 0)
 				{
-					for (auto& zone : MapHelper::getZone(unit->getRegion())->getNeighbourhood())
+					for (auto &zone : MapHelper::getZone(unit->getRegion())->getNeighbourhood())
 						zone->setTurretDefense(false);
 				}
 			}
@@ -372,13 +372,13 @@ void SwarmCAT::onUnitComplete(BWAPI::Unit unit)
 
 			if (unit->getType() == BWAPI::UnitTypes::Terran_Bunker)
 			{
-				for (auto& zone : unitZone->getNeighbourhood())
+				for (auto &zone : unitZone->getNeighbourhood())
 					zone->setBunkerDefense(true);
 			}
 
 			if (unit->getType() == BWAPI::UnitTypes::Terran_Missile_Turret)
 			{
-				for (auto& zone : unitZone->getNeighbourhood())
+				for (auto &zone : unitZone->getNeighbourhood())
 					zone->setTurretDefense(true);
 			}
 
@@ -397,6 +397,7 @@ void SwarmCAT::drawDebugText()
 	Broodwar->drawTextScreen(200, 10, "Average FPS: %f", Broodwar->getAverageFPS());
 	Broodwar->drawTextScreen(200, 40, "Agent Count: %d", AgentHelper::getAgentset().size());	
 	Broodwar->drawTextScreen(200, 60, "Root Tasks: ");
+
 	int i = 1;
 	for (auto &task : TaskHelper::getRootTasks())
 		Broodwar->drawTextScreen(200, 60 + (10 * i++), "%d : %s", task->getID(), task->getName().c_str());
@@ -416,25 +417,11 @@ void SwarmCAT::drawDebugText()
 			Broodwar->drawCircleMap(coalition->getUnitSet().getPosition(), 10 + (coalition->getUnitSet().size() * 5), BWAPI::Colors::Red);		
 	}
 
-	/*auto scoutedUnits = ArmyHelper::getScoutedUnits();
-	i = 1;
-	for (auto type : scoutedUnits.getTypes())
-		Broodwar->drawTextScreen(400, 250 + (10 * i++), "%s : %d", type.c_str(), scoutedUnits[type]);	*/
-
 	for (auto &a : AgentHelper::getAgentset())
 	{
 		auto u = a->getUnit();
 		if (u->exists())
 		{
-			//if (u->getType().isWorker())
-			//{
-			//	if (((Worker*)a)->getMiningBase())
-			//	{
-			//		Broodwar->drawLineMap(u->getPosition(), ((Worker*)a)->getMiningBase()->getBaseLocation()->getPosition(), Colors::Red);					
-			//		if(u->getOrderTargetPosition() != BWAPI::Position(0, 0))
-			//			Broodwar->drawLineMap(u->getPosition(), u->getOrderTargetPosition(), Colors::Blue);
-			//	}
-			//}
 			BWAPI::Color unitCircleColor;
 
 			if (a->isFree())
@@ -446,6 +433,11 @@ void SwarmCAT::drawDebugText()
 				u->getPosition(),
 				u->getType().dimensionLeft(),
 				unitCircleColor
+				);
+			
+			Broodwar->drawTextMap(
+				u->getPosition(),
+				"%d", a->getBoredom()
 				);
 		}
 	}
@@ -473,7 +465,6 @@ void SwarmCAT::drawDebugText()
 	Broodwar->drawTextScreen(10, 20, "Expand Desire: %.2f", DesireHelper::getExpandDesire());
 	Broodwar->drawTextScreen(10, 30, "Supply Desire: %.2f", DesireHelper::getSupplyDesire());
 
-
 	/*draw zones*/
 	auto unitDefenseDesireMap = DesireHelper::getUnitDefenseDesireMap();
 	auto bunkerDefenseDesireMap = DesireHelper::getBunkerDefenseDesireMap();
@@ -496,7 +487,7 @@ void SwarmCAT::drawDebugText()
 void SwarmCAT::drawTerrainData()
 {
 	//we will iterate through all the base locations, and draw their outlines.
-	for (const auto& baseLocation : BWTA::getBaseLocations()) {
+	for (const auto &baseLocation : BWTA::getBaseLocations()) {
 		TilePosition p = baseLocation->getTilePosition();
 
 		//draw outline of center location
@@ -505,12 +496,12 @@ void SwarmCAT::drawTerrainData()
 		Broodwar->drawBoxMap(leftTop, rightBottom, Colors::Blue);
 
 		//draw a circle at each mineral patch
-		for (const auto& mineral : baseLocation->getStaticMinerals()) {
+		for (const auto &mineral : baseLocation->getStaticMinerals()) {
 			Broodwar->drawCircleMap(mineral->getInitialPosition(), 30, Colors::Cyan);
 		}
 
 		//draw the outlines of Vespene geysers
-		for (const auto& geyser : baseLocation->getGeysers()) {
+		for (const auto &geyser : baseLocation->getGeysers()) {
 			TilePosition p1 = geyser->getInitialTilePosition();
 			Position leftTop1(p1.x * TILE_SIZE, p1.y * TILE_SIZE);
 			Position rightBottom1(leftTop1.x + 4 * TILE_SIZE, leftTop1.y + 2 * TILE_SIZE);
@@ -524,7 +515,7 @@ void SwarmCAT::drawTerrainData()
 	}
 
 	//we will iterate through all the regions and ...
-	for (const auto& region : BWTA::getRegions()) {
+	for (const auto & region : BWTA::getRegions()) {
 		// draw the polygon outline of it in green
 		BWTA::Polygon p = region->getPolygon();
 		for (size_t j = 0; j < p.size(); ++j) {

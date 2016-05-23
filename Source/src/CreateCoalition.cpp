@@ -10,25 +10,31 @@ CreateCoalition::CreateCoalition(Composition composition, Task* const& task)
 {
 	taskName = "CreateCoalition(Composition, " + task->getName() + ")";
 	Composition adjustedComposition;
+	double multiplier = EconHelper::getUnitMultiplier(composition);
 	if (task->getType() == ATT)
 	{
-		for (auto& unit : composition.getUnitMap())
+		for (auto &unit : composition.getUnitMap())
 		{
 			if (!unit.first.isBuilding() && unit.second > 0)
-				adjustedComposition.addType(unit.first, (int)std::ceil(((double)unit.second * EconHelper::getUnitMultiplier(composition))));
+			{
+				int unitCount = int(std::ceil((double(unit.second) * multiplier)));
+				if (unitCount > 40)
+					unitCount = 40;
+				adjustedComposition.addType(unit.first, unitCount);
+			}
 		}
 		composition = adjustedComposition;
 		std::cout << "Composition\n";
 		composition.printDebugInfo();
-		std::cout << "Composition Multiplier : " << EconHelper::getUnitMultiplier(composition) << "\n";
+		std::cout << "Composition Multiplier : " << multiplier << "\n";
 	}
 	
 	taskCoalition = CoalitionHelper::addCoalition(composition, task);
 	task->setCoalition(taskCoalition);
 	cost = composition.getCost();
 	taskType = CRC;
-	if (cost == 0)
-		succeed();
+	if (multiplier == 0)
+		fail();
 	//debug = true;
 }
 
@@ -45,7 +51,7 @@ void CreateCoalition::act()
 {
 	printDebugInfo("Acting");
 	Composition differenceComposition = taskCoalition->getTargetComp() - taskCoalition->getCurrentComp();
-	for (auto unitType : differenceComposition.getTypes())
+	for (auto &unitType : differenceComposition.getTypes())
 	{
 		int unitCount = differenceComposition[unitType];
 		if (unitType.isWorker())

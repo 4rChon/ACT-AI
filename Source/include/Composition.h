@@ -47,9 +47,9 @@ public:
 
 	///getters
 	std::vector<BWAPI::UnitType> getTypes() const;
-	UnitMap getUnitMap() const { return unitMap; }
-	double getCost() const { return cost; }
-	Attributes &getAttributes() { return attributes; }
+	UnitMap getUnitMap() const						{ return unitMap; }
+	double getCost() const							{ return cost; }
+	Attributes &getAttributes()						{ return attributes; }
 
 	///helpers		
 	void removeType(const BWAPI::UnitType& unitType, int count = 1);

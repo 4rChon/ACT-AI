@@ -15,6 +15,6 @@ namespace CoalitionHelper
 	int getNextID();						//Get next coalitionID - used for initialising new coalitions
 
 	///helpers	
-	Coalition* addCoalition(Composition composition, Task* task);	//Add a new coalition with composition and task
+	Coalition* addCoalition(Composition composition, Task* const& task);	//Add a new coalition with composition and task
 	void removeCoalition(Coalition* const& coalition);						//Remove a coalition
 };

@@ -25,8 +25,6 @@ namespace ArmyHelper
 			}
 		};
 
-		static bool attacking;
-		static bool defending;
 		static bool scouting;
 		static double productionRatio;
 		static Zone* scoutTarget;
@@ -37,9 +35,7 @@ namespace ArmyHelper
 
 	void initialiseHelper()
 	{
-		attacking = false;
 		scouting = false;
-		defending = true;		
 		scoutTarget = nullptr;
 		if (BWTA::getStartLocations().size() == 2)
 		{
@@ -56,13 +52,13 @@ namespace ArmyHelper
 	{
 		if(!scouting)
 			scout();
-		//if(!attacking)
+
 		attack();		
 	}
 
 	void scout()
 	{
-		for each (auto &bases in BWTA::getStartLocations())
+		for (auto & bases : BWTA::getStartLocations())
 		{
 			scoutTarget = MapHelper::getZone(BWAPI::Broodwar->getRegionAt(bases->getPosition()));
 			if (BWAPI::Broodwar->getFrameCount() - scoutTarget->getLastVisited() > 1500)
@@ -76,7 +72,7 @@ namespace ArmyHelper
 			}
 		}
 
-		for each (auto &bases in BWTA::getBaseLocations())
+		for (auto & bases : BWTA::getBaseLocations())
 		{
 			scoutTarget = MapHelper::getZone(BWAPI::Broodwar->getRegionAt(bases->getPosition()));
 			if (BWAPI::Broodwar->getFrameCount() - scoutTarget->getLastVisited() > 7500)
@@ -95,15 +91,14 @@ namespace ArmyHelper
 	{		
 		if (targetPriorityList.size() > 0)
 		{
-			//attacking = true;
-			for (auto &target : targetPriorityList)
+			for (auto & target : targetPriorityList)
 			{		
-				Taskset& attackTasks = TaskHelper::getAttackTasks();
+				const Taskset& attackTasks = TaskHelper::getAttackTasks();
 				if (attackTasks.size() >= 3)
 					return;
 
 				bool sameRegion = false;
-				for (auto &task : attackTasks)
+				for (auto & task : attackTasks)
 				{
 					if (target.second->getSuperRegion()->getCenter() == task->getTarget()->getSuperRegion()->getCenter())
 					{
@@ -121,36 +116,20 @@ namespace ArmyHelper
 		}
 	}
 
-	void defend()
-	{
-		attacking = false;
-		defending = true;
-	}
-
 	void stopScouting()
 	{
 		scouting = !scouting;
 	}
 
-	bool isAttacking()
-	{
-		return attacking;
-	}
-
-	bool isDefending()
-	{
-		return defending;
-	}
-
 	void addTargetPriority(BWAPI::Unit unit)
 	{
-		auto target = std::pair<UnitCostPair, Zone*>(UnitCostPair(unit->getID(), unit->getType()), MapHelper::getZone(unit->getRegion()));
+		std::pair<UnitCostPair, Zone*> target = std::pair<UnitCostPair, Zone*>(UnitCostPair(unit->getID(), unit->getType()), MapHelper::getZone(unit->getRegion()));
 		targetPriorityList.insert(target);
 	}
 
 	void removeTargetPriority(BWAPI::Unit unit)
 	{
-		for (auto& target : targetPriorityList)
+		for (auto & target : targetPriorityList)
 		{
 			if (target.first.first == unit->getID())
 				targetPriorityList.erase(target.first);				
@@ -159,16 +138,16 @@ namespace ArmyHelper
 
 	void updateTargetPriority()
 	{
-		for (auto &target : targetPriorityList)
+		for (auto & target : targetPriorityList)
 		{
 			if (target.second->getLastVisited() < 5 && !BWAPI::Broodwar->getUnit(target.first.first)->exists())
 				targetPriorityList.erase(target.first);
 		}
 	}
 
-	void clearZoneTargets(Zone* const&zone)
+	void clearZoneTargets(Zone* const& zone)
 	{
-		for (auto &target : targetPriorityList)
+		for (auto & target : targetPriorityList)
 		{
 			if (target.second == zone)
 				targetPriorityList.erase(target.first);
@@ -188,7 +167,7 @@ namespace ArmyHelper
 	Composition getScoutedUnits()
 	{
 		Composition scoutedUnitComposition;
-		for (auto unitType = scoutedUnits.begin(); unitType != scoutedUnits.end(); unitType++)
+		for (auto & unitType = scoutedUnits.begin(); unitType != scoutedUnits.end(); unitType++)
 			scoutedUnitComposition.addType(unitType->second);
 		return scoutedUnitComposition;
 	}
@@ -196,7 +175,7 @@ namespace ArmyHelper
 	void printPriorityList(int count)
 	{
 		int i = 0;
-		for (auto& target : targetPriorityList)
+		for (auto & target : targetPriorityList)
 		{
 			BWAPI::Broodwar->drawTextScreen(125, 250 + (10 * ++i), "%d : %s - %d", target.first.first, ((BWAPI::UnitType)target.first.second).getName().c_str(), target.second->getID());
 			if (i == count)

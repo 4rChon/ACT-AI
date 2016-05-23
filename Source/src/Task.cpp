@@ -54,7 +54,7 @@ void Task::addSubTask(Task* const& task)
 
 void Task::deleteSubTasks()
 {
-	for (Taskset::iterator taskIt = subTasks.begin(); taskIt != subTasks.end(); ++taskIt)
+	for (auto &taskIt = subTasks.begin(); taskIt != subTasks.end(); ++taskIt)
 		TaskHelper::deleteTask(*taskIt);		
 
 	subTasks.clear();
@@ -62,7 +62,8 @@ void Task::deleteSubTasks()
 
 void Task::updateSubTasks()
 {
-	for (Taskset::iterator taskIt = subTasks.begin(); taskIt != subTasks.end(); ++taskIt)
+	printDebugInfo("Updating Sub Tasks");
+	for (auto &taskIt = subTasks.begin(); taskIt != subTasks.end(); ++taskIt)
 	{				
 		if ((*taskIt)->isComplete())
 		{
@@ -77,7 +78,7 @@ void Task::updateSubTasks()
 
 void Task::removeSuperTasks()
 {
-	for (Taskset::iterator taskIt = superTasks.begin(); taskIt != superTasks.end(); ++taskIt)
+	for (auto &taskIt = superTasks.begin(); taskIt != superTasks.end(); ++taskIt)
 		(*taskIt)->removeSubTask(this);
 
 	superTasks.clear();
@@ -85,9 +86,13 @@ void Task::removeSuperTasks()
 
 void Task::createCoalition()
 {
+	printDebugInfo("Create Coalition");
 	Composition c = CompositionHelper::getComposition(taskType);
+	printDebugInfo("Composition Obtained");
 	CreateCoalition *createCoalition = new CreateCoalition(c, this);
+	printDebugInfo("Create Coalition Task Created");
 	addSubTask(createCoalition);
+	printDebugInfo("Create Coalition Subtask Added");
 }
 
 void Task::succeed()

@@ -12,6 +12,7 @@ Attack::Attack(Zone* const& target)
 	taskName = "Attack(" + std::to_string(target->getID()) + ")";
 	this->target = target;
 	taskType = ATT;
+	/*debug = true;*/
 }
 
 // assign an attacking coalition
@@ -28,8 +29,11 @@ void Attack::act()
 {	
 	printDebugInfo("Acting");
 
-	if (util::game::getSelf()->supplyUsed() >= 400)
+	if (util::game::getSelf()->supplyUsed() >= 400 && coalition->getAge() > 24 * 60)
+	{
+		printDebugInfo("Coalition is " + std::to_string(coalition->getAge()) + " frames old", true);
 		coalition->activate();
+	}
 
 	if (coalition->isActive())
 	{		
@@ -79,7 +83,6 @@ void Attack::fail()
 	profit = coalition->getProfit();
 	printDebugInfo("Failure!", true);
 
-	ArmyHelper::defend();
 	ArmyHelper::updateTargetPriority();
 }
 
@@ -89,7 +92,6 @@ void Attack::succeed()
 	profit = coalition->getProfit();
 	printDebugInfo("Success!", true);
 
-	ArmyHelper::defend();
 	ArmyHelper::updateTargetPriority();
 	ArmyHelper::clearZoneTargets(target);
 }

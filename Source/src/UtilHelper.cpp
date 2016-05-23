@@ -9,6 +9,7 @@
 #include <iostream>
 #include <random>
 #include <chrono>
+#include <ctime>
 
 namespace util
 {			
@@ -180,7 +181,7 @@ namespace util
 			bool hasResearched = !self->hasResearched(unitType.requiredTech());
 			bool hasCreator = self->hasUnitTypeRequirement(unitType.whatBuilds().first, unitType.whatBuilds().second);
 
-			for each(auto& requirement in unitType.requiredUnits())
+			for each(auto &requirement in unitType.requiredUnits())
 			{
 				if (!self->hasUnitTypeRequirement(requirement.first, requirement.second))
 					hasUnitTypeRequirement = false;
@@ -230,7 +231,7 @@ namespace util
 			if (usedComposition.useCount > 0)
 				avgActivationFrame = (int)((double)usedComposition.activationFrame / usedComposition.useCount);
 			int frameBracket = game::getFrameBracket(avgActivationFrame, 7200);
-			auto fileName = std::to_string(frameBracket) + "_" + std::to_string(usedComposition.taskType);
+			auto fileName = std::to_string(frameBracket) + "_" + std::to_string(clock()) + "_" + std::to_string(usedComposition.taskType);
 
 			compStream.open(directory + fileName + ".comp", std::ios::binary | std::ios::out);
 

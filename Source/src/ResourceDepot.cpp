@@ -105,7 +105,7 @@ bool ResourceDepot::isGasSaturated()
 	return gasSaturation >= 1;
 }
 
-void ResourceDepot::addMineralWorker(Worker* worker)
+void ResourceDepot::addMineralWorker(Worker* const& worker)
 {	
 	if (baseLocation->getMinerals().size() > 0)
 	{
@@ -115,7 +115,7 @@ void ResourceDepot::addMineralWorker(Worker* worker)
 	}
 }
 
-void ResourceDepot::addGasWorker(Worker* worker)
+void ResourceDepot::addGasWorker(Worker* const& worker)
 {
 	if (baseLocation->getGeysers().size() > 0)
 	{
@@ -125,7 +125,7 @@ void ResourceDepot::addGasWorker(Worker* worker)
 	}
 }
 
-void ResourceDepot::removeWorker(Worker* worker)
+void ResourceDepot::removeWorker(Worker* const& worker)
 {
 	if (workers.count(worker) > 0)
 	{
@@ -137,7 +137,7 @@ void ResourceDepot::removeWorker(Worker* worker)
 	}
 }
 
-bool ResourceDepot::addGeyser(Worker* worker)
+bool ResourceDepot::addGeyser(Worker* const& worker)
 {
 	for (auto &geyser : baseLocation->getGeysers())
 	{

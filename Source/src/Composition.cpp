@@ -13,7 +13,7 @@ Composition::Composition(BWAPI::Unitset unitSet)
 	: cost(0)
 {
 	initAttributes();
-	for (auto unit : unitSet)
+	for (auto &unit : unitSet)
 		addType(unit->getType());
 	
 }
@@ -31,7 +31,7 @@ Composition::Composition(const Composition& comp)
 {
 	cost = comp.cost;
 	attributes = comp.attributes;
-	for (auto& unit : comp.unitMap)
+	for (auto &unit : comp.unitMap)
 		unitMap[unit.first] = unit.second;
 	
 }
@@ -124,7 +124,6 @@ void Composition::addType(const BWAPI::UnitType& unitType, int count)
 	cost += ((unitType.gasPrice() * 1.5) + (unitType.mineralPrice())) * count;
 	updateAttributes(unitType, count);
 }
-
 
 void Composition::updateMaxRange()
 {

@@ -52,7 +52,6 @@ namespace AgentHelper
 
 	void createAgent(BWAPI::Unit unit)
 	{
-		Agent* agent = nullptr;
 		if (unit->getType() == BWAPI::UnitTypes::Zerg_Larva
 			|| unit->getType() == BWAPI::UnitTypes::Zerg_Egg
 			|| unit->getType() == BWAPI::UnitTypes::Zerg_Cocoon
@@ -69,22 +68,32 @@ namespace AgentHelper
 
 		if (unit->getType().isResourceDepot())
 		{
-			agent = new ResourceDepot(unit);
-			resourceDepots.insert((ResourceDepot*)agent);
+			ResourceDepot* const& agent = new ResourceDepot(unit);
+			resourceDepots.insert(agent);
+			agentSet.insert(agent);
 		}
 		else if (unit->getType().isWorker())
-			agent = new Worker(unit);
+		{
+			Worker* const& agent = new Worker(unit);
+			agentSet.insert(agent);
+		}
 		else if (unit->getType() == BWAPI::UnitTypes::Terran_Comsat_Station)
-			agent = new ComsatStation(unit);
+		{
+			ComsatStation* const& agent = new ComsatStation(unit);
+			agentSet.insert(agent);
+		}
 		else
-			agent = new Agent(unit);
+		{
+			Agent* const& agent = new Agent(unit);
+			agentSet.insert(agent);
+		}
 
-		agentSet.insert(agent);
+		
 	}
 
 	void removeAgent(int id)
 	{
-		Agent* agent = getAgent(id);
+		Agent* const& agent = getAgent(id);
 		if (!agent)
 			std::cout << "\tAgent not found\n";
 		else

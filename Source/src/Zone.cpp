@@ -46,7 +46,7 @@ void Zone::updateZone()
 {
 	resetScores();
 
-	for (auto& unit : region->getUnits())
+	for (auto & unit : region->getUnits())
 	{
 		if (unit->getPlayer() == util::game::getEnemy())
 			enemyScore += 100 + unit->getType().buildScore() + unit->getType().destroyScore();

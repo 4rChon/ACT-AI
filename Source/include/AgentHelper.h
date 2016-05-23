@@ -15,7 +15,6 @@ namespace AgentHelper
 	void initialiseHelper();
 
 	///setters
-	//
 	void setLastServiced(Agentset::iterator lastServiced);
 
 	//getters

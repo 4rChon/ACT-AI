@@ -102,6 +102,7 @@ namespace ReplayHelper
 		}
 
 		usedComp.useCount = 0;
+		usedComp.fitness = 1;
 
 		CompositionHelper::saveComposition(usedComp);
 	}

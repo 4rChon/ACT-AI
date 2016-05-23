@@ -24,7 +24,7 @@ Agent::Agent()
 	, lastEngaged(0)
 	, isEngaged(false)
 	, lastKillCount(0)
-	, isCandidateAgent(false)
+	, boredom(0)
 {
 }
 
@@ -43,6 +43,7 @@ Agent::Agent(BWAPI::Unit unit)
 	, isEngaged(false)
 	, lastKillCount(0)
 	, lastCommand(unit->getLastCommand())
+	, boredom(0)
 {
 }
 
@@ -200,6 +201,19 @@ void Agent::updateKillCount()
 	lastKillCount = unit->getKillCount();
 }
 
+void Agent::updateBoredom()
+{
+	if (!isEngaged)
+	{
+		boredom++;
+		if (boredom > 180)
+			coalition->removeAgent(this);
+		return;
+	}
+
+	boredom = 0;	
+}
+
 void Agent::updateBoundActions()
 {
 	if (!task)
@@ -219,14 +233,15 @@ void Agent::updateBoundActions()
 
 	auto inRange = unit->getUnitsInRadius(unit->getType().sightRange(), BWAPI::Filter::IsNeutral && !BWAPI::Filter::IsInvincible);
 
-	for (auto& neutralUnit : inRange)
+	for (auto &neutralUnit : inRange)
 	{
 		if (attack(neutralUnit))
 			break;
 	}
 
-	updateEngagement();
+	updateEngagement(); 
 	updateKillCount();
+	updateBoredom();
 }
 
 void Agent::updateFreeActions()
@@ -240,13 +255,13 @@ void Agent::updateFreeActions()
 	{
 		BWAPI::SetContainer<BWAPI::UnitType> addonList;
 
-		for (auto unitType : unit->getType().buildsWhat())
+		for (auto &unitType : unit->getType().buildsWhat())
 			if (unitType.isAddon())
 				addonList.insert(unitType);
 
 		if (addonList.size() > 1)
 		{
-			for (auto& task : TaskHelper::getAllTasks())
+			for (auto &task : TaskHelper::getAllTasks())
 			{
 				if (task->getType() == CRU)
 				{
@@ -314,9 +329,17 @@ void Agent::updateActions()
 	if (unit->getType().isBuilding())
 		unit->setRallyPoint(unit->getClosestUnit(BWAPI::Filter::IsResourceDepot && BWAPI::Filter::IsOwned));
 	
-	if (unit->isUnderAttack())
+	if (unit->isUnderAttack() && !MapHelper::getZone(unit->getRegion())->isDefending())
 	{
-		if ((unit->getType().isBuilding() || unit->getUnitsInRadius(unit->getType().sightRange(), (BWAPI::Filter::IsBuilding || BWAPI::Filter::IsBeingConstructed) && BWAPI::Filter::IsOwned).size() > 0) && !MapHelper::getZone(unit->getRegion())->isDefending())
+		if (task)
+		{
+			if (task->getType() == EXP)
+			{
+				Defend* defend = new Defend(unit);
+				TaskHelper::addTask(defend, true);
+			}
+		}
+		else if ((unit->getType().isBuilding() || unit->getUnitsInRadius(unit->getType().sightRange(), (BWAPI::Filter::IsBuilding || BWAPI::Filter::IsBeingConstructed) && BWAPI::Filter::IsOwned).size() > 0))
 		{
 			Defend* defend = new Defend(unit);
 			TaskHelper::addTask(defend, true);

@@ -54,13 +54,13 @@ public:
 	}
 
 	//getters
-	Zone* getTarget()						{ return target; }
+	Zone* getTarget() const					{ return target; }
 	virtual bool Task::isComplete() const	{ return complete; }
 	TaskType getType() const				{ return taskType; }
 	int getID() const						{ return taskID; }
 	std::string getName() const				{ return taskName; }
-	Taskset& getSubTasks()					{ return subTasks; }
-	Taskset& getSuperTasks()				{ return superTasks; }
+	const Taskset& getSubTasks()			{ return subTasks; }
+	const Taskset& getSuperTasks()			{ return superTasks; }
 	virtual Coalition* getCoalition() const { return coalition; }
 	virtual double getCost();	
 	virtual double getProfit()				{ return profit; }

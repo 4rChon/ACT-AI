@@ -29,7 +29,7 @@ namespace MapHelper
 		loadMapData();
 	}
 
-	const BuildingPlacer* getBuildingPlacer()
+	BuildingPlacer* getBuildingPlacer()
 	{
 		return bp;
 	}
@@ -50,7 +50,7 @@ namespace MapHelper
 		return nullptr;
 	}
 
-	Field& getRegionField()
+	const Field& getRegionField()
 	{
 		return regionField;
 	}

@@ -41,7 +41,7 @@ void Worker::unsetMiningBase()
 	gasMiner = false;
 }
 
-void Worker::setMiningBase(ResourceDepot* miningBase, bool gasMiner)
+void Worker::setMiningBase(ResourceDepot* const& miningBase, bool gasMiner)
 {
 	unsetMiningBase();
 
@@ -105,11 +105,11 @@ void Worker::act()
 
 bool Worker::build(BWAPI::UnitType building, BWAPI::TilePosition* desiredPosition)
 {	
-	const BuildingPlacer* bp = MapHelper::getBuildingPlacer();	
+	BuildingPlacer* bp = MapHelper::getBuildingPlacer();	
 	if (!BWAPI::Broodwar->canMake(building, unit))
 		return false;
 
-	if (EconHelper::haveMoney(building) && !unit->isConstructing())
+	if (EconHelper::haveMoney(building.mineralPrice() - reservedMinerals, building.gasPrice() - reservedGas) && !unit->isConstructing())
 	{
 		if (reservedMinerals + reservedGas == 0)
 			reserveResources(building.mineralPrice(), building.gasPrice());

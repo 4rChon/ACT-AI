@@ -113,12 +113,9 @@ namespace util
 	void initialiseUtil();
 
 	namespace calc
-	{
-		//Normalises an array of values after weighing them with coefficients
-		double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr);
-
+	{		
+		double normaliseValues(std::vector<double> valueArr, std::vector<double> coeffArr);	//Normalises an array of values after weighing them with coefficients
 		double normaliseDistance(BWAPI::Position pos1, BWAPI::Position pos2);
-
 		double getRandom(int min, int max);
 
 		BWAPI::UnitType getRandomType(Composition composition);
@@ -128,24 +125,15 @@ namespace util
 	namespace game
 	{
 		void setSelf();
-
 		void setStartLocation();
-
 		void setEnemy();
+		
+		BWAPI::Playerset &getEnemies();	//Returns all enemies		
+		BWAPI::Player getEnemy();		//Returns first enemy		
+		BWAPI::Player getSelf();		//Returns player
+		BWAPI::TilePosition getStartLocation();		
 
-		//Returns all enemies
-		BWAPI::Playerset &getEnemies();
-
-		//Returns first enemy
-		BWAPI::Player getEnemy();
-
-		//Returns player
-		BWAPI::Player getSelf();
-
-		BWAPI::TilePosition getStartLocation();
-
-		//Returns player name
-		std::string getSelfName();
+		std::string getSelfName();		//Returns player name
 		bool canMakeUnit(BWAPI::UnitType unitType);
 		bool canResearch(BWAPI::TechType techType);
 
