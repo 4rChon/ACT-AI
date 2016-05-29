@@ -206,7 +206,7 @@ void Agent::updateBoredom()
 	if (!isEngaged)
 	{
 		boredom++;
-		if (boredom > 180)
+		if (boredom > 300)
 			coalition->removeAgent(this);
 		return;
 	}
@@ -241,7 +241,8 @@ void Agent::updateBoundActions()
 
 	updateEngagement(); 
 	updateKillCount();
-	updateBoredom();
+	if(task->getType() == ATT)
+		updateBoredom();
 }
 
 void Agent::updateFreeActions()

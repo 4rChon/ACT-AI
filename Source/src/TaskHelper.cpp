@@ -18,8 +18,8 @@ namespace TaskHelper
 		nextID = 0;
 		
 		/* optional opening */
-		//CreateUnit* createUnit = new CreateUnit(...);
-		//addTask(createUnit, true);
+		CreateUnit* createUnit = new CreateUnit(BWAPI::UnitTypes::Terran_Comsat_Station);
+		addTask(createUnit, true);
 	}
 
 	int getNextID()

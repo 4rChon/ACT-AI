@@ -225,13 +225,13 @@ namespace util
 		void serializeComposition(CompositionHelper::UsedComposition usedComposition)
 		{
 			std::ofstream compStream;
-
-			auto directory = "ai-data\\" + game::getEnemy()->getRace().getName() + "\\compositions\\";
+			
 			int avgActivationFrame = usedComposition.activationFrame;
 			if (usedComposition.useCount > 0)
 				avgActivationFrame = (int)((double)usedComposition.activationFrame / usedComposition.useCount);
 			int frameBracket = game::getFrameBracket(avgActivationFrame, 7200);
-			auto fileName = std::to_string(frameBracket) + "_" + std::to_string(clock()) + "_" + std::to_string(usedComposition.taskType);
+			auto directory = "ai-data\\" + game::getEnemy()->getRace().getName() + "\\compositions\\";
+			auto fileName = std::to_string(frameBracket) + "_" + std::to_string(usedComposition.taskType);
 
 			compStream.open(directory + fileName + ".comp", std::ios::binary | std::ios::out);
 
@@ -334,9 +334,7 @@ namespace util
 		{
 			std::ofstream dataStream;
 
-			auto directory = "ai-data\\" + game::getEnemy()->getRace().getName() + "\\maps\\";
-			auto fileName = BWAPI::Broodwar->mapHash();
-			auto target = directory + fileName;
+			auto target = getTarget(BWAPI::Broodwar->mapHash(), "maps");
 
 			dataStream.open(target, std::ios::binary | std::ios::out);			
 
@@ -347,8 +345,6 @@ namespace util
 
 				dataStream.write((char*)&zoneID, sizeof(zoneID));
 				dataStream.write((char*)&defenseCount, sizeof(defenseCount));
-
-				//std::cout << "ZoneID : " << zoneID << " | dCount : " << defenseCount << "\n";
 			}			
 
 			dataStream.close();			
@@ -356,9 +352,7 @@ namespace util
 
 		std::map<int, int> deserializeMapData()
 		{	
-			auto directory = "ai-data\\" + game::getEnemy()->getRace().getName() + "\\maps\\";
-			auto fileName = BWAPI::Broodwar->mapHash();
-			auto target = directory + fileName;
+			auto target = getTarget(BWAPI::Broodwar->mapHash(), "maps");
 
 			std::map<int, int> zoneDefenseMap;
 
@@ -385,5 +379,136 @@ namespace util
 
 			return zoneDefenseMap;
 		}
+
+		int loadIteration()
+		{
+			auto target = getTarget("iteration", "data");
+
+			if (!fs::exists(target))
+				return 0;
+
+			std::ifstream dataStream;
+			dataStream.open(target, std::ios::binary | std::ios::in);
+
+			int iteration;
+			dataStream.read((char*)&iteration, sizeof(iteration));
+			dataStream.close();
+			return iteration;
+		}
+
+		void saveIteration(int iteration)
+		{
+			auto target = getTarget("iteration", "data");
+			std::ofstream dataStream;
+			dataStream.open(target, std::ios::binary | std::ios::out);
+
+			dataStream.write((char*)&iteration, sizeof(iteration));
+			dataStream.close();
+		}
+
+		const std::string getTarget(const std::string filename, const std::string folderName)
+		{
+			auto directory = "ai-data\\" + game::getEnemy()->getRace().getName() + "\\" + folderName + "\\";
+			return directory + filename;
+		}
+	}
+
+	namespace eval
+	{
+		namespace
+		{
+			static int iteration = 9;
+		}
+		//(result, time)
+		void logResult(bool isWinner)
+		{
+			auto target = data::getTarget("winrate.csv", "data");
+			std::ofstream datastream;
+			datastream.open(target, std::ios::out | std::ios::app);
+
+			//int iteration = 9;// data::loadIteration();
+			int seconds = int(game::getFrameBracket(BWAPI::Broodwar->getFrameCount(), 24*60) / 24);
+			int winner = 0;
+			if (isWinner)
+				winner = 1;
+			datastream << winner << "," << seconds << ","<< iteration <<"\n";
+			datastream.close();
+		}
+
+		//(scoreRatio, iteration)
+		void logScoreRatio()
+		{
+
+		}
+
+		//(income, time)
+		void logIncome(double income)
+		{
+			auto target = data::getTarget("incomeRate.csv", "data");
+			std::ofstream datastream;
+			datastream.open(target, std::ios::out | std::ios::app);
+
+			int seconds = int(BWAPI::Broodwar->getFrameCount() / 24);
+			datastream << income << "," << seconds << "\n";
+			datastream.close();
+
+		}
+
+		//(expansion, time)
+		void logExpansion(int expansionCount)
+		{
+			auto target = data::getTarget("expansionTimings.csv", "data");
+			std::ofstream datastream;
+			datastream.open(target, std::ios::out | std::ios::app);
+
+			int seconds = int(BWAPI::Broodwar->getFrameCount() / 24);
+			datastream << expansionCount << "," << seconds << "\n";
+			datastream.close();
+		}
+
+		//(composition, iteration)
+		void logCompositionFitness()
+		{
+			//iteration = 9;//data::loadIteration();			
+			std::cout << "Iteration number << " << iteration << "\n";
+			auto target = data::getTarget("fitnessHistory.txt", "data");
+			std::ofstream dataStream;
+			dataStream.open(target, std::ios::out | std::ios::app);
+
+			double fitness = 0;
+			for (auto composition : CompositionHelper::getCompositionSet())
+				fitness += composition.fitness;
+			if(fitness > 0)
+				fitness /= CompositionHelper::getCompositionSet().size();
+			
+			std::cout << "Average Fitness " << fitness << "\n";
+			dataStream << iteration << "," << fitness << "\n";
+			dataStream.close();
+			//iteration++;
+			//data::saveIteration(2);
+		}
+
+		//(position(x, y), defenseCount)
+		void logDefenseMap(MapHelper::Field field)
+		{						
+			auto target = data::getTarget("defenseMap.csv", "data");
+
+			std::ofstream dataStream;
+			dataStream.open(target, std::ios::out);
+
+			for (auto &zone : field)
+			{
+				BWAPI::TilePosition tilePos = BWAPI::TilePosition(zone->getRegion()->getCenter());
+				int posX = tilePos.x;
+				int posY = tilePos.y;
+				int defenseCount = zone->getTimesDefended();
+
+				std::ofstream readableStream;
+				
+				dataStream << posX << "," << posY << "," << defenseCount << "\n";
+			}
+			dataStream.close();
+		}
+
 	}
 }

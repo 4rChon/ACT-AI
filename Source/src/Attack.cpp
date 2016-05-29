@@ -29,11 +29,8 @@ void Attack::act()
 {	
 	printDebugInfo("Acting");
 
-	if (util::game::getSelf()->supplyUsed() >= 400 && coalition->getAge() > 24 * 60)
-	{
-		printDebugInfo("Coalition is " + std::to_string(coalition->getAge()) + " frames old", true);
+	if (util::game::getSelf()->supplyUsed() >= 400 && coalition->getAge() > 24 * 10)
 		coalition->activate();
-	}
 
 	if (coalition->isActive())
 	{		

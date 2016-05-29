@@ -42,6 +42,8 @@ void SwarmCAT::onStart()
 	std::cout << " ---------------- MATCH START ----------------\n";
 	Broodwar << "The map is " << Broodwar->mapName() << "!" << std::endl;
 
+	Broodwar->setLocalSpeed(0);
+	//Broodwar->setGUI(false);
 	Broodwar->enableFlag(Flag::UserInput);
 
 	//Broodwar->enableFlag(Flag::CompleteMapInformation);
@@ -77,13 +79,20 @@ void SwarmCAT::onStart()
 		DesireHelper::initialiseHelper();
 		TaskHelper::initialiseHelper();
 		ArmyHelper::initialiseHelper();
+		
 	}
 }
 
 void SwarmCAT::onEnd(bool isWinner)
 {
 	CompositionHelper::saveCompositions();
-	MapHelper::saveMapData();
+	if (!BWAPI::Broodwar->isReplay())
+	{
+		MapHelper::saveMapData();
+		util::eval::logCompositionFitness();
+		util::eval::logResult(isWinner);
+	}
+
 	/*TaskHelper::deleteTaskTree(TaskHelper::getRootTasks());
 	for(auto &coalition : CoalitionHelper::getCoalitionset())
 		CoalitionHelper::removeCoalition(coalition);*/
@@ -94,8 +103,13 @@ void SwarmCAT::onFrame()
 {
 	if (!Broodwar->isReplay())
 	{
+		if (BWAPI::Broodwar->getFrameCount() % (24 * 60) == 0)
+		{
+			auto player = util::game::getSelf();
+			util::eval::logIncome((player->gatheredMinerals() + player->gatheredGas()) - (player->spentGas() + player->spentMinerals()));
+		}
 		//std::cout << "---FrameStart---\n";	
-		drawDebugText();
+		//drawDebugText();
 		//Cancel unfinished structures if not being constructed by an scv.
 		if (util::game::getSelf()->incompleteUnitCount(BWAPI::UnitTypes::Buildings))
 		{			
@@ -167,7 +181,6 @@ void SwarmCAT::onFrame()
 	else
 	{
 		ReplayHelper::evolveFlaggedCompositions();
-		//ReplayHelper::showNextComposition();
 	}
 }
 
@@ -227,7 +240,6 @@ void SwarmCAT::onUnitDiscover(BWAPI::Unit unit)
 {
 	if (!Broodwar->isReplay())
 	{
-		//std::cout << "UnitDiscover\n";
 		if (unit->getType().isBuilding() && unit->getPlayer() == util::game::getEnemy())
 			ArmyHelper::addTargetPriority(unit);
 	}
@@ -235,33 +247,25 @@ void SwarmCAT::onUnitDiscover(BWAPI::Unit unit)
 
 void SwarmCAT::onUnitEvade(BWAPI::Unit unit)
 {
-	//std::cout << "UnitEvade\n";
 }
 
 void SwarmCAT::onUnitShow(BWAPI::Unit unit)
 {
-	////std::cout << "UnitShow\n";
 	if (!Broodwar->isReplay())
 	{
 		if (unit->getPlayer() == util::game::getEnemy())
 			ArmyHelper::addScoutedUnit(unit->getID(), unit->getType());
 	}
-
-	
-	//if (unit->getType() == BWAPI::UnitTypes::Zerg_Lurker || unit->getType().hasPermanentCloak())
-	//	ArmyHelper::scan(unit->getPosition());
 }
 
 void SwarmCAT::onUnitHide(BWAPI::Unit unit)
 {	
-	//std::cout << "UnitHide\n";
 }
 
 void SwarmCAT::onUnitCreate(BWAPI::Unit unit)
 {
 	if (!Broodwar->isReplay())
 	{
-		//std::cout << unit->getID() << " : " << unit->getType().c_str() << " : Unit created!\n";
 		if (unit->getPlayer() == util::game::getSelf() && !(unit->getType().supplyProvided() == 16 || unit->getType().isBuilding()))
 			DesireHelper::updateSupplyDesire(unit->getType());
 
@@ -283,7 +287,6 @@ void SwarmCAT::onUnitDestroy(BWAPI::Unit unit)
 {	
 	if (!Broodwar->isReplay())
 	{
-		//std::cout << unit->getID() << " : " << unit->getType().c_str() << " : Unit destroyed!\n";
 		if (unit->getPlayer() == util::game::getSelf() && !unit->isBeingConstructed())
 		{
 			if (unit->getType() == BWAPI::UnitTypes::Terran_Bunker)
@@ -332,7 +335,6 @@ void SwarmCAT::onUnitMorph(BWAPI::Unit unit)
 {
 	if (!Broodwar->isReplay())
 	{
-		//std::cout << unit->getID() << " : Unit morphed!\n";
 		if (Broodwar->isReplay())
 		{
 			// if we are in a replay, then we will print out the build order of the structures
@@ -349,7 +351,6 @@ void SwarmCAT::onUnitMorph(BWAPI::Unit unit)
 
 void SwarmCAT::onUnitRenegade(BWAPI::Unit unit)
 {
-	//std::cout << "UnitRenegade\n";
 }
 
 void SwarmCAT::onSaveGame(std::string gameName)
@@ -361,11 +362,15 @@ void SwarmCAT::onUnitComplete(BWAPI::Unit unit)
 {
 	if (!Broodwar->isReplay())
 	{
-		//std::cout << unit->getID() << " : Unit complete!\n";
 		if (unit->getPlayer() == util::game::getSelf())
 		{			
 			if (unit->getType().isResourceDepot())
+			{
 				DesireHelper::updateSupplyDesire(unit->getType());
+				int unitCount = util::game::getSelf()->allUnitCount(unit->getType());
+				if( unitCount > 1)
+					util::eval::logExpansion(unitCount -1);
+			}
 			AgentHelper::createAgent(unit);
 
 			auto unitZone = MapHelper::getZone(unit->getRegion()); 			

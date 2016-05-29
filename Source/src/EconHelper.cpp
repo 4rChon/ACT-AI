@@ -107,7 +107,6 @@ namespace EconHelper
 
 	double getUnitMultiplier(Composition composition)
 	{
-		//double gasCostPerMinute = 0;
 		double minCostPerMinute = 0;
 		auto unitMap = composition.getUnitMap();
 		int min = 0;
@@ -121,26 +120,11 @@ namespace EconHelper
 		{
 			double unitCount = ((double)composition[unitType] / min);
 			double minCost = unitType.mineralPrice() + unitType.whatBuilds().first.mineralPrice();
-			//double gasCost = unitType.gasPrice() + unitType.whatBuilds().first.gasPrice();
 			double buildTimeInMinutes = ((double)(unitType.buildTime() + unitType.whatBuilds().first.buildTime()) / (24 * 60)) * unitCount;
 			minCostPerMinute += (minCost / buildTimeInMinutes) * unitCount;
-			//gasCostPerMinute += (gasCost / buildTimeInMinutes) * unitCount;
 		}
 		
-		double mineralRatio = double(getMinerals() + getMineralIncome()) / minCostPerMinute;		
-		//double gasRatio = double(getGas() + getGasIncome()) / gasCostPerMinute;
-		std::cout << "Mineral Ratio: " << mineralRatio << " : " << getMinerals() << " + " << getMineralIncome() << " / " << minCostPerMinute << "\n";
-		//std::cout << "Gas Ratio: " << gasRatio << "\n";
-
-		//if (mineralRatio > 40) mineralRatio = 40;
-		//if (gasRatio > 40) gasRatio = 40;
-
-		//double ratio = std::max(mineralRatio, gasRatio);
-
-		//if (getGasIncome() == 0 && getGas() == 0)
-		double ratio = mineralRatio;
-
-		std::cout << "Ratio: " << ratio << "\n";
+		double ratio = double(getMinerals() + getMineralIncome()) / minCostPerMinute;
 		return ratio;
 	}
 

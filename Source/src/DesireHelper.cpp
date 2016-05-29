@@ -164,8 +164,14 @@ namespace DesireHelper
 			return BWAPI::UnitTypes::None;
 
 		if (producer == util::game::getSelf()->getRace().getCenter())
+		{
 			if (util::game::getSelf()->allUnitCount(util::game::getSelf()->getRace().getWorker()) < 70)
 				return util::game::getSelf()->getRace().getWorker();
+			else
+				return BWAPI::UnitTypes::None;
+		}
+
+
 
 		auto bestUnit = std::pair<BWAPI::UnitType, double>(BWAPI::UnitTypes::None, 0.0);		
 

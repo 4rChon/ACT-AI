@@ -127,6 +127,8 @@ void ResourceDepot::addGasWorker(Worker* const& worker)
 
 void ResourceDepot::removeWorker(Worker* const& worker)
 {
+	if (baseLocation == nullptr)
+		return;
 	if (workers.count(worker) > 0)
 	{
 		if (worker->isMiningGas())

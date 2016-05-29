@@ -62,7 +62,8 @@ int Coalition::getAge() const
 {
 	if(!active)
 		return BWAPI::Broodwar->getFrameCount() - creationFrame;
-	return BWAPI::Broodwar->getFrameCount() - activationFrame;
+	std::cout << "Creation Frame " << creationFrame << "\n";
+	return activationFrame - creationFrame;
 }
 
 double Coalition::getCost()
@@ -93,7 +94,7 @@ double Coalition::getFitness()
 {
 	std::vector<double> valueArr;
 	std::vector<double> coeffArr;
-	valueArr.push_back(profit/cost);
+	valueArr.push_back(getProfit()/getCost());
 	coeffArr.push_back(0.1);
 	return util::calc::normaliseValues(valueArr, coeffArr);
 }

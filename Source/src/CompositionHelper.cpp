@@ -33,8 +33,6 @@ namespace CompositionHelper
 
 	Composition getComposition(TaskType taskType)
 	{ 
-		if(taskType == ATT)
-			std::cout << "Getting Composition for Attack Type\n";
 		//return best composition for tasktype
 		std::vector<UsedComposition> candidateSet;
 		for each(auto &usedComposition in compositionSet)
@@ -48,8 +46,6 @@ namespace CompositionHelper
 
 		if (candidateSet.size() > 0)
 		{
-			if (taskType == ATT)
-				std::cout << "Found " << candidateSet.size() << " Candidates\n";
 			auto scoutedUnits = ArmyHelper::getScoutedUnits();
 			//scoutedUnits.debugInfo();
 			for (auto &unitType : scoutedUnits.getTypes())
@@ -57,49 +53,31 @@ namespace CompositionHelper
 				auto counters = getCounters(unitType);
 				for (auto &it = candidateSet.begin(); it != candidateSet.end();)
 				{
-					if (taskType == ATT)
-						std::cout << "Iterating Candidate Sets\n";
 					bool canCounter = false;
 					//if usedComposition contains at least one counter...
 					for (auto &counterType : counters.getTypes())
 					{
-						if (taskType == ATT)
-							std::cout << "Testing Candidate Set for Counters\n";
 						if ((*it).composition[counterType] > 0)
 						{
-							if (taskType == ATT)
-								std::cout << "can counter\n";
-							
 							canCounter = true;
 							break;
 						}
 					}
 
 					if (!canCounter)
-					{
-						if (taskType == ATT)
-							std::cout << "Can't counter\nErasing iterator\n";
 						it = candidateSet.erase(it);
-					}
 					else
-					{
-						if (taskType == ATT)
-							std::cout << "Incrementing iterator\n";
 						it++;
-					}
 				}
 			}
 		}
 		else
 		{
-			if (taskType == ATT)
-				std::cout << "Found no Candidates\n";
 			Composition c;
 			switch (taskType)
 			{
 			case ATT:
 			{
-				std::cout << "Getting new Attack composition\n";
 				c.addType(BWAPI::UnitTypes::Terran_Marine);
 				c.addType(BWAPI::UnitTypes::Terran_Medic);
 				return c;
@@ -125,7 +103,6 @@ namespace CompositionHelper
 			}
 			default:
 			{
-				std::cout << "Getting new Default?? composition\n";
 				c.addType(BWAPI::UnitTypes::Terran_Marine);
 				c.addType(BWAPI::UnitTypes::Terran_Medic);
 				return c;
@@ -133,23 +110,13 @@ namespace CompositionHelper
 			}
 		}
 
-		if (taskType == ATT)
-			std::cout << "Choosing Candidate with highest fitness\n";
 		auto bestComposition = *candidateSet.begin();
 		for (auto &candidate : candidateSet)
 		{
-			if (taskType == ATT)
-				std::cout << "Iterating over candidates\n";
 			if (candidate.fitness > bestComposition.fitness)
-			{
-				if (taskType == ATT)
-					std::cout << "Assigning Candidate\n";
 				bestComposition = candidate;
-			}
 		}
 
-		if (taskType == ATT)
-			std::cout << "Returning best composition\n";
 		return bestComposition.composition;
 	}
 
@@ -295,7 +262,12 @@ namespace CompositionHelper
 			1
 		};
 
-		workingSet.push_back(usedComposition);
+		std::cout << "\n\nActivationFrame: \t\t" << usedComposition.activationFrame << "\n";
+		std::cout << "\n\nCost: \t\t" << coalition->getCost() << "\n";
+		std::cout << "\n\nProfit: \t\t" << coalition->getProfit() << "\n";
+		std::cout << "\n\nFitness: \t\t" << usedComposition.fitness << "\n";
+
+		saveComposition(usedComposition);
 	}
 
 	void saveComposition(UsedComposition usedComposition)

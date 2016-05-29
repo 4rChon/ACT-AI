@@ -20,7 +20,7 @@ private:
 	bool active;						//True if currentComp >= targetComp
 	bool focusFire;
 	int const creationFrame;			//Set to first frame of coalition's existence	
-	int activationFrame;			//Set to first frame of coalition's activation	
+	int activationFrame;				//Set to first frame of coalition's activation	
 	int const coalitionID;				//coalitioniD - obtained from CoalitionHelper	
 	double cost;						//Current coalition money and time cost	
 	double profit;						//Current coalition profit	
@@ -38,7 +38,7 @@ public:
 
 	///getters		
 	int getAge() const;							//Get frame count for coalition creation. If coalition is active, get activation time for coalition.	
-	int getActivationFrame() const		{ return activationFrame; }
+	int getActivationFrame() const		{ std::cout << "Creation Frame " << creationFrame << "\n"; return activationFrame; }
 	int getID() const					{ return coalitionID; }	//Get a unique coalition ID.	
 	double getCost();							//Get the cost of the coalition so far.	
 	double getProfit();							//Get the profit of the coalition so far.	

@@ -23,10 +23,8 @@ CreateCoalition::CreateCoalition(Composition composition, Task* const& task)
 				adjustedComposition.addType(unit.first, unitCount);
 			}
 		}
+		std::cout << "Ratio: " << multiplier << "\n";
 		composition = adjustedComposition;
-		std::cout << "Composition\n";
-		composition.printDebugInfo();
-		std::cout << "Composition Multiplier : " << multiplier << "\n";
 	}
 	
 	taskCoalition = CoalitionHelper::addCoalition(composition, task);

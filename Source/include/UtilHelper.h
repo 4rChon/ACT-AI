@@ -148,5 +148,18 @@ namespace util
 		CompositionHelper::UsedComposition deserializeComposition(std::string target);
 		void serializeMapData(MapHelper::Field regionField);
 		std::map<int, int> deserializeMapData();
+		int loadIteration();		
+		void saveIteration(int iteration);
+		const std::string getTarget(const std::string filename, const std::string folderName);
+	}
+
+	namespace eval
+	{
+		void logResult(bool isWinner);			//(result, time)
+		void logScoreRatio();					//(scoreRatio, time)
+		void logIncome(double income);			//(income, time)
+		void logExpansion(int expansionCount);	//(expansion, time)
+		void logCompositionFitness();			//(composition, iteration)
+		void logDefenseMap(MapHelper::Field field); //(position(x, y), defenseCount)
 	}
 }

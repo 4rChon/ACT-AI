@@ -75,5 +75,6 @@ namespace MapHelper
 		}
 
 		util::data::serializeMapData(regionField);
+		util::eval::logDefenseMap(regionField);
 	}
 }
