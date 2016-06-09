@@ -51,8 +51,7 @@
 <h2>
 <a id="what-are-agents" class="anchor" href="#what-are-agents" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are Agents?</h2>
 
-<p>Each unit in the game is represented by an agent capable of acting autonomously according to the unit's capabilities. The set of decisions that an agent can make are directly mapped to a unit's possible actions. Each individual agent has a separate weight mapped to each action. This mapping changes according to the state of the game. In order to prevent agents from ignoring current
-abstract tasks, a freewill parameter that modifies the likelihood of autonomous action is assigned at agent creation.</p>
+<p>Each unit in the game is represented by an agent capable of acting autonomously according to the unit's capabilities. The set of decisions that an agent can make are directly mapped to a unit's possible actions.
 
 <h2>
 <a id="what-are-tasks" class="anchor" href="#what-are-tasks" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>What are Tasks?</h2>
@@ -63,14 +62,15 @@ abstract tasks, a freewill parameter that modifies the likelihood of autonomous 
 <li><p>Attack : An Attack task is initialised with a composition and a target location.  The task is complete when the designated location's enemy score is below a certain threshold.  The death of all units in the assigned coalition leads to failure of the
 task.</p></li>
 <li><p>Defend : If an agent is not assigned to any coalition, it will automatically take part in defending. A Defend task ends when the match is over, with its success depending  on  whether  the  player  has  won  or  lost  the game. </p></li>
+<li><p>Scout : Sends a unit to gather information from a specified location.</p></li>
+<li><p>Expand : Expanding is essential in increasing income. Town Hall agents are capable of initiating this task by looking at the worker saturation levels at the respective mining location.</p></li>
 </ul>
+
 
 <p>In addition, a set of sub-tasks are used in order to aid the execution of the super-tasks.</p>
 
 <ul>
 <li><p>CreateCoalition : Creates a new coalition for the specified task with an applicable composition.</p></li>
-<li><p>Scout : Sends a unit to gather information from a specified location.</p></li>
-<li><p>Expand : Expanding is essential in increasing income. Town Hall agents are capable of initiating this task by looking at the worker saturation levels at the respective mining location.</p></li>
 <li><p>CreateUnit : Creates a coalition capable of producing a specified unit and commands the coalition to train the unit.</p></li>
 <li><p>ResearchTech : Equivalent of CreateUnit but for technology and upgrades.</p></li>
 <li><p>SatisfyRequirement : Called by CreateUnit and ResearchTech whenever the requirements  for  the  requested game entity have not yet been met.</p></li>
