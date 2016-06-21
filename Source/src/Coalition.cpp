@@ -62,7 +62,7 @@ int Coalition::getAge() const
 {
 	if(!active)
 		return BWAPI::Broodwar->getFrameCount() - creationFrame;
-	std::cout << "Creation Frame " << creationFrame << "\n";
+	//std::cout << "Creation Frame " << creationFrame << "\n";
 	return activationFrame - creationFrame;
 }
 
