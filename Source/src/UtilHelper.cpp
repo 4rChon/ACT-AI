@@ -417,11 +417,14 @@ namespace util
 	{
 		namespace
 		{
+			static bool log = false;
 			static int iteration = 9;
 		}
 		//(result, time)
 		void logResult(bool isWinner)
 		{
+			if (!log)
+				return;
 			auto target = data::getTarget("winrate.csv", "data");
 			std::ofstream datastream;
 			datastream.open(target, std::ios::out | std::ios::app);
@@ -438,12 +441,15 @@ namespace util
 		//(scoreRatio, iteration)
 		void logScoreRatio()
 		{
-
+			if (!log)
+				return;
 		}
 
 		//(income, time)
 		void logIncome(double income)
 		{
+			if (!log)
+				return;
 			auto target = data::getTarget("incomeRate.csv", "data");
 			std::ofstream datastream;
 			datastream.open(target, std::ios::out | std::ios::app);
@@ -457,6 +463,8 @@ namespace util
 		//(expansion, time)
 		void logExpansion(int expansionCount)
 		{
+			if (!log)
+				return;
 			auto target = data::getTarget("expansionTimings.csv", "data");
 			std::ofstream datastream;
 			datastream.open(target, std::ios::out | std::ios::app);
@@ -469,8 +477,10 @@ namespace util
 		//(composition, iteration)
 		void logCompositionFitness()
 		{
+			if (!log)
+				return;
 			//iteration = 9;//data::loadIteration();			
-			std::cout << "Iteration number << " << iteration << "\n";
+			//std::cout << "Iteration number << " << iteration << "\n";
 			auto target = data::getTarget("fitnessHistory.txt", "data");
 			std::ofstream dataStream;
 			dataStream.open(target, std::ios::out | std::ios::app);
@@ -491,6 +501,8 @@ namespace util
 		//(position(x, y), defenseCount)
 		void logDefenseMap(MapHelper::Field field)
 		{						
+			if (!log)
+				return;
 			auto target = data::getTarget("defenseMap.csv", "data");
 
 			std::ofstream dataStream;

@@ -26,6 +26,7 @@ using namespace BWAPI;
 using namespace Filter;
 
 bool analyzed = false;
+bool drawGui = false;
 auto currentTime = std::chrono::high_resolution_clock::now();
 
 DWORD WINAPI AnalyzeThread()
@@ -108,25 +109,28 @@ void SwarmCAT::onFrame()
 			auto player = util::game::getSelf();
 			util::eval::logIncome((player->gatheredMinerals() + player->gatheredGas()) - (player->spentGas() + player->spentMinerals()));
 		}
-		//std::cout << "---FrameStart---\n";	
-		//drawDebugText();
-		//Cancel unfinished structures if not being constructed by an scv.
-		if (util::game::getSelf()->incompleteUnitCount(BWAPI::UnitTypes::Buildings))
-		{			
-			auto unfinishedUnits = BWAPI::Broodwar->getUnitsInRectangle(Position(0, 0), Position(BWAPI::Broodwar->mapWidth() * TILE_SIZE, BWAPI::Broodwar->mapHeight() * TILE_SIZE), BWAPI::Filter::IsBuilding && !BWAPI::Filter::IsBeingConstructed && !BWAPI::Filter::IsCompleted);
-			unfinishedUnits.cancelConstruction();
-		}
+		//std::cout << "---FrameStart---\n";			
 
 		currentTime = std::chrono::high_resolution_clock::now();
 
 		if (Broodwar->isReplay() || Broodwar->isPaused() || !Broodwar->self())
 			return;
 
-		if (analyzed)
-			drawTerrainData();
-
+		
+		if (drawGui)
+			drawDebugText();
+		
+		if (analyzed && drawGui)
+			drawTerrainData();				
 		if (Broodwar->getFrameCount() % Broodwar->getLatencyFrames() != 0)
 			return;
+
+		//Cancel unfinished structures if not being constructed by an scv.
+		if (util::game::getSelf()->incompleteUnitCount(BWAPI::UnitTypes::Buildings))
+		{
+			auto unfinishedUnits = BWAPI::Broodwar->getUnitsInRectangle(Position(0, 0), Position(BWAPI::Broodwar->mapWidth() * TILE_SIZE, BWAPI::Broodwar->mapHeight() * TILE_SIZE), BWAPI::Filter::IsBuilding && !BWAPI::Filter::IsBeingConstructed && !BWAPI::Filter::IsCompleted);
+			unfinishedUnits.cancelConstruction();
+		}
 
 		auto &a = AgentHelper::getLastServiced();
 		while (a != AgentHelper::getAgentset().end())
@@ -215,6 +219,8 @@ void SwarmCAT::onSendText(std::string text)
 		else
 			std::cout << "No composition found\n";
 	}
+	if (text.compare(0, 8, "draw gui"))
+		drawGui = !drawGui;
 }
 
 void SwarmCAT::onReceiveText(BWAPI::Player player, std::string text)
